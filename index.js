@@ -30,9 +30,10 @@ const PAYSTACK_LINK = process.env.PAYSTACK_PAYMENT_LINK;
 async function sendMessage(to, body) {
   try {
     await twilioClient.messages.create({
-      from: TWILIO_NUMBER,
-      to: `whatsapp:${to}`,
-      body: body,
+  from: TWILIO_NUMBER,
+  to: `whatsapp:${to}`,
+  body: body,
+  messagingServiceSid: process.env.TWILIO_MESSAGING_SID || undefined,
     });
   } catch (err) {
     console.error('Send error:', err.message);
