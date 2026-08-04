@@ -86,7 +86,7 @@ async function handleOnboarding(phone, message) {
       active: 'false',
       streak: 0,
     });
-    await sendMessage(phone, 'Welcome to SkillStack NG! Learn copywriting in 90 days - 15 minutes a day. No app needed. Reply 1 to get started.');
+    await sendMessage(phone, 'Welcome to SkillStack NG! Learn copywriting in 90 days - 15 minutes a day, Monday to Friday. No app needed. Reply 1 to get started.');
     return;
   }
 
@@ -111,7 +111,7 @@ async function handleOnboarding(phone, message) {
     };
     const timePreference = timeMap[message.toUpperCase()];
     await supabase.from('subscribers').update({ time_preference: timePreference }).eq('phone', phone);
-    await sendMessage(phone, 'Set! Your lesson arrives every day at ' + message.toUpperCase() + '. To activate your subscription pay 3000 per month here: ' + PAYSTACK_LINK + ' Once paid reply DONE');
+    await sendMessage(phone, 'Set! Your lesson arrives Monday to Friday at ' + message.toUpperCase() + '. Weekends are practice days — no new lesson but your streak keeps running. To activate pay 5000 per month here: ' + PAYSTACK_LINK + ' Once paid reply DONE');
     return;
   }
 
@@ -141,8 +141,8 @@ async function handleOnboarding(phone, message) {
       return;
     }
     const feedback = await getFeedback(lesson.task, message, lesson.feedback_prompt);
-    await sendMessage(phone, 'Feedback on Day ' + sub.day_number + ':\n\n' + feedback + '\n\nStreak: ' + sub.streak + ' days. See you tomorrow!');
-    const nextDay = sub.day_number < 14 ? sub.day_number + 1 : sub.day_number;
+    await sendMessage(phone, 'Feedback on Day ' + sub.day_number + ':\n\n' + feedback + '\n\nStreak: ' + sub.streak + ' days. See you Monday!' );
+    const nextDay = sub.day_number < 35 ? sub.day_number + 1 : sub.day_number;
     await supabase.from('subscribers').update({
       day_number: nextDay,
       streak: sub.streak + 1,
@@ -169,6 +169,13 @@ cron.schedule('0 * * * *', async () => {
   const currentHour = now.getUTCHours();
   const currentMinute = now.getUTCMinutes();
   if (currentMinute > 5) return;
+
+  const watDay = new Date(now.getTime() + 60 * 60 * 1000).getDay();
+  if (watDay === 0 || watDay === 6) {
+    console.log('Weekend — no lessons today.');
+    return;
+  }
+
   const watHour = (currentHour + 1) % 24;
   const timeString = String(watHour).padStart(2, '0') + ':00';
   const { data: subscribers } = await supabase
@@ -187,6 +194,18 @@ cron.schedule('0 * * * *', async () => {
   }
 });
 
+cron.schedule('0 8 * * 6', async () => {
+  console.log('Sending Saturday review message...');
+  const { data: subscribers } = await supabase
+    .from('subscribers')
+    .select('*')
+    .eq('active', 'true');
+  if (!subscribers) return;
+  for (const sub of subscribers) {
+    await sendMessage(sub.phone, 'Weekend review time! No new lesson today ' + sub.name + ' — pick your favourite task from this week and rewrite it. See if you can improve it using what you learned. Your lessons resume Monday. Keep going!');
+  }
+});
+
 cron.schedule('0 9 * * *', async () => {
   console.log('Running re-engagement check...');
   const yesterday = new Date();
@@ -199,7 +218,10 @@ cron.schedule('0 9 * * *', async () => {
     .eq('last_active', yesterdayStr);
   if (!missedSubscribers) return;
   for (const sub of missedSubscribers) {
-    await sendMessage(sub.phone, 'Hey ' + sub.name + '! You missed yesterdays lesson Day ' + sub.day_number + '. Your streak is at ' + sub.streak + ' days. Reply CONTINUE and I will send yesterdays lesson now.');
+    const now = new Date();
+    const watDay = new Date(now.getTime() + 60 * 60 * 1000).getDay();
+    if (watDay === 0 || watDay === 6) continue;
+    await sendMessage(sub.phone, 'Hey ' + sub.name + '! You missed yesterday\'s lesson Day ' + sub.day_number + '. Your streak is at ' + sub.streak + ' days. Reply CONTINUE and I will send yesterday\'s lesson now.');
   }
 });
 
