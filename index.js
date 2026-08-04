@@ -24,17 +24,15 @@ const twilioClient = twilio(
 
 const TWILIO_NUMBER = process.env.TWILIO_WHATSAPP_NUMBER;
 const PAYSTACK_LINK = process.env.PAYSTACK_PAYMENT_LINK;
-const CONTENT_SID = process.env.TWILIO_CONTENT_SID;
 
 async function sendMessage(to, body) {
   try {
     await twilioClient.messages.create({
       from: TWILIO_NUMBER,
-      to: `whatsapp:${to}`,
-      contentSid: CONTENT_SID,
-      contentVariables: JSON.stringify({ "1": body }),
+      to: 'whatsapp:' + to,
+      body: body,
     });
-    console.log(`Sent to ${to}`);
+    console.log('Sent to ' + to);
   } catch (err) {
     console.error('Send error:', err.message);
   }
@@ -65,14 +63,14 @@ async function getFeedback(task, submission, feedbackPrompt) {
     max_tokens: 300,
     messages: [{
       role: 'user',
-      content: `${feedbackPrompt}\n\nLesson task: ${task}\n\nStudent submission: ${submission}`
+      content: feedbackPrompt + '\n\nLesson task: ' + task + '\n\nStudent submission: ' + submission
     }],
   });
   return message.content[0].text;
 }
 
 function formatLesson(lesson, dayNumber) {
-  return `Day ${dayNumber} of 90 - SkillStack NG\n\n${lesson.title}\n\n${lesson.content}\n\n---\nTODAY'S TASK\n${lesson.task}\n\nReply with your answer and I will give you personal feedback.`;
+  return 'Day ' + dayNumber + ' of 90 - SkillStack NG\n\n' + lesson.title + '\n\n' + lesson.content + '\n\n---\nTODAYS TASK\n' + lesson.task + '\n\nReply with your answer and I will give you personal feedback.';
 }
 
 async function handleOnboarding(phone, message) {
@@ -88,7 +86,7 @@ async function handleOnboarding(phone, message) {
       active: 'false',
       streak: 0,
     });
-    await sendMessage(phone, 'Welcome to SkillStack NG! You are about to learn copywriting in 90 days - 15 minutes a day. Reply 1 to get started.');
+    await sendMessage(phone, 'Welcome to SkillStack NG! Learn copywriting in 90 days - 15 minutes a day. No app needed. Reply 1 to get started.');
     return;
   }
 
@@ -101,12 +99,115 @@ async function handleOnboarding(phone, message) {
   if (sub.active === 'false' && sub.name === 'AWAITING') {
     const name = message.trim();
     await supabase.from('subscribers').update({ name: name }).eq('phone', phone);
-    await sendMessage(phone, `Nice to meet you ${name}! What time do you want your daily lesson? Reply: 6AM, 7AM, 8AM, 12PM, 6PM or 9PM`);
+    await sendMessage(phone, 'Nice to meet you ' + name + '! What time do you want your daily lesson? Reply: 6AM, 7AM, 8AM, 12PM, 6PM or 9PM');
     return;
   }
 
   const validTimes = ['6AM', '7AM', '8AM', '12PM', '6PM', '9PM'];
   if (sub.active === 'false' && sub.name !== '' && sub.name !== 'AWAITING' && validTimes.includes(message.toUpperCase())) {
-    const timeMap = { '6AM': '06:00', '7AM': '07:00', '8AM': '08:00', '12PM': '12:00', '6PM': '18:00', '9PM': '21:00' };
-    await supabase.from('subscribers').update({ time_preference: timeMap[message.toUpperCase()] }).eq('phone', phone);
-    await sendMessage(phone, `Set! Your lesson arrives every day at ${message.toUpperCase()}. To activate your subscription pay 3
+    const timeMap = {
+      '6AM': '06:00', '7AM': '07:00', '8AM': '08:00',
+      '12PM': '12:00', '6PM': '18:00', '9PM': '21:00'
+    };
+    const timePreference = timeMap[message.toUpperCase()];
+    await supabase.from('subscribers').update({ time_preference: timePreference }).eq('phone', phone);
+    await sendMessage(phone, 'Set! Your lesson arrives every day at ' + message.toUpperCase() + '. To activate your subscription pay 3000 per month here: ' + PAYSTACK_LINK + ' Once paid reply DONE');
+    return;
+  }
+
+  if (sub.active === 'false' && message.toUpperCase() === 'DONE') {
+    await supabase.from('subscribers').update({
+      active: 'true',
+      day_number: 1,
+      streak: 1,
+      last_active: new Date().toISOString().split('T')[0]
+    }).eq('phone', phone);
+    const lesson = await getLesson(1);
+    if (lesson) {
+      await sendMessage(phone, 'Payment confirmed! Welcome to SkillStack NG ' + sub.name + '. Your 90 day copywriting journey starts NOW. Here is Day 1:');
+      await sendMessage(phone, formatLesson(lesson, 1));
+    }
+    return;
+  }
+
+  if (sub.active === 'true' && sub.day_number > 0) {
+    const lesson = await getLesson(sub.day_number);
+    if (!lesson) {
+      await sendMessage(phone, 'You have completed all available lessons. More coming soon!');
+      return;
+    }
+    if (message.toUpperCase() === 'CONTINUE') {
+      await sendMessage(phone, formatLesson(lesson, sub.day_number));
+      return;
+    }
+    const feedback = await getFeedback(lesson.task, message, lesson.feedback_prompt);
+    await sendMessage(phone, 'Feedback on Day ' + sub.day_number + ':\n\n' + feedback + '\n\nStreak: ' + sub.streak + ' days. See you tomorrow!');
+    const nextDay = sub.day_number < 14 ? sub.day_number + 1 : sub.day_number;
+    await supabase.from('subscribers').update({
+      day_number: nextDay,
+      streak: sub.streak + 1,
+      last_active: new Date().toISOString().split('T')[0]
+    }).eq('phone', phone);
+    return;
+  }
+
+  await sendMessage(phone, 'Welcome back! Reply 1 to start your copywriting journey or DONE if you have already paid.');
+}
+
+app.post('/webhook', async (req, res) => {
+  res.status(200).send('OK');
+  const message = (req.body.Body || '').trim();
+  const from = (req.body.From || '').replace('whatsapp:', '');
+  if (!from || !message) return;
+  console.log('Message from ' + from + ': ' + message);
+  await handleOnboarding(from, message);
+});
+
+cron.schedule('0 * * * *', async () => {
+  console.log('Running hourly lesson check...');
+  const now = new Date();
+  const currentHour = now.getUTCHours();
+  const currentMinute = now.getUTCMinutes();
+  if (currentMinute > 5) return;
+  const watHour = (currentHour + 1) % 24;
+  const timeString = String(watHour).padStart(2, '0') + ':00';
+  const { data: subscribers } = await supabase
+    .from('subscribers')
+    .select('*')
+    .eq('active', 'true')
+    .eq('time_preference', timeString);
+  if (!subscribers || subscribers.length === 0) return;
+  const today = new Date().toISOString().split('T')[0];
+  for (const sub of subscribers) {
+    if (sub.last_active === today) continue;
+    const lesson = await getLesson(sub.day_number);
+    if (!lesson) continue;
+    await sendMessage(sub.phone, formatLesson(lesson, sub.day_number));
+    console.log('Sent lesson ' + sub.day_number + ' to ' + sub.phone);
+  }
+});
+
+cron.schedule('0 9 * * *', async () => {
+  console.log('Running re-engagement check...');
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = yesterday.toISOString().split('T')[0];
+  const { data: missedSubscribers } = await supabase
+    .from('subscribers')
+    .select('*')
+    .eq('active', 'true')
+    .eq('last_active', yesterdayStr);
+  if (!missedSubscribers) return;
+  for (const sub of missedSubscribers) {
+    await sendMessage(sub.phone, 'Hey ' + sub.name + '! You missed yesterdays lesson Day ' + sub.day_number + '. Your streak is at ' + sub.streak + ' days. Reply CONTINUE and I will send yesterdays lesson now.');
+  }
+});
+
+app.get('/', (req, res) => {
+  res.send('SkillStack NG bot is running');
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log('SkillStack NG running on port ' + PORT);
+});
