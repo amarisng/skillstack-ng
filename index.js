@@ -1,9 +1,9 @@
 const express = require('express');
-const twilio = require('twilio');
 const { createClient } = require('@supabase/supabase-js');
 const Anthropic = require('@anthropic-ai/sdk');
 const cron = require('node-cron');
 const path = require('path');
+const axios = require('axios');
 const app = express();
 
 app.use(express.urlencoded({ extended: false }));
@@ -19,25 +19,31 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
-const twilioClient = twilio(
-  process.env.TWILIO_SID,
-  process.env.TWILIO_AUTH_TOKEN
-);
-
-const TWILIO_NUMBER = process.env.TWILIO_WHATSAPP_NUMBER;
 const PAYSTACK_LINK = process.env.PAYSTACK_PAYMENT_LINK;
 const VERIFY_TOKEN = process.env.WEBHOOK_VERIFY_TOKEN || 'skillstack_verify_2024';
+const META_TOKEN = process.env.META_WHATSAPP_TOKEN;
+const META_PHONE_ID = process.env.META_PHONE_NUMBER_ID;
 
 async function sendMessage(to, body) {
   try {
-    await twilioClient.messages.create({
-      from: TWILIO_NUMBER,
-      to: 'whatsapp:' + to,
-      body: body,
-    });
+    await axios.post(
+      'https://graph.facebook.com/v19.0/' + META_PHONE_ID + '/messages',
+      {
+        messaging_product: 'whatsapp',
+        to: to,
+        type: 'text',
+        text: { body: body }
+      },
+      {
+        headers: {
+          'Authorization': 'Bearer ' + META_TOKEN,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
     console.log('Sent to ' + to);
   } catch (err) {
-    console.error('Send error:', err.message);
+    console.error('Send error:', err.response ? JSON.stringify(err.response.data) : err.message);
   }
 }
 
@@ -157,7 +163,6 @@ async function handleOnboarding(phone, message) {
   await sendMessage(phone, 'Welcome back! Reply 1 to start your copywriting journey or DONE if you have already paid.');
 }
 
-// Meta WhatsApp webhook verification
 app.get('/webhook', (req, res) => {
   const mode = req.query['hub.mode'];
   const token = req.query['hub.verify_token'];
@@ -170,7 +175,6 @@ app.get('/webhook', (req, res) => {
   }
 });
 
-// Meta WhatsApp incoming messages
 app.post('/webhook', async (req, res) => {
   res.status(200).send('OK');
   try {
@@ -188,14 +192,6 @@ app.post('/webhook', async (req, res) => {
           console.log('Meta message from ' + from + ': ' + text);
           await handleOnboarding(from, text);
         }
-      }
-    } else {
-      // Twilio fallback
-      const message = (req.body.Body || '').trim();
-      const from = (req.body.From || '').replace('whatsapp:', '');
-      if (from && message) {
-        console.log('Twilio message from ' + from + ': ' + message);
-        await handleOnboarding(from, message);
       }
     }
   } catch (err) {
