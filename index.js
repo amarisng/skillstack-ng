@@ -24,6 +24,7 @@ const VERIFY_TOKEN = process.env.WEBHOOK_VERIFY_TOKEN || 'skillstack_verify_2024
 const META_TOKEN = process.env.META_WHATSAPP_TOKEN;
 const META_PHONE_ID = process.env.META_PHONE_NUMBER_ID;
 
+// Send a free-form text message (works within 24-hour window)
 async function sendMessage(to, body) {
   try {
     await axios.post(
@@ -41,9 +42,36 @@ async function sendMessage(to, body) {
         }
       }
     );
-    console.log('Sent to ' + to);
+    console.log('Sent text to ' + to);
   } catch (err) {
     console.error('Send error:', err.response ? JSON.stringify(err.response.data) : err.message);
+  }
+}
+
+// Send the approved template to open a conversation
+async function sendLessonReadyTemplate(to) {
+  try {
+    await axios.post(
+      'https://graph.facebook.com/v19.0/' + META_PHONE_ID + '/messages',
+      {
+        messaging_product: 'whatsapp',
+        to: to,
+        type: 'template',
+        template: {
+          name: 'lesson_ready',
+          language: { code: 'en' }
+        }
+      },
+      {
+        headers: {
+          'Authorization': 'Bearer ' + META_TOKEN,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    console.log('Sent lesson_ready template to ' + to);
+  } catch (err) {
+    console.error('Template send error:', err.response ? JSON.stringify(err.response.data) : err.message);
   }
 }
 
@@ -139,16 +167,26 @@ async function handleOnboarding(phone, message) {
     return;
   }
 
+  // Active subscriber — check if they are requesting their lesson
   if (sub.active === 'true' && sub.day_number > 0) {
     const lesson = await getLesson(sub.day_number);
     if (!lesson) {
       await sendMessage(phone, 'You have completed all available lessons. More coming soon!');
       return;
     }
+
+    // Subscriber replied to lesson_ready template — send the full lesson
+    if (message.toUpperCase() === 'LESSON' || message.toUpperCase() === 'HI' || message.toUpperCase() === 'HELLO' || message.toUpperCase() === 'YES') {
+      await sendMessage(phone, formatLesson(lesson, sub.day_number));
+      return;
+    }
+
     if (message.toUpperCase() === 'CONTINUE') {
       await sendMessage(phone, formatLesson(lesson, sub.day_number));
       return;
     }
+
+    // Otherwise treat as task submission and give feedback
     const feedback = await getFeedback(lesson.task, message, lesson.feedback_prompt);
     await sendMessage(phone, 'Feedback on Day ' + sub.day_number + ':\n\n' + feedback + '\n\nStreak: ' + sub.streak + ' days. See you Monday!');
     const nextDay = sub.day_number < 65 ? sub.day_number + 1 : sub.day_number;
@@ -163,18 +201,20 @@ async function handleOnboarding(phone, message) {
   await sendMessage(phone, 'Welcome back! Reply 1 to start your copywriting journey or DONE if you have already paid.');
 }
 
+// Meta webhook verification
 app.get('/webhook', (req, res) => {
   const mode = req.query['hub.mode'];
   const token = req.query['hub.verify_token'];
   const challenge = req.query['hub.challenge'];
   if (mode === 'subscribe' && token === VERIFY_TOKEN) {
-    console.log('Webhook verified by Meta');
+    console.log('Webhook verified');
     res.status(200).send(challenge);
   } else {
     res.status(403).send('Forbidden');
   }
 });
 
+// Meta incoming messages
 app.post('/webhook', async (req, res) => {
   res.status(200).send('OK');
   try {
@@ -189,7 +229,7 @@ app.post('/webhook', async (req, res) => {
         const from = msg.from;
         const text = msg.text && msg.text.body;
         if (from && text) {
-          console.log('Meta message from ' + from + ': ' + text);
+          console.log('Message from ' + from + ': ' + text);
           await handleOnboarding(from, text);
         }
       }
@@ -199,6 +239,7 @@ app.post('/webhook', async (req, res) => {
   }
 });
 
+// Daily lesson scheduler — sends lesson_ready template
 cron.schedule('0 * * * *', async () => {
   console.log('Running hourly lesson check...');
   const now = new Date();
@@ -221,13 +262,12 @@ cron.schedule('0 * * * *', async () => {
   const today = new Date().toISOString().split('T')[0];
   for (const sub of subscribers) {
     if (sub.last_active === today) continue;
-    const lesson = await getLesson(sub.day_number);
-    if (!lesson) continue;
-    await sendMessage(sub.phone, formatLesson(lesson, sub.day_number));
-    console.log('Sent lesson ' + sub.day_number + ' to ' + sub.phone);
+    await sendLessonReadyTemplate(sub.phone);
+    console.log('Sent lesson_ready template to ' + sub.phone);
   }
 });
 
+// Saturday review message
 cron.schedule('0 8 * * 6', async () => {
   console.log('Sending Saturday review message...');
   const { data: subscribers } = await supabase
@@ -236,10 +276,11 @@ cron.schedule('0 8 * * 6', async () => {
     .eq('active', 'true');
   if (!subscribers) return;
   for (const sub of subscribers) {
-    await sendMessage(sub.phone, 'Weekend review time! No new lesson today ' + sub.name + ' — pick your favourite task from this week and rewrite it. Your lessons resume Monday. Keep going!');
+    await sendLessonReadyTemplate(sub.phone);
   }
 });
 
+// Re-engagement check
 cron.schedule('0 9 * * *', async () => {
   console.log('Running re-engagement check...');
   const yesterday = new Date();
@@ -255,7 +296,7 @@ cron.schedule('0 9 * * *', async () => {
     const now = new Date();
     const watDay = new Date(now.getTime() + 60 * 60 * 1000).getDay();
     if (watDay === 0 || watDay === 6) continue;
-    await sendMessage(sub.phone, 'Hey ' + sub.name + '! You missed yesterday\'s lesson Day ' + sub.day_number + '. Your streak is at ' + sub.streak + ' days. Reply CONTINUE and I will send yesterday\'s lesson now.');
+    await sendLessonReadyTemplate(sub.phone);
   }
 });
 
