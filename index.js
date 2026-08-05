@@ -26,6 +26,7 @@ const twilioClient = twilio(
 
 const TWILIO_NUMBER = process.env.TWILIO_WHATSAPP_NUMBER;
 const PAYSTACK_LINK = process.env.PAYSTACK_PAYMENT_LINK;
+const VERIFY_TOKEN = process.env.WEBHOOK_VERIFY_TOKEN || 'skillstack_verify_2024';
 
 async function sendMessage(to, body) {
   try {
@@ -113,7 +114,7 @@ async function handleOnboarding(phone, message) {
     };
     const timePreference = timeMap[message.toUpperCase()];
     await supabase.from('subscribers').update({ time_preference: timePreference }).eq('phone', phone);
-    await sendMessage(phone, 'Set! Your lesson arrives Monday to Friday at ' + message.toUpperCase() + '. Weekends are practice days — no new lesson but your streak keeps running. To activate pay 5000 per month here: ' + PAYSTACK_LINK + ' Once paid reply DONE');
+    await sendMessage(phone, 'Set! Your lesson arrives Monday to Friday at ' + message.toUpperCase() + '. Weekends are practice days. To activate pay 5000 per month here: ' + PAYSTACK_LINK + ' Once paid reply DONE');
     return;
   }
 
@@ -156,13 +157,50 @@ async function handleOnboarding(phone, message) {
   await sendMessage(phone, 'Welcome back! Reply 1 to start your copywriting journey or DONE if you have already paid.');
 }
 
+// Meta WhatsApp webhook verification
+app.get('/webhook', (req, res) => {
+  const mode = req.query['hub.mode'];
+  const token = req.query['hub.verify_token'];
+  const challenge = req.query['hub.challenge'];
+  if (mode === 'subscribe' && token === VERIFY_TOKEN) {
+    console.log('Webhook verified by Meta');
+    res.status(200).send(challenge);
+  } else {
+    res.status(403).send('Forbidden');
+  }
+});
+
+// Meta WhatsApp incoming messages
 app.post('/webhook', async (req, res) => {
   res.status(200).send('OK');
-  const message = (req.body.Body || '').trim();
-  const from = (req.body.From || '').replace('whatsapp:', '');
-  if (!from || !message) return;
-  console.log('Message from ' + from + ': ' + message);
-  await handleOnboarding(from, message);
+  try {
+    const body = req.body;
+    if (body.object === 'whatsapp_business_account') {
+      const entry = body.entry && body.entry[0];
+      const changes = entry && entry.changes && entry.changes[0];
+      const value = changes && changes.value;
+      const messages = value && value.messages;
+      if (messages && messages.length > 0) {
+        const msg = messages[0];
+        const from = msg.from;
+        const text = msg.text && msg.text.body;
+        if (from && text) {
+          console.log('Meta message from ' + from + ': ' + text);
+          await handleOnboarding(from, text);
+        }
+      }
+    } else {
+      // Twilio fallback
+      const message = (req.body.Body || '').trim();
+      const from = (req.body.From || '').replace('whatsapp:', '');
+      if (from && message) {
+        console.log('Twilio message from ' + from + ': ' + message);
+        await handleOnboarding(from, message);
+      }
+    }
+  } catch (err) {
+    console.error('Webhook error:', err.message);
+  }
 });
 
 cron.schedule('0 * * * *', async () => {
@@ -171,13 +209,11 @@ cron.schedule('0 * * * *', async () => {
   const currentHour = now.getUTCHours();
   const currentMinute = now.getUTCMinutes();
   if (currentMinute > 5) return;
-
   const watDay = new Date(now.getTime() + 60 * 60 * 1000).getDay();
   if (watDay === 0 || watDay === 6) {
     console.log('Weekend — no lessons today.');
     return;
   }
-
   const watHour = (currentHour + 1) % 24;
   const timeString = String(watHour).padStart(2, '0') + ':00';
   const { data: subscribers } = await supabase
@@ -204,7 +240,7 @@ cron.schedule('0 8 * * 6', async () => {
     .eq('active', 'true');
   if (!subscribers) return;
   for (const sub of subscribers) {
-    await sendMessage(sub.phone, 'Weekend review time! No new lesson today ' + sub.name + ' — pick your favourite task from this week and rewrite it. See if you can improve it using what you learned. Your lessons resume Monday. Keep going!');
+    await sendMessage(sub.phone, 'Weekend review time! No new lesson today ' + sub.name + ' — pick your favourite task from this week and rewrite it. Your lessons resume Monday. Keep going!');
   }
 });
 
