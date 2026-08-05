@@ -32,7 +32,6 @@
     overflow-x: hidden;
   }
 
-  /* HERO SECTION */
   .hero {
     display: flex;
     flex-direction: column;
@@ -90,9 +89,7 @@
     margin-bottom: 16px;
   }
 
-  .hero h1 span {
-    color: var(--wa-green);
-  }
+  .hero h1 span { color: var(--wa-green); }
 
   .hero p {
     font-size: clamp(15px, 2vw, 18px);
@@ -129,7 +126,6 @@
     font-weight: 500;
   }
 
-  /* PHONE DEMO */
   .demo-section {
     display: flex;
     justify-content: center;
@@ -139,10 +135,7 @@
     flex-wrap: wrap;
   }
 
-  .phone-wrap {
-    position: relative;
-    flex-shrink: 0;
-  }
+  .phone-wrap { position: relative; flex-shrink: 0; }
 
   .phone {
     width: 320px;
@@ -167,7 +160,6 @@
     flex-direction: column;
   }
 
-  /* WA HEADER */
   .wa-header {
     background: var(--wa-dark);
     padding: 12px 16px 10px;
@@ -177,11 +169,7 @@
     flex-shrink: 0;
   }
 
-  .wa-back {
-    color: white;
-    font-size: 20px;
-    opacity: 0.9;
-  }
+  .wa-back { color: white; font-size: 20px; opacity: 0.9; }
 
   .wa-avatar {
     width: 36px; height: 36px;
@@ -196,9 +184,7 @@
     flex-shrink: 0;
   }
 
-  .wa-contact {
-    flex: 1;
-  }
+  .wa-contact { flex: 1; }
 
   .wa-name {
     font-size: 15px;
@@ -208,10 +194,7 @@
     margin-bottom: 2px;
   }
 
-  .wa-status {
-    font-size: 11px;
-    color: rgba(255,255,255,0.7);
-  }
+  .wa-status { font-size: 11px; color: rgba(255,255,255,0.7); }
 
   .wa-icons {
     display: flex;
@@ -220,7 +203,6 @@
     font-size: 16px;
   }
 
-  /* WA CHAT AREA */
   .wa-chat {
     flex: 1;
     overflow-y: auto;
@@ -253,14 +235,10 @@
     max-width: 85%;
     opacity: 0;
     transform: translateY(8px);
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition: opacity 0.4s ease, transform 0.4s ease;
   }
 
-  .msg.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
+  .msg.visible { opacity: 1; transform: translateY(0); }
   .msg.incoming { align-self: flex-start; }
   .msg.outgoing { align-self: flex-end; }
 
@@ -297,7 +275,6 @@
   }
 
   .msg.incoming .msg-time { justify-content: flex-start; }
-
   .tick { color: #53bdeb; font-size: 12px; }
 
   .lesson-bubble {
@@ -309,13 +286,10 @@
     align-self: flex-start;
     opacity: 0;
     transform: translateY(8px);
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition: opacity 0.4s ease, transform 0.4s ease;
   }
 
-  .lesson-bubble.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  .lesson-bubble.visible { opacity: 1; transform: translateY(0); }
 
   .lesson-header {
     background: var(--wa-dark);
@@ -381,14 +355,11 @@
     align-self: flex-start;
     opacity: 0;
     transform: translateY(8px);
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition: opacity 0.4s ease, transform 0.4s ease;
     overflow: hidden;
   }
 
-  .feedback-bubble.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  .feedback-bubble.visible { opacity: 1; transform: translateY(0); }
 
   .feedback-header {
     background: #128C7E;
@@ -413,11 +384,6 @@
 
   .feedback-line:last-child { margin-bottom: 0; }
 
-  .streak-msg .msg-bubble {
-    background: #FFF3E0;
-  }
-
-  /* TYPING INDICATOR */
   .typing-indicator {
     display: flex;
     align-items: center;
@@ -428,7 +394,7 @@
     border-top-left-radius: 2px;
     align-self: flex-start;
     opacity: 0;
-    transition: opacity 0.2s ease;
+    transition: opacity 0.3s ease;
     max-width: 70px;
   }
 
@@ -449,7 +415,6 @@
     30% { transform: translateY(-5px); }
   }
 
-  /* WA INPUT BAR */
   .wa-input {
     background: #F0F0F0;
     padding: 8px 10px;
@@ -482,7 +447,6 @@
     flex-shrink: 0;
   }
 
-  /* SIDE CONTENT */
   .demo-side {
     max-width: 360px;
     padding-top: 40px;
@@ -611,7 +575,6 @@
     margin-top: 10px;
   }
 
-  /* REPLAY BUTTON */
   .replay-btn {
     display: flex;
     align-items: center;
@@ -633,7 +596,6 @@
     color: white;
   }
 
-  /* BOTTOM SECTION */
   .bottom-section {
     border-top: 1px solid rgba(255,255,255,0.06);
     padding: 48px 24px;
@@ -688,7 +650,6 @@
 </head>
 <body>
 
-<!-- HERO -->
 <section class="hero">
   <div class="badge"><span class="badge-dot"></span>Live Demo</div>
   <h1>Your copywriting school<br>lives on <span>WhatsApp</span></h1>
@@ -701,15 +662,12 @@
   </div>
 </section>
 
-<!-- DEMO -->
 <section class="demo-section">
 
-  <!-- PHONE -->
   <div class="phone-wrap">
     <div class="phone">
       <div class="phone-inner">
 
-        <!-- Header -->
         <div class="wa-header">
           <div class="wa-back">‹</div>
           <div class="wa-avatar">SN</div>
@@ -723,12 +681,10 @@
           </div>
         </div>
 
-        <!-- Chat -->
         <div class="wa-chat" id="chat">
           <div class="wa-date-divider"><span>Today</span></div>
         </div>
 
-        <!-- Input -->
         <div class="wa-input">
           <div class="wa-input-field">Type a message</div>
           <div class="wa-send-btn">➤</div>
@@ -738,7 +694,6 @@
     </div>
   </div>
 
-  <!-- SIDE -->
   <div class="demo-side">
     <h2>This is what <span>learning</span><br>feels like here</h2>
     <p>No app downloads. No video buffering. No login pages. Your lesson arrives like a message from a friend — and an AI coach is always ready to review your work.</p>
@@ -785,12 +740,10 @@
 
 </section>
 
-<!-- REPLAY -->
 <div style="text-align:center">
   <button class="replay-btn" id="replay-btn">↺ Watch demo again</button>
 </div>
 
-<!-- BOTTOM -->
 <section class="bottom-section">
   <h2>Ready to start earning from writing?</h2>
   <p>Join Nigerian professionals learning copywriting on their commute, during lunch, and before work.</p>
@@ -800,7 +753,6 @@
 
 <script>
 const chat = document.getElementById('chat');
-let animationTimeout = null;
 let allTimeouts = [];
 
 function clearAllTimeouts() {
@@ -834,16 +786,11 @@ function removeTyping(el) {
   later(() => { if(el.parentNode) el.parentNode.removeChild(el); }, 300);
 }
 
-function addMsg(type, html, time, extraClass) {
+function addMsg(type, html, time) {
   const el = document.createElement('div');
-  el.className = 'msg ' + type + (extraClass ? ' ' + extraClass : '');
-
+  el.className = 'msg ' + type;
   const ticks = type === 'outgoing' ? '<span class="tick">✓✓</span>' : '';
-
-  el.innerHTML = `
-    <div class="msg-bubble">${html}</div>
-    <div class="msg-time">${ticks}${time}</div>
-  `;
+  el.innerHTML = '<div class="msg-bubble">' + html + '</div><div class="msg-time">' + ticks + time + '</div>';
   chat.appendChild(el);
   later(() => el.classList.add('visible'), 50);
   scrollDown();
@@ -853,24 +800,23 @@ function addMsg(type, html, time, extraClass) {
 function addLesson(time) {
   const el = document.createElement('div');
   el.className = 'lesson-bubble';
-  el.innerHTML = `
-    <div class="lesson-header">
-      <div class="lesson-tag">📚 Day 1 of 90 — SkillStack NG</div>
-      <div class="lesson-title">What copy actually is (and why it works)</div>
-    </div>
-    <div class="lesson-body">
-      Most people think copywriting means writing nicely. It does not.<br><br>
-      Copy has one job — to make someone take action. Click. Buy. Sign up. Call. Every word you write is either pushing the reader toward that action or pulling them away.<br><br>
-      <strong>Nothing is neutral.</strong>
-      <hr class="lesson-divider">
-      <div class="lesson-task-label">✏️ Today's Task</div>
-      <div class="lesson-task">Find any product near you. Write two one-sentence descriptions:<br>
-      <strong>A:</strong> Regular writing — just describe what it is<br>
-      <strong>B:</strong> Copy — make someone want to buy it<br><br>
-      Reply with both. Label them A and B.</div>
-    </div>
-    <div class="lesson-footer">${time}</div>
-  `;
+  el.innerHTML =
+    '<div class="lesson-header">' +
+      '<div class="lesson-tag">📚 Day 1 of 90 — SkillStack NG</div>' +
+      '<div class="lesson-title">What copy actually is (and why it works)</div>' +
+    '</div>' +
+    '<div class="lesson-body">' +
+      'Most people think copywriting means writing nicely. It does not.<br><br>' +
+      'Copy has one job — to make someone take action. Click. Buy. Sign up. Call. Every word you write is either pushing the reader toward that action or pulling them away.<br><br>' +
+      '<strong>Nothing is neutral.</strong>' +
+      '<hr class="lesson-divider">' +
+      '<div class="lesson-task-label">✏️ Today\'s Task</div>' +
+      '<div class="lesson-task">Find any product near you. Write two one-sentence descriptions:<br>' +
+      '<strong>A:</strong> Regular writing — just describe what it is<br>' +
+      '<strong>B:</strong> Copy — make someone want to buy it<br><br>' +
+      'Reply with both. Label them A and B.</div>' +
+    '</div>' +
+    '<div class="lesson-footer">' + time + '</div>';
   chat.appendChild(el);
   later(() => el.classList.add('visible'), 50);
   scrollDown();
@@ -880,15 +826,14 @@ function addLesson(time) {
 function addFeedback(time) {
   const el = document.createElement('div');
   el.className = 'feedback-bubble';
-  el.innerHTML = `
-    <div class="feedback-header">🤖 AI Coach Feedback — Day 1</div>
-    <div class="feedback-body">
-      <div class="feedback-line">✅ <span><strong>Strength:</strong> Version B creates genuine desire — "the bag that makes your outfit make sense" is a real benefit, not a feature.</span></div>
-      <div class="feedback-line">⚠️ <span><strong>Improve:</strong> Version A says "quality leather bag" — quality is claimed by everyone. What specifically makes it quality? Stitch count? Source? Be concrete.</span></div>
-      <div class="feedback-line">💡 <span><strong>Pro tip:</strong> For Nigerian fashion copy, name the occasion. Who wears this to what? "The bag for owambe season" beats any generic benefit claim.</span></div>
-    </div>
-    <div class="lesson-footer">${time}</div>
-  `;
+  el.innerHTML =
+    '<div class="feedback-header">🤖 AI Coach Feedback — Day 1</div>' +
+    '<div class="feedback-body">' +
+      '<div class="feedback-line">✅ <span><strong>Strength:</strong> Version B creates genuine desire — "the bag that makes your outfit make sense" is a real benefit, not a feature.</span></div>' +
+      '<div class="feedback-line">⚠️ <span><strong>Improve:</strong> Version A says "quality leather bag" — quality is claimed by everyone. What specifically makes it quality? Stitch count? Source? Be concrete.</span></div>' +
+      '<div class="feedback-line">💡 <span><strong>Pro tip:</strong> For Nigerian fashion copy, name the occasion. Who wears this to what? "The bag for owambe season" beats any generic benefit claim.</span></div>' +
+    '</div>' +
+    '<div class="lesson-footer">' + time + '</div>';
   chat.appendChild(el);
   later(() => el.classList.add('visible'), 50);
   scrollDown();
@@ -900,61 +845,57 @@ function scrollDown() {
 }
 
 function runDemo() {
-  // Clear chat
   while(chat.children.length > 1) chat.removeChild(chat.lastChild);
   setStep(1);
   document.getElementById('wa-status').textContent = 'online';
 
-  let t = 800;
+  let t = 1000;
 
   // Step 1: Lesson arrives
   later(() => {
     setStep(1);
     addLesson('7:00 AM');
     scrollDown();
-  }, t); t += 1200;
+  }, t); t += 4000;
 
-  // Step 2: Student types task
-  later(() => setStep(2), t); t += 600;
+  // Step 2: Student reads and types task
+  later(() => setStep(2), t); t += 2500;
 
   later(() => {
     addMsg('outgoing',
       '<strong>A:</strong> Brown leather handbag, medium size, with gold zip.<br><br><strong>B:</strong> The bag that makes your outfit make sense — structured, rich brown leather, the kind you carry to an interview and an owambe and both times it is right.',
       '7:18 AM');
-  }, t); t += 1000;
+  }, t); t += 3000;
 
   // Step 3: AI typing then feedback
   later(() => {
     setStep(3);
-    document.getElementById('wa-status').textContent = 'typing…';
+    document.getElementById('wa-status').textContent = 'typing...';
     const typing = addTyping();
     later(() => {
       document.getElementById('wa-status').textContent = 'online';
       removeTyping(typing);
-      addFeedback('7:18 AM');
-    }, 2200);
-  }, t); t += 2600;
+      addFeedback('7:19 AM');
+    }, 4000);
+  }, t); t += 5500;
 
   // Step 4: Streak message
   later(() => {
     setStep(4);
     addMsg('incoming',
-      '🔥 <strong>Streak: 1 day</strong><br>Day 1 done. See you tomorrow at 7AM for Day 2 — Headlines: The 5 seconds that determine everything.',
-      '7:18 AM');
+      '🔥 <strong>Streak: 1 day</strong><br><br>Day 1 done. See you tomorrow at 7AM for Day 2 — Headlines: The 5 seconds that determine everything.',
+      '7:19 AM');
     scrollDown();
   }, t);
 }
 
-// Init
-later(() => runDemo(), 600);
+later(() => runDemo(), 1000);
 
-// Replay
 document.getElementById('replay-btn').addEventListener('click', () => {
   clearAllTimeouts();
   later(() => runDemo(), 200);
 });
 
-// CTA links — replace # with real Paystack link
 const PAYSTACK_LINK = 'https://paystack.shop/pay/2-h3igsfd2';
 document.getElementById('main-cta').href = PAYSTACK_LINK;
 document.getElementById('final-cta').href = PAYSTACK_LINK;
