@@ -3,10 +3,12 @@ const twilio = require('twilio');
 const { createClient } = require('@supabase/supabase-js');
 const Anthropic = require('@anthropic-ai/sdk');
 const cron = require('node-cron');
+const path = require('path');
 const app = express();
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -141,8 +143,8 @@ async function handleOnboarding(phone, message) {
       return;
     }
     const feedback = await getFeedback(lesson.task, message, lesson.feedback_prompt);
-    await sendMessage(phone, 'Feedback on Day ' + sub.day_number + ':\n\n' + feedback + '\n\nStreak: ' + sub.streak + ' days. See you Monday!' );
-    const nextDay = sub.day_number < 35 ? sub.day_number + 1 : sub.day_number;
+    await sendMessage(phone, 'Feedback on Day ' + sub.day_number + ':\n\n' + feedback + '\n\nStreak: ' + sub.streak + ' days. See you Monday!');
+    const nextDay = sub.day_number < 65 ? sub.day_number + 1 : sub.day_number;
     await supabase.from('subscribers').update({
       day_number: nextDay,
       streak: sub.streak + 1,
@@ -226,7 +228,7 @@ cron.schedule('0 9 * * *', async () => {
 });
 
 app.get('/', (req, res) => {
-  res.send('SkillStack NG bot is running');
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 const PORT = process.env.PORT || 3000;
