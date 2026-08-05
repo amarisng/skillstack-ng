@@ -24,7 +24,6 @@ const VERIFY_TOKEN = process.env.WEBHOOK_VERIFY_TOKEN || 'skillstack_verify_2024
 const META_TOKEN = process.env.META_WHATSAPP_TOKEN;
 const META_PHONE_ID = process.env.META_PHONE_NUMBER_ID;
 
-// Send a free-form text message (works within 24-hour window)
 async function sendMessage(to, body) {
   try {
     await axios.post(
@@ -48,7 +47,6 @@ async function sendMessage(to, body) {
   }
 }
 
-// Send the approved template to open a conversation
 async function sendLessonReadyTemplate(to) {
   try {
     await axios.post(
@@ -167,26 +165,20 @@ async function handleOnboarding(phone, message) {
     return;
   }
 
-  // Active subscriber — check if they are requesting their lesson
   if (sub.active === 'true' && sub.day_number > 0) {
     const lesson = await getLesson(sub.day_number);
     if (!lesson) {
       await sendMessage(phone, 'You have completed all available lessons. More coming soon!');
       return;
     }
-
-    // Subscriber replied to lesson_ready template — send the full lesson
     if (message.toUpperCase() === 'LESSON' || message.toUpperCase() === 'HI' || message.toUpperCase() === 'HELLO' || message.toUpperCase() === 'YES') {
       await sendMessage(phone, formatLesson(lesson, sub.day_number));
       return;
     }
-
     if (message.toUpperCase() === 'CONTINUE') {
       await sendMessage(phone, formatLesson(lesson, sub.day_number));
       return;
     }
-
-    // Otherwise treat as task submission and give feedback
     const feedback = await getFeedback(lesson.task, message, lesson.feedback_prompt);
     await sendMessage(phone, 'Feedback on Day ' + sub.day_number + ':\n\n' + feedback + '\n\nStreak: ' + sub.streak + ' days. See you Monday!');
     const nextDay = sub.day_number < 65 ? sub.day_number + 1 : sub.day_number;
@@ -201,7 +193,6 @@ async function handleOnboarding(phone, message) {
   await sendMessage(phone, 'Welcome back! Reply 1 to start your copywriting journey or DONE if you have already paid.');
 }
 
-// Meta webhook verification
 app.get('/webhook', (req, res) => {
   const mode = req.query['hub.mode'];
   const token = req.query['hub.verify_token'];
@@ -214,7 +205,6 @@ app.get('/webhook', (req, res) => {
   }
 });
 
-// Meta incoming messages
 app.post('/webhook', async (req, res) => {
   res.status(200).send('OK');
   try {
@@ -239,7 +229,18 @@ app.post('/webhook', async (req, res) => {
   }
 });
 
-// Daily lesson scheduler — sends lesson_ready template
+app.get('/privacy', (req, res) => {
+  res.send('<!DOCTYPE html><html><head><title>SkillStack NG Privacy Policy</title><style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 20px;line-height:1.7;color:#333}h1{color:#075E54}h2{color:#128C7E;margin-top:32px}</style></head><body><h1>SkillStack NG Privacy Policy</h1><p>Last updated: August 2026</p><h2>Information We Collect</h2><p>We collect your WhatsApp phone number and name when you subscribe to SkillStack NG. We also store your lesson progress and streak data to deliver your daily lessons.</p><h2>How We Use Your Information</h2><p>Your phone number is used solely to deliver your daily copywriting lessons and AI feedback via WhatsApp. We do not sell, share, or use your data for advertising purposes.</p><h2>Data Storage</h2><p>Your data is stored securely on Supabase servers. We retain your data for as long as you are an active subscriber. You may request deletion of your data at any time.</p><h2>WhatsApp Messaging</h2><p>By subscribing to SkillStack NG you consent to receive WhatsApp messages from us including daily lessons, feedback, and account updates. You can unsubscribe at any time by replying STOP.</p><h2>Contact Us</h2><p>For privacy questions contact us at amarissynergylimited@gmail.com</p><p>SkillStack NG is operated by Amaris Synergy Limited, Lagos, Nigeria.</p></body></html>');
+});
+
+app.get('/terms', (req, res) => {
+  res.send('<!DOCTYPE html><html><head><title>SkillStack NG Terms of Service</title><style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 20px;line-height:1.7;color:#333}h1{color:#075E54}h2{color:#128C7E;margin-top:32px}</style></head><body><h1>SkillStack NG Terms of Service</h1><p>Last updated: August 2026</p><h2>Service Description</h2><p>SkillStack NG is a WhatsApp-based copywriting education platform operated by Amaris Synergy Limited. Subscribers receive daily copywriting lessons and AI-powered feedback via WhatsApp.</p><h2>Subscription</h2><p>Subscription is billed at 5,000 NGN per month. Payment is processed via Paystack. Your subscription renews automatically each month until cancelled.</p><h2>Cancellation</h2><p>You may cancel your subscription at any time by contacting us at amarissynergylimited@gmail.com. Refunds are not provided for partial months.</p><h2>Content</h2><p>All lesson content is the intellectual property of Amaris Synergy Limited. Subscribers may not reproduce or distribute lesson content without permission.</p><h2>Limitation of Liability</h2><p>SkillStack NG provides educational content only. We do not guarantee specific income outcomes from completing the programme.</p><h2>Contact</h2><p>amarissynergylimited@gmail.com</p></body></html>');
+});
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 cron.schedule('0 * * * *', async () => {
   console.log('Running hourly lesson check...');
   const now = new Date();
@@ -267,7 +268,6 @@ cron.schedule('0 * * * *', async () => {
   }
 });
 
-// Saturday review message
 cron.schedule('0 8 * * 6', async () => {
   console.log('Sending Saturday review message...');
   const { data: subscribers } = await supabase
@@ -280,7 +280,6 @@ cron.schedule('0 8 * * 6', async () => {
   }
 });
 
-// Re-engagement check
 cron.schedule('0 9 * * *', async () => {
   console.log('Running re-engagement check...');
   const yesterday = new Date();
@@ -298,10 +297,6 @@ cron.schedule('0 9 * * *', async () => {
     if (watDay === 0 || watDay === 6) continue;
     await sendLessonReadyTemplate(sub.phone);
   }
-});
-
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 const PORT = process.env.PORT || 3000;
