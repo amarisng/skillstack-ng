@@ -123,6 +123,10 @@ async function activateSubscriber(whatsappNumber, name) {
     let sub = await getSubscriber(cleanPhone);
 
     if (sub) {
+      if (sub.active === 'true') {
+        console.log('Subscriber already active — skipping duplicate: ' + cleanPhone);
+        return;
+      }
       await supabase.from('subscribers').update({
         active: 'true',
         day_number: 1,
@@ -280,7 +284,7 @@ app.post('/paystack-webhook', async (req, res) => {
       if (whatsappNumber) {
         await activateSubscriber(whatsappNumber, customerName);
       } else {
-        console.log('No WhatsApp number found in payment. Full metadata: ' + JSON.stringify(data.metadata));
+        console.log('No WhatsApp number found. Metadata: ' + JSON.stringify(data.metadata));
       }
     }
 
@@ -391,6 +395,10 @@ app.get('/privacy', (req, res) => {
 
 app.get('/terms', (req, res) => {
   res.send('<!DOCTYPE html><html><head><title>SkillStack NG Terms of Service</title><style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 20px;line-height:1.7;color:#333}h1{color:#075E54}h2{color:#128C7E;margin-top:32px}</style></head><body><h1>SkillStack NG Terms of Service</h1><p>Last updated: August 2026</p><h2>Service Description</h2><p>SkillStack NG is a WhatsApp-based copywriting education platform operated by Amaris Synergy Limited. Subscribers receive daily copywriting lessons and AI-powered feedback via WhatsApp.</p><h2>Subscription</h2><p>Subscription is billed at 5,000 NGN per month. Payment is processed via Paystack. Your subscription renews automatically each month until cancelled.</p><h2>Cancellation</h2><p>You may cancel your subscription at any time by contacting us at amarissynergylimited@gmail.com. Refunds are not provided for partial months.</p><h2>Content</h2><p>All lesson content is the intellectual property of Amaris Synergy Limited. Subscribers may not reproduce or distribute lesson content without permission.</p><h2>Limitation of Liability</h2><p>SkillStack NG provides educational content only. We do not guarantee specific income outcomes from completing the programme.</p><h2>Contact</h2><p>amarissynergylimited@gmail.com</p></body></html>');
+});
+
+app.get('/beta', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'beta.html'));
 });
 
 app.get('/', (req, res) => {
