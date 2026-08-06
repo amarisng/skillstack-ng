@@ -8,8 +8,6 @@ const crypto = require('crypto');
 const app = express();
 
 app.use(express.urlencoded({ extended: false }));
-
-// Raw body needed for Paystack webhook verification
 app.use('/paystack-webhook', express.raw({ type: 'application/json' }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -25,13 +23,13 @@ const anthropic = new Anthropic({
 
 const PAYSTACK_LINK = process.env.PAYSTACK_PAYMENT_LINK;
 const PAYSTACK_SECRET = process.env.PAYSTACK_SECRET_KEY;
+const PAYSTACK_TEST_SECRET = process.env.PAYSTACK_TEST_SECRET_KEY;
 const VERIFY_TOKEN = process.env.WEBHOOK_VERIFY_TOKEN || 'skillstack_verify_2024';
 const META_TOKEN = process.env.META_WHATSAPP_TOKEN;
 const META_PHONE_ID = process.env.META_PHONE_NUMBER_ID;
 
 async function sendMessage(to, body) {
   try {
-    // Clean the number — remove any + or spaces
     const cleanNumber = to.replace(/\D/g, '');
     await axios.post(
       'https://graph.facebook.com/v19.0/' + META_PHONE_ID + '/messages',
@@ -120,12 +118,11 @@ function formatLesson(lesson, dayNumber) {
 async function activateSubscriber(whatsappNumber, name) {
   try {
     const cleanPhone = whatsappNumber.replace(/\D/g, '');
+    console.log('Activating subscriber: ' + cleanPhone);
 
-    // Check if subscriber exists
     let sub = await getSubscriber(cleanPhone);
 
     if (sub) {
-      // Update existing subscriber to active
       await supabase.from('subscribers').update({
         active: 'true',
         day_number: 1,
@@ -133,7 +130,6 @@ async function activateSubscriber(whatsappNumber, name) {
         last_active: new Date().toISOString().split('T')[0]
       }).eq('phone', cleanPhone);
     } else {
-      // Create new subscriber
       await supabase.from('subscribers').insert({
         phone: cleanPhone,
         name: name || 'Subscriber',
@@ -146,14 +142,13 @@ async function activateSubscriber(whatsappNumber, name) {
       });
     }
 
-    // Send welcome and Day 1 lesson
     const lesson = await getLesson(1);
     if (lesson) {
       await sendMessage(cleanPhone, 'Payment confirmed! Welcome to SkillStack NG ' + (name || '') + '. Your 90 day copywriting journey starts NOW. Here is Day 1:');
       await sendMessage(cleanPhone, formatLesson(lesson, 1));
     }
 
-    console.log('Activated subscriber: ' + cleanPhone);
+    console.log('Subscriber activated successfully: ' + cleanPhone);
   } catch (err) {
     console.error('Activation error:', err.message);
   }
@@ -197,7 +192,7 @@ async function handleOnboarding(phone, message) {
     };
     const timePreference = timeMap[message.toUpperCase()];
     await supabase.from('subscribers').update({ time_preference: timePreference }).eq('phone', phone);
-    await sendMessage(phone, 'Perfect ' + sub.name + '! Your lesson will arrive Monday to Friday at ' + message.toUpperCase() + '.\n\nTo activate your subscription pay ₦5,000 per month here:\n' + PAYSTACK_LINK + '\n\nMake sure to enter this WhatsApp number (' + phone + ') in the WhatsApp Number field on the payment form so we can activate your account automatically after payment.');
+    await sendMessage(phone, 'Perfect ' + sub.name + '! Your lesson will arrive Monday to Friday at ' + message.toUpperCase() + '.\n\nTo activate your subscription pay 5,000 per month here:\n' + PAYSTACK_LINK + '\n\nMake sure to enter this WhatsApp number (' + phone + ') in the WhatsApp Number field on the payment form so we can activate your account automatically after payment.');
     return;
   }
 
@@ -227,28 +222,34 @@ async function handleOnboarding(phone, message) {
   }
 
   if (sub.active === 'false') {
-    await sendMessage(phone, 'To activate your subscription pay ₦5,000 per month here:\n' + PAYSTACK_LINK + '\n\nMake sure to enter your WhatsApp number in the WhatsApp Number field on the payment form.');
+    await sendMessage(phone, 'To activate your subscription pay 5,000 per month here:\n' + PAYSTACK_LINK + '\n\nMake sure to enter your WhatsApp number in the WhatsApp Number field on the payment form.');
     return;
   }
 
   await sendMessage(phone, 'Welcome back! Reply 1 to start your copywriting journey.');
 }
 
-// Paystack webhook — payment verification
 app.post('/paystack-webhook', async (req, res) => {
   try {
-    // Verify the webhook is from Paystack
-    const hash = crypto.createHmac('sha512', PAYSTACK_SECRET)
+    const signature = req.headers['x-paystack-signature'];
+
+    const hashLive = crypto.createHmac('sha512', PAYSTACK_SECRET)
       .update(req.body)
       .digest('hex');
 
-    if (hash !== req.headers['x-paystack-signature']) {
+    const hashTest = PAYSTACK_TEST_SECRET
+      ? crypto.createHmac('sha512', PAYSTACK_TEST_SECRET)
+          .update(req.body)
+          .digest('hex')
+      : null;
+
+    if (hashLive !== signature && hashTest !== signature) {
       console.log('Invalid Paystack signature');
       return res.status(401).send('Unauthorized');
     }
 
     const event = JSON.parse(req.body);
-    console.log('Paystack event:', event.event);
+    console.log('Paystack event received:', event.event);
 
     if (event.event === 'charge.success' || event.event === 'subscription.create') {
       const data = event.data;
@@ -256,30 +257,30 @@ app.post('/paystack-webhook', async (req, res) => {
         ? data.customer.first_name
         : 'Subscriber';
 
-      // Get WhatsApp number from custom fields
       let whatsappNumber = null;
+
       if (data.metadata && data.metadata.custom_fields) {
         const whatsappField = data.metadata.custom_fields.find(
           f => f.variable_name === 'whatsapp_number' ||
                f.display_name === 'WhatsApp Number' ||
-               f.variable_name === 'whatsapp'
+               f.variable_name === 'whatsapp' ||
+               f.display_name === 'whatsapp_number'
         );
         if (whatsappField) {
           whatsappNumber = whatsappField.value;
+          console.log('WhatsApp number from custom field: ' + whatsappNumber);
         }
       }
 
-      // Also check customer phone
       if (!whatsappNumber && data.customer && data.customer.phone) {
         whatsappNumber = data.customer.phone;
+        console.log('WhatsApp number from customer phone: ' + whatsappNumber);
       }
 
       if (whatsappNumber) {
-        console.log('Activating subscriber: ' + whatsappNumber);
         await activateSubscriber(whatsappNumber, customerName);
       } else {
-        console.log('No WhatsApp number found in payment data');
-        console.log('Payment data:', JSON.stringify(data));
+        console.log('No WhatsApp number found in payment. Full metadata: ' + JSON.stringify(data.metadata));
       }
     }
 
@@ -290,7 +291,6 @@ app.post('/paystack-webhook', async (req, res) => {
   }
 });
 
-// Meta webhook verification
 app.get('/webhook', (req, res) => {
   const mode = req.query['hub.mode'];
   const token = req.query['hub.verify_token'];
@@ -303,7 +303,6 @@ app.get('/webhook', (req, res) => {
   }
 });
 
-// Meta incoming messages
 app.post('/webhook', async (req, res) => {
   res.status(200).send('OK');
   try {
