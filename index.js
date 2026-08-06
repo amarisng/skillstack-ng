@@ -118,13 +118,20 @@ function formatLesson(lesson, dayNumber) {
 async function activateSubscriber(whatsappNumber, name) {
   try {
     const cleanPhone = whatsappNumber.replace(/\D/g, '');
-    console.log('Activating subscriber: ' + cleanPhone);
+    
+    // Ensure number starts with country code
+    let finalPhone = cleanPhone;
+    if (finalPhone.startsWith('0')) {
+      finalPhone = '234' + finalPhone.substring(1);
+    }
+    
+    console.log('Activating subscriber: ' + finalPhone);
 
-    let sub = await getSubscriber(cleanPhone);
+    let sub = await getSubscriber(finalPhone);
 
     if (sub) {
       if (sub.active === 'true') {
-        console.log('Subscriber already active — skipping duplicate: ' + cleanPhone);
+        console.log('Subscriber already active — skipping duplicate: ' + finalPhone);
         return;
       }
       await supabase.from('subscribers').update({
@@ -132,10 +139,10 @@ async function activateSubscriber(whatsappNumber, name) {
         day_number: 1,
         streak: 1,
         last_active: new Date().toISOString().split('T')[0]
-      }).eq('phone', cleanPhone);
+      }).eq('phone', finalPhone);
     } else {
       await supabase.from('subscribers').insert({
-        phone: cleanPhone,
+        phone: finalPhone,
         name: name || 'Subscriber',
         day_number: 1,
         track: 'copywriting',
@@ -148,11 +155,11 @@ async function activateSubscriber(whatsappNumber, name) {
 
     const lesson = await getLesson(1);
     if (lesson) {
-      await sendMessage(cleanPhone, 'Payment confirmed! Welcome to SkillStack NG ' + (name || '') + '. Your 90 day copywriting journey starts NOW. Here is Day 1:');
-      await sendMessage(cleanPhone, formatLesson(lesson, 1));
+      await sendMessage(finalPhone, 'Payment confirmed! Welcome to SkillStack NG ' + (name || '') + '. Your 90 day copywriting journey starts NOW. Here is Day 1:');
+      await sendMessage(finalPhone, formatLesson(lesson, 1));
     }
 
-    console.log('Subscriber activated successfully: ' + cleanPhone);
+    console.log('Subscriber activated successfully: ' + finalPhone);
   } catch (err) {
     console.error('Activation error:', err.message);
   }
@@ -255,7 +262,8 @@ app.post('/paystack-webhook', async (req, res) => {
     const event = JSON.parse(req.body);
     console.log('Paystack event received:', event.event);
 
-    if (event.event === 'charge.success' || event.event === 'subscription.create') {
+    // Only process charge.success — ignore subscription.create to avoid duplicates
+    if (event.event === 'charge.success') {
       const data = event.data;
       const customerName = data.customer && data.customer.first_name
         ? data.customer.first_name
@@ -276,15 +284,10 @@ app.post('/paystack-webhook', async (req, res) => {
         }
       }
 
-      if (!whatsappNumber && data.customer && data.customer.phone) {
-        whatsappNumber = data.customer.phone;
-        console.log('WhatsApp number from customer phone: ' + whatsappNumber);
-      }
-
       if (whatsappNumber) {
         await activateSubscriber(whatsappNumber, customerName);
       } else {
-        console.log('No WhatsApp number found. Metadata: ' + JSON.stringify(data.metadata));
+        console.log('No WhatsApp number found in custom fields. Metadata: ' + JSON.stringify(data.metadata));
       }
     }
 
