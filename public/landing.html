@@ -6,385 +6,506 @@
 <title>SkillStack NG — Learn Copywriting in 90 Days on WhatsApp</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600&display=swap');
-
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-
-:root{
-  --g: #075E54;
-  --ga: #25D366;
-  --gal: #DCF8C6;
-  --ink: #0D1C0F;
-  --body: #2D3A30;
-  --mute: #6B7D6E;
-  --rule: #E0E8E1;
-  --bg: #FAFCFA;
-  --white: #FFFFFF;
-  --wa-bg: #E5DDD5;
-}
-
+:root{--g:#075E54;--ga:#25D366;--gal:#DCF8C6;--ink:#0D1C0F;--body:#2D3A30;--mute:#6B7D6E;--rule:#E0E8E1;--bg:#FAFCFA;--white:#FFFFFF;--wa-bg:#E5DDD5}
 html{scroll-behavior:smooth}
-
-body{
-  font-family:'Inter',sans-serif;
-  background:var(--bg);
-  color:var(--ink);
-  line-height:1.6;
-  overflow-x:hidden;
-}
-
-nav{
-  position:sticky;top:0;z-index:100;
-  background:rgba(250,252,250,0.92);
-  backdrop-filter:blur(12px);
-  border-bottom:1px solid var(--rule);
-  padding:0 24px;
-  height:60px;
-  display:flex;align-items:center;justify-content:space-between;
-}
-
-.nav-logo{
-  font-family:'Bricolage Grotesque',sans-serif;
-  font-size:18px;font-weight:800;
-  color:var(--g);letter-spacing:-0.01em;
-}
-
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;overflow-x:hidden}
+nav{position:sticky;top:0;z-index:100;background:rgba(250,252,250,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--rule);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:'Bricolage Grotesque',sans-serif;font-size:18px;font-weight:800;color:var(--g);letter-spacing:-0.01em}
 .nav-logo span{color:var(--ga)}
-
-.nav-cta{
-  background:var(--ga);color:var(--ink);
-  font-size:14px;font-weight:700;
-  padding:9px 20px;border-radius:100px;
-  text-decoration:none;
-  transition:transform .15s,box-shadow .15s;
-  white-space:nowrap;
-}
-
+.nav-cta{background:var(--ga);color:var(--ink);font-size:14px;font-weight:700;padding:9px 20px;border-radius:100px;text-decoration:none;transition:transform .15s,box-shadow .15s;white-space:nowrap}
 .nav-cta:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(37,211,102,.3)}
-
-.hero{
-  max-width:1200px;margin:0 auto;
-  padding:80px 24px 60px;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:64px;
-  align-items:center;
-}
-
-@media(max-width:768px){
-  .hero{grid-template-columns:1fr;gap:48px;padding:48px 20px 40px}
-  .hero-visual{order:-1}
-}
-
-.hero-eyebrow{
-  display:inline-flex;align-items:center;gap:8px;
-  background:rgba(37,211,102,.1);
-  border:1px solid rgba(37,211,102,.25);
-  border-radius:100px;
-  padding:5px 14px;
-  font-size:12px;font-weight:600;
-  color:var(--g);letter-spacing:.06em;text-transform:uppercase;
-  margin-bottom:20px;
-}
-
-.live-dot{
-  width:7px;height:7px;background:var(--ga);
-  border-radius:50%;
-  animation:livepulse 2s infinite;
-}
-
-@keyframes livepulse{
-  0%,100%{opacity:1;transform:scale(1)}
-  50%{opacity:.4;transform:scale(.7)}
-}
-
-.hero h1{
-  font-family:'Bricolage Grotesque',sans-serif;
-  font-size:clamp(36px,5vw,58px);
-  font-weight:800;
-  line-height:1.08;
-  letter-spacing:-.025em;
-  color:var(--ink);
-  margin-bottom:20px;
-}
-
-.hero h1 em{
-  font-style:normal;
-  color:var(--g);
-  position:relative;
-}
-
-.hero h1 em::after{
-  content:'';
-  position:absolute;
-  left:0;bottom:-4px;right:0;
-  height:3px;
-  background:var(--ga);
-  border-radius:2px;
-}
-
-.hero-sub{
-  font-size:17px;color:var(--body);
-  line-height:1.7;
-  margin-bottom:36px;
-  max-width:460px;
-}
-
-.hero-actions{
-  display:flex;flex-direction:column;gap:12px;
-  max-width:400px;
-}
-
-.btn-primary{
-  display:block;
-  background:var(--g);color:#fff;
-  font-size:16px;font-weight:700;
-  padding:16px 24px;
-  border-radius:14px;
-  text-decoration:none;
-  text-align:center;
-  transition:transform .15s,box-shadow .15s;
-  letter-spacing:-.01em;
-}
-
+.hero{max-width:1200px;margin:0 auto;padding:80px 24px 60px;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+@media(max-width:768px){.hero{grid-template-columns:1fr;gap:48px;padding:48px 20px 40px}.hero-visual{order:-1}}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.25);border-radius:100px;padding:5px 14px;font-size:12px;font-weight:600;color:var(--g);letter-spacing:.06em;text-transform:uppercase;margin-bottom:20px}
+.live-dot{width:7px;height:7px;background:var(--ga);border-radius:50%;animation:livepulse 2s infinite}
+@keyframes livepulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+.hero h1{font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(36px,5vw,58px);font-weight:800;line-height:1.08;letter-spacing:-.025em;color:var(--ink);margin-bottom:20px}
+.hero h1 em{font-style:normal;color:var(--g);position:relative}
+.hero h1 em::after{content:'';position:absolute;left:0;bottom:-4px;right:0;height:3px;background:var(--ga);border-radius:2px}
+.hero-sub{font-size:17px;color:var(--body);line-height:1.7;margin-bottom:36px;max-width:460px}
+.hero-actions{display:flex;flex-direction:column;gap:12px;max-width:400px}
+.btn-primary{display:block;background:var(--g);color:#fff;font-size:16px;font-weight:700;padding:16px 24px;border-radius:14px;text-decoration:none;text-align:center;transition:transform .15s,box-shadow .15s;letter-spacing:-.01em}
 .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(7,94,84,.25)}
-
-.btn-secondary{
-  display:block;
-  background:transparent;color:var(--g);
-  border:1.5px solid var(--ga);
-  font-size:15px;font-weight:600;
-  padding:14px 24px;
-  border-radius:14px;
-  text-decoration:none;
-  text-align:center;
-  transition:background .15s;
-}
-
+.btn-secondary{display:block;background:transparent;color:var(--g);border:1.5px solid var(--ga);font-size:15px;font-weight:600;padding:14px 24px;border-radius:14px;text-decoration:none;text-align:center;transition:background .15s}
 .btn-secondary:hover{background:rgba(37,211,102,.06)}
-
-.hero-trust{
-  display:flex;align-items:center;gap:8px;
-  margin-top:16px;
-  font-size:13px;color:var(--mute);
-}
-
+.hero-trust{display:flex;align-items:center;gap:8px;margin-top:16px;font-size:13px;color:var(--mute)}
 .trust-dot{width:4px;height:4px;background:var(--rule);border-radius:50%}
-
 .hero-visual{display:flex;justify-content:center;align-items:center}
-
-.phone-frame{
-  width:280px;
-  background:#1a1a1a;
-  border-radius:40px;
-  padding:10px;
-  box-shadow:0 32px 64px rgba(0,0,0,.18),0 0 0 1px rgba(255,255,255,.06);
-}
-
-.phone-screen{
-  background:var(--wa-bg);
-  border-radius:32px;
-  overflow:hidden;
-  height:540px;
-  display:flex;flex-direction:column;
-}
-
-.wa-head{
-  background:var(--g);
-  padding:10px 14px 8px;
-  display:flex;align-items:center;gap:10px;
-  flex-shrink:0;
-}
-
-.wa-av{
-  width:34px;height:34px;
-  background:var(--ga);border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-size:12px;font-weight:800;color:var(--g);flex-shrink:0;
-}
-
+.phone-frame{width:280px;background:#1a1a1a;border-radius:40px;padding:10px;box-shadow:0 32px 64px rgba(0,0,0,.18),0 0 0 1px rgba(255,255,255,.06)}
+.phone-screen{background:var(--wa-bg);border-radius:32px;overflow:hidden;height:540px;display:flex;flex-direction:column}
+.wa-head{background:var(--g);padding:10px 14px 8px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.wa-av{width:34px;height:34px;background:var(--ga);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--g);flex-shrink:0}
 .wa-info{flex:1}
 .wa-name{font-size:13px;font-weight:700;color:#fff}
 .wa-status{font-size:10px;color:rgba(255,255,255,.7)}
-
-.wa-chat{
-  flex:1;overflow:hidden;
-  padding:10px 8px;
-  display:flex;flex-direction:column;gap:6px;
-}
-
+.wa-chat{flex:1;overflow:hidden;padding:10px 8px;display:flex;flex-direction:column;gap:6px}
 .wa-date{text-align:center;margin:4px 0 6px}
-.wa-date span{
-  background:rgba(255,255,255,.85);
-  color:#667781;font-size:10px;font-weight:500;
-  padding:2px 10px;border-radius:8px;
-}
-
-.msg{
-  display:flex;flex-direction:column;
-  max-width:84%;
-  opacity:0;transform:translateY(6px);
-  transition:opacity .35s ease,transform .35s ease;
-}
+.wa-date span{background:rgba(255,255,255,.85);color:#667781;font-size:10px;font-weight:500;padding:2px 10px;border-radius:8px}
+.msg{display:flex;flex-direction:column;max-width:84%;opacity:0;transform:translateY(6px);transition:opacity .35s ease,transform .35s ease}
 .msg.show{opacity:1;transform:translateY(0)}
 .msg.in{align-self:flex-start}
 .msg.out{align-self:flex-end}
-
-.msg-bub{
-  padding:7px 9px 5px;
-  border-radius:8px;
-  font-size:11.5px;
-  line-height:1.5;
-  color:#111;
-  word-break:break-word;
-}
+.msg-bub{padding:7px 9px 5px;border-radius:8px;font-size:11.5px;line-height:1.5;color:#111;word-break:break-word}
 .msg.in .msg-bub{background:#fff;border-top-left-radius:2px}
 .msg.out .msg-bub{background:var(--gal);border-top-right-radius:2px}
-
-.msg-time{
-  font-size:9px;color:#667781;
-  text-align:right;margin-top:1px;padding-right:2px;
-}
+.msg-time{font-size:9px;color:#667781;text-align:right;margin-top:1px;padding-right:2px}
 .msg.in .msg-time{text-align:left}
-
-.lesson-card{
-  background:#fff;border-radius:8px;border-top-left-radius:2px;
-  overflow:hidden;max-width:84%;align-self:flex-start;
-  opacity:0;transform:translateY(6px);
-  transition:opacity .35s ease,transform .35s ease;
-}
+.lesson-card{background:#fff;border-radius:8px;border-top-left-radius:2px;overflow:hidden;max-width:84%;align-self:flex-start;opacity:0;transform:translateY(6px);transition:opacity .35s ease,transform .35s ease}
 .lesson-card.show{opacity:1;transform:translateY(0)}
-
 .lesson-head{background:var(--g);padding:7px 10px}
 .lesson-tag{font-size:9px;font-weight:700;color:rgba(255,255,255,.75);text-transform:uppercase;letter-spacing:.05em}
 .lesson-title{font-size:11.5px;font-weight:700;color:#fff;margin-top:2px;line-height:1.3}
-
 .lesson-body{padding:7px 10px;font-size:10.5px;line-height:1.55;color:#222}
-
-.lesson-task{
-  border-top:1px solid rgba(0,0,0,.08);
-  margin-top:5px;padding-top:5px;
-  font-size:10px;color:#333;
-}
+.lesson-task{border-top:1px solid rgba(0,0,0,.08);margin-top:5px;padding-top:5px;font-size:10px;color:#333}
 .task-label{font-size:9px;font-weight:700;color:var(--g);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
-
 .lesson-foot{font-size:9px;color:#667781;text-align:right;padding:3px 10px 5px}
-
-.fb-card{
-  background:#fff;border-radius:8px;border-top-left-radius:2px;
-  overflow:hidden;max-width:84%;align-self:flex-start;
-  opacity:0;transform:translateY(6px);
-  transition:opacity .35s ease,transform .35s ease;
-}
+.fb-card{background:#fff;border-radius:8px;border-top-left-radius:2px;overflow:hidden;max-width:84%;align-self:flex-start;opacity:0;transform:translateY(6px);transition:opacity .35s ease,transform .35s ease}
 .fb-card.show{opacity:1;transform:translateY(0)}
-
 .fb-head{background:#128C7E;padding:5px 10px;color:#fff;font-size:10px;font-weight:700}
 .fb-body{padding:7px 10px;font-size:10.5px;line-height:1.55;color:#222}
 .fb-foot{font-size:9px;color:#667781;text-align:right;padding:3px 10px 5px}
-
-.typing{
-  display:flex;align-items:center;gap:4px;
-  background:#fff;padding:8px 12px;
-  border-radius:8px;border-top-left-radius:2px;
-  align-self:flex-start;max-width:60px;
-  opacity:0;transition:opacity .2s;
-}
+.typing{display:flex;align-items:center;gap:4px;background:#fff;padding:8px 12px;border-radius:8px;border-top-left-radius:2px;align-self:flex-start;max-width:60px;opacity:0;transition:opacity .2s}
 .typing.show{opacity:1}
 .td{width:6px;height:6px;background:#667781;border-radius:50%;animation:tb 1.2s infinite}
 .td:nth-child(2){animation-delay:.2s}
 .td:nth-child(3){animation-delay:.4s}
 @keyframes tb{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-4px)}}
-
-.proof-bar{
-  border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);
-  background:var(--white);padding:20px 24px;
-  display:flex;align-items:center;justify-content:center;
-  gap:40px;flex-wrap:wrap;
-}
-
+.proof-bar{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);background:var(--white);padding:20px 24px;display:flex;align-items:center;justify-content:center;gap:40px;flex-wrap:wrap}
 .proof-item{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mute);font-weight:500}
 .proof-icon{font-size:18px}
-
 .section{max-width:1100px;margin:0 auto;padding:80px 24px}
-
-.section-eyebrow{
-  font-size:12px;font-weight:600;color:var(--ga);
-  letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;
-}
-
-.section-title{
-  font-family:'Bricolage Grotesque',sans-serif;
-  font-size:clamp(28px,4vw,44px);font-weight:800;
-  line-height:1.12;letter-spacing:-.02em;color:var(--ink);margin-bottom:16px;
-}
-
+.section-eyebrow{font-size:12px;font-weight:600;color:var(--ga);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
+.section-title{font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(28px,4vw,44px);font-weight:800;line-height:1.12;letter-spacing:-.02em;color:var(--ink);margin-bottom:16px}
 .section-title span{color:var(--g)}
-
-.section-body{
-  font-size:17px;color:var(--body);line-height:1.7;
-  max-width:600px;margin-bottom:48px;
-}
-
+.section-body{font-size:17px;color:var(--body);line-height:1.7;max-width:600px;margin-bottom:48px}
 .problem-section{background:var(--white)}
-
-.problem-grid{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-  gap:1px;background:var(--rule);border:1px solid var(--rule);
-  border-radius:16px;overflow:hidden;
-}
-
+.problem-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:16px;overflow:hidden}
 .problem-item{background:var(--white);padding:28px 24px;display:flex;gap:16px}
 .problem-icon{font-size:24px;flex-shrink:0;margin-top:2px}
-
-.problem-item h3{
-  font-family:'Bricolage Grotesque',sans-serif;
-  font-size:16px;font-weight:700;margin-bottom:6px;color:var(--ink);
-}
-
+.problem-item h3{font-family:'Bricolage Grotesque',sans-serif;font-size:16px;font-weight:700;margin-bottom:6px;color:var(--ink)}
 .problem-item p{font-size:14px;color:var(--mute);line-height:1.6}
-
 .steps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:24px}
-
-.step{
-  background:var(--white);border:1px solid var(--rule);
-  border-radius:16px;padding:28px 24px;position:relative;
-}
-
-.step-num{
-  font-family:'Bricolage Grotesque',sans-serif;
-  font-size:48px;font-weight:800;color:rgba(37,211,102,.15);
-  line-height:1;margin-bottom:12px;letter-spacing:-.03em;
-}
-
+.step{background:var(--white);border:1px solid var(--rule);border-radius:16px;padding:28px 24px;position:relative}
+.step-num{font-family:'Bricolage Grotesque',sans-serif;font-size:48px;font-weight:800;color:rgba(37,211,102,.15);line-height:1;margin-bottom:12px;letter-spacing:-.03em}
 .step h3{font-family:'Bricolage Grotesque',sans-serif;font-size:17px;font-weight:700;margin-bottom:8px;color:var(--ink)}
 .step p{font-size:14px;color:var(--mute);line-height:1.6}
-
 .curriculum-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-bottom:40px}
-
 .week-card{background:var(--white);border:1px solid var(--rule);border-radius:14px;padding:20px}
-
 .week-label{font-size:11px;font-weight:700;color:var(--ga);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
-
 .week-card h3{font-family:'Bricolage Grotesque',sans-serif;font-size:15px;font-weight:700;color:var(--ink);margin-bottom:8px}
-
 .week-card ul{list-style:none;display:flex;flex-direction:column;gap:4px}
-
 .week-card li{font-size:12.5px;color:var(--mute);display:flex;align-items:flex-start;gap:6px;line-height:1.4}
-
 .week-card li::before{content:'→';color:var(--ga);flex-shrink:0;font-size:11px;margin-top:2px}
-
 .income-section{background:var(--g);padding:80px 24px}
 .income-inner{max-width:1100px;margin:0 auto}
 .income-section .section-eyebrow{color:var(--ga)}
 .income-section .section-title{color:#fff}
 .income-section .section-title span{color:var(--ga)}
 .income-section .section-body{color:rgba(255,255,255,.65)}
-
 .rates-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
-
 .rate-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:20px}
 .rate-service{font-size:13px;color:rgba(255,255,255,.55);margin-bottom:8px;font-weight:500}
 .rate-amount{font-family:'Bricolage Grotesque',sans-serif;font-size:22px;font-weight:800;color:var(--ga);line-height:1;letter-spacing:-.02em}
-
 .testi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.testi-card{background:var(--white);border:1px solid var(--rule);border-radius:16px;padding:28px}
+.testi-stars{color:var(--ga);font-size:14px;margin-bottom:12px;letter-spacing:2px}
+.testi-quote{font-size:15px;color:var(--body);line-height:1.7;margin-bottom:16px;font-style:italic}
+.testi-author{display:flex;align-items:center;gap:12px}
+.testi-av{width:40px;height:40px;background:var(--gal);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque',sans-serif;font-size:14px;font-weight:800;color:var(--g);flex-shrink:0}
+.testi-name{font-size:14px;font-weight:700;color:var(--ink)}
+.testi-title{font-size:12px;color:var(--mute)}
+.pricing-section{background:var(--white)}
+.pricing-card{max-width:520px;margin:0 auto;background:var(--bg);border:2px solid var(--ga);border-radius:20px;overflow:hidden}
+.pricing-head{background:var(--g);padding:24px 32px;text-align:center}
+.pricing-head h3{font-family:'Bricolage Grotesque',sans-serif;font-size:22px;font-weight:800;color:#fff;margin-bottom:4px}
+.pricing-head p{font-size:14px;color:rgba(255,255,255,.65)}
+.pricing-body{padding:32px}
+.price-display{text-align:center;margin-bottom:28px}
+.price-label{font-size:13px;color:var(--mute);margin-bottom:4px}
+.price-amount{font-family:'Bricolage Grotesque',sans-serif;font-size:56px;font-weight:800;color:var(--ink);line-height:1;letter-spacing:-.03em}
+.price-amount span{font-size:22px;color:var(--mute);font-weight:500}
+.price-context{font-size:13px;color:var(--mute);margin-top:6px}
+.value-stack{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.value-item{display:flex;justify-content:space-between;align-items:center;font-size:14px;padding-bottom:10px;border-bottom:1px solid var(--rule)}
+.value-item:last-child{border-bottom:none;padding-bottom:0}
+.value-name{color:var(--body);font-weight:500}
+.value-included{color:var(--ga);font-weight:700;font-size:13px}
+.pricing-cta{display:block;width:100%;background:var(--ga);color:var(--ink);font-size:17px;font-weight:800;padding:18px;border-radius:14px;text-decoration:none;text-align:center;transition:transform .15s,box-shadow .15s;letter-spacing:-.01em;margin-bottom:14px}
+.pricing-cta:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(37,211,102,.3)}
+.pricing-note{text-align:center;font-size:13px;color:var(--mute);line-height:1.6}
+.faq-list{display:flex;flex-direction:column;gap:0;border:1px solid var(--rule);border-radius:16px;overflow:hidden;max-width:720px;margin:0 auto}
+.faq-item{background:var(--white);border-bottom:1px solid var(--rule)}
+.faq-item:last-child{border-bottom:none}
+.faq-q{width:100%;background:none;border:none;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;font-family:'Bricolage Grotesque',sans-serif;font-size:16px;font-weight:700;color:var(--ink);text-align:left;cursor:pointer}
+.faq-icon{font-size:18px;color:var(--ga);flex-shrink:0;transition:transform .2s}
+.faq-item.open .faq-icon{transform:rotate(45deg)}
+.faq-a{display:none;padding:0 24px 20px;font-size:15px;color:var(--body);line-height:1.7}
+.faq-item.open .faq-a{display:block}
+.final-cta-section{background:var(--g);padding:80px 24px;text-align:center}
+.final-cta-section h2{font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(32px,5vw,52px);font-weight:800;color:#fff;line-height:1.1;letter-spacing:-.025em;max-width:600px;margin:0 auto 16px}
+.final-cta-section h2 span{color:var(--ga)}
+.final-cta-section p{font-size:17px;color:rgba(255,255,255,.65);max-width:480px;margin:0 auto 36px;line-height:1.65}
+.final-btn{display:inline-block;background:var(--ga);color:var(--ink);font-size:17px;font-weight:800;padding:18px 40px;border-radius:14px;text-decoration:none;transition:transform .15s,box-shadow .15s;letter-spacing:-.01em}
+.final-btn:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(37,211,102,.3)}
+.final-note{font-size:13px;color:rgba(255,255,255,.4);margin-top:14px}
+footer{border-top:1px solid var(--rule);padding:28px 24px;text-align:center;background:var(--white)}
+footer p{font-size:13px;color:var(--mute)}
+footer a{color:var(--mute);text-decoration:none}
+footer a:hover{color:var(--g)}
+@media(max-width:600px){.proof-bar{gap:20px}.pricing-body{padding:24px 20px}.faq-q{font-size:15px;padding:16px 18px}.faq-a{padding:0 18px 16px}}
+</style>
+</head>
+<body>
 
-.testi-card{background:var(--
+<nav>
+  <div class="nav-logo">Skill<span>Stack</span> NG</div>
+  <a href="https://paystack.shop/pay/2-h3igsfd2" class="nav-cta">Start for ₦5,000/month →</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-text">
+    <div class="hero-eyebrow"><span class="live-dot"></span> Now open — copywriting track</div>
+    <h1>Nigerian freelancers earn ₦500k/month from <em>writing.</em> Learn the skill in 90 days.</h1>
+    <p class="hero-sub">SkillStack NG delivers one copywriting lesson to your WhatsApp every morning. 15 minutes. Monday to Friday. An AI coach gives you personal feedback the same day. No app. No login. Just your phone.</p>
+    <div class="hero-actions">
+      <a href="https://paystack.shop/pay/2-h3igsfd2" class="btn-primary">Start learning today — ₦5,000/month →</a>
+      <a href="https://skillstack-ng.onrender.com" class="btn-secondary">See how it works first</a>
+    </div>
+    <div class="hero-trust">
+      <span>65 lessons</span><span class="trust-dot"></span>
+      <span>AI feedback daily</span><span class="trust-dot"></span>
+      <span>Cancel anytime</span>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="phone-frame">
+      <div class="phone-screen">
+        <div class="wa-head">
+          <div class="wa-av">SN</div>
+          <div class="wa-info">
+            <div class="wa-name">SkillStack NG</div>
+            <div class="wa-status" id="wa-status">online</div>
+          </div>
+        </div>
+        <div class="wa-chat" id="chat">
+          <div class="wa-date"><span>Today</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="proof-bar">
+  <div class="proof-item"><span class="proof-icon">📚</span> 65 lessons written</div>
+  <div class="proof-item"><span class="proof-icon">🤖</span> AI feedback on every task</div>
+  <div class="proof-item"><span class="proof-icon">🇳🇬</span> Built for Nigerian market</div>
+  <div class="proof-item"><span class="proof-icon">📱</span> Delivered on WhatsApp</div>
+  <div class="proof-item"><span class="proof-icon">⏱️</span> 15 minutes per day</div>
+</div>
+
+<div class="problem-section">
+<section class="section">
+  <div class="section-eyebrow">The problem</div>
+  <h2 class="section-title">Most Nigerians who try to learn copywriting <span>never finish.</span></h2>
+  <p class="section-body">Not because they are not serious. Because the format does not fit the life.</p>
+  <div class="problem-grid">
+    <div class="problem-item">
+      <div class="problem-icon">😓</div>
+      <div>
+        <h3>Course platforms require commitment</h3>
+        <p>A 6-hour video course requires 6 hours you do not have. A 15-minute WhatsApp lesson requires 15 minutes you already spend on your phone.</p>
+      </div>
+    </div>
+    <div class="problem-item">
+      <div class="problem-icon">🌍</div>
+      <div>
+        <h3>Foreign examples do not translate</h3>
+        <p>Most copywriting courses use Starbucks and Apple as examples. Nigerian buyers think differently. Nigerian markets work differently.</p>
+      </div>
+    </div>
+    <div class="problem-item">
+      <div class="problem-icon">🔇</div>
+      <div>
+        <h3>No feedback on your actual work</h3>
+        <p>Watching videos does not make you a copywriter. Writing copy and getting specific feedback on your specific work does.</p>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+
+<section class="section">
+  <div class="section-eyebrow">How it works</div>
+  <h2 class="section-title">Four steps. <span>90 days.</span> One skill that pays.</h2>
+  <div class="steps-grid">
+    <div class="step">
+      <div class="step-num">01</div>
+      <h3>Lesson arrives on WhatsApp</h3>
+      <p>Every morning Monday to Friday your lesson appears on WhatsApp at the time you choose. Read it on your commute, at lunch, or before your first meeting.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <h3>You do the task</h3>
+      <p>Every lesson ends with a practical task. Apply what you just learned to a real Nigerian product, brand, or scenario. Then reply with your answer.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <h3>AI coach gives you feedback</h3>
+      <p>An AI coach trained on Nigerian copywriting reads your submission and sends back specific, personal coaching immediately — every single day.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <h3>Your skills compound</h3>
+      <p>By Day 30 you can write captions that convert. By Day 60 you can pitch clients. By Day 90 you have a portfolio, a rate card, and a plan to earn.</p>
+    </div>
+  </div>
+</section>
+
+<div class="problem-section">
+<section class="section">
+  <div class="section-eyebrow">The curriculum</div>
+  <h2 class="section-title">65 lessons. 9 weeks. <span>Everything you need.</span></h2>
+  <p class="section-body">Every lesson was written specifically for Nigerian copywriters — with Nigerian examples, Nigerian market context, and Nigerian income opportunities at the centre.</p>
+  <div class="curriculum-grid">
+    <div class="week-card">
+      <div class="week-label">Week 1 — 2</div>
+      <h3>Foundation</h3>
+      <ul>
+        <li>What copy is and why it works</li>
+        <li>The PAS formula</li>
+        <li>Writing headlines</li>
+        <li>Nigerian audience writing</li>
+      </ul>
+    </div>
+    <div class="week-card">
+      <div class="week-label">Week 3 — 4</div>
+      <h3>Advanced Techniques</h3>
+      <ul>
+        <li>Platform-specific writing</li>
+        <li>Pricing copy</li>
+        <li>Urgency and scarcity</li>
+        <li>Product launch sequences</li>
+      </ul>
+    </div>
+    <div class="week-card">
+      <div class="week-label">Week 5 — 6</div>
+      <h3>Persuasion and Industries</h3>
+      <ul>
+        <li>Buyer psychology</li>
+        <li>Real estate copy</li>
+        <li>Fintech and food copy</li>
+        <li>Fashion and health copy</li>
+      </ul>
+    </div>
+    <div class="week-card">
+      <div class="week-label">Week 7 — 9</div>
+      <h3>Business and Craft</h3>
+      <ul>
+        <li>Setting your rates</li>
+        <li>Getting clients</li>
+        <li>Building a portfolio</li>
+        <li>Your 90-day roadmap</li>
+      </ul>
+    </div>
+  </div>
+</section>
+</div>
+
+<div class="income-section">
+<section class="section income-inner">
+  <div class="section-eyebrow">What this skill pays</div>
+  <h2 class="section-title" style="color:#fff">Nigerian copywriter rates <span>in 2026.</span></h2>
+  <p class="section-body" style="color:rgba(255,255,255,.6)">These are real rates paid by Nigerian brands right now. One client at these rates covers months of SkillStack NG subscription.</p>
+  <div class="rates-grid">
+    <div class="rate-card"><div class="rate-service">Landing page</div><div class="rate-amount">₦100k–₦300k</div></div>
+    <div class="rate-card"><div class="rate-service">Email sequence</div><div class="rate-amount">₦60k–₦150k</div></div>
+    <div class="rate-card"><div class="rate-service">Caption package</div><div class="rate-amount">₦40k–₦120k</div></div>
+    <div class="rate-card"><div class="rate-service">Monthly retainer</div><div class="rate-amount">₦80k–₦250k</div></div>
+    <div class="rate-card"><div class="rate-service">Sales page</div><div class="rate-amount">₦150k–₦500k</div></div>
+    <div class="rate-card"><div class="rate-service">Brand voice guide</div><div class="rate-amount">₦100k–₦300k</div></div>
+  </div>
+</section>
+</div>
+
+<section class="section">
+  <div class="section-eyebrow">Beta tester feedback</div>
+  <h2 class="section-title">What early users <span>are saying.</span></h2>
+  <div class="testi-grid">
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-quote">"I have tried three copywriting courses before and abandoned all of them. SkillStack NG is different — the lesson is already on my phone before I am fully awake. I have not missed a day in two weeks."</p>
+      <div class="testi-author">
+        <div class="testi-av">AT</div>
+        <div><div class="testi-name">Adaeze T.</div><div class="testi-title">Marketing executive, Lagos</div></div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-quote">"The AI feedback is what makes this different. It does not just tell me good job — it tells me exactly which word was weak and exactly how to fix it. I am actually learning, not just consuming."</p>
+      <div class="testi-author">
+        <div class="testi-av">EO</div>
+        <div><div class="testi-name">Emeka O.</div><div class="testi-title">Freelancer, Abuja</div></div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-quote">"Day 12 and I already rewrote my brand captions. My engagement went up immediately. The Nigerian examples are what make it click — not Starbucks, not Apple. Actual Lagos brands."</p>
+      <div class="testi-author">
+        <div class="testi-av">FS</div>
+        <div><div class="testi-name">Fatima S.</div><div class="testi-title">Small business owner, Kano</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="pricing-section">
+<section class="section">
+  <div class="section-eyebrow">Pricing</div>
+  <h2 class="section-title" style="text-align:center">Simple, honest <span>pricing.</span></h2>
+  <p class="section-body" style="margin:0 auto 48px;text-align:center">One plan. Everything included. Cancel anytime.</p>
+  <div class="pricing-card">
+    <div class="pricing-head">
+      <h3>SkillStack NG — Copywriting Track</h3>
+      <p>90 days. 65 lessons. AI coaching every day.</p>
+    </div>
+    <div class="pricing-body">
+      <div class="price-display">
+        <div class="price-label">Monthly subscription</div>
+        <div class="price-amount">₦5,000 <span>/month</span></div>
+        <div class="price-context">That is ₦167 per day — less than a bottle of Lacasera</div>
+      </div>
+      <div class="value-stack">
+        <div class="value-item"><span class="value-name">65 copywriting lessons</span><span class="value-included">Included</span></div>
+        <div class="value-item"><span class="value-name">AI feedback on every task</span><span class="value-included">Included</span></div>
+        <div class="value-item"><span class="value-name">WhatsApp delivery — no app</span><span class="value-included">Included</span></div>
+        <div class="value-item"><span class="value-name">Nigerian context throughout</span><span class="value-included">Included</span></div>
+        <div class="value-item"><span class="value-name">Portfolio and rate card templates</span><span class="value-included">Included</span></div>
+        <div class="value-item"><span class="value-name">Streak tracking and re-engagement</span><span class="value-included">Included</span></div>
+      </div>
+      <a href="https://paystack.shop/pay/2-h3igsfd2" class="pricing-cta">Start learning today →</a>
+      <p class="pricing-note">First lesson arrives immediately after payment. Enter your WhatsApp number on the payment form. Cancel anytime by contacting us.</p>
+    </div>
+  </div>
+</section>
+</div>
+
+<section class="section">
+  <div class="section-eyebrow">Questions</div>
+  <h2 class="section-title" style="text-align:center;margin-bottom:40px">Everything you want to <span>know.</span></h2>
+  <div class="faq-list">
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">Do I need writing experience to join?<span class="faq-icon">+</span></button>
+      <div class="faq-a">None at all. SkillStack NG starts from the very beginning — what copy is, why it works, and how to write your first sentence. The only requirement is that you show up for 15 minutes every morning.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">What if I miss a day?<span class="faq-icon">+</span></button>
+      <div class="faq-a">Your lesson waits for you. Reply CONTINUE any time you fall behind and your lesson is sent immediately. The bot also notices when you miss a day and sends you a reminder. Life happens — the programme is built for that.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">How does the AI feedback work?<span class="faq-icon">+</span></button>
+      <div class="faq-a">Every task you submit is read by an AI coach trained specifically for Nigerian copywriting contexts. It sends back three things: one specific strength, one specific improvement, and one pro tip you can apply immediately. No generic praise. No vague criticism. Specific, personal coaching every day.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">When will I be able to get my first paying client?<span class="faq-icon">+</span></button>
+      <div class="faq-a">Students who complete the programme and apply the client pitch framework from Week 7 typically land their first client within 30 to 60 days of finishing. Results depend on effort — but the framework is built on what actually works in the Nigerian freelance market.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">Can I use this to improve my own brand's copy?<span class="faq-icon">+</span></button>
+      <div class="faq-a">Absolutely. Many SkillStack NG subscribers are business owners who want to write better captions, emails, and sales pages for their own brand. The skills apply equally whether you are writing for clients or for yourself.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">How do I cancel?<span class="faq-icon">+</span></button>
+      <div class="faq-a">Send an email to amarissynergylimited@gmail.com and we cancel your subscription immediately. No long process. No questions asked.</div>
+    </div>
+  </div>
+</section>
+
+<div class="final-cta-section">
+  <h2>Start your 90-day copywriting journey <span>today.</span></h2>
+  <p>15 minutes a day. Your first lesson arrives on WhatsApp immediately after payment. No app. No login. Just your phone and the discipline to show up.</p>
+  <a href="https://paystack.shop/pay/2-h3igsfd2" class="final-btn">Start for ₦5,000/month →</a>
+  <div class="final-note">Cancel anytime · Nigerian-built · AI feedback daily</div>
+</div>
+
+<footer>
+  <p>SkillStack NG is operated by Amaris Synergy Limited, Lagos, Nigeria. &nbsp;·&nbsp; <a href="/privacy">Privacy Policy</a> &nbsp;·&nbsp; <a href="/terms">Terms of Service</a> &nbsp;·&nbsp; amarissynergylimited@gmail.com</p>
+</footer>
+
+<script>
+function toggleFaq(btn) {
+  btn.parentElement.classList.toggle('open');
+}
+
+const chat = document.getElementById('chat');
+
+function later(fn, ms) { return setTimeout(fn, ms); }
+
+function addMsg(type, html, time) {
+  const el = document.createElement('div');
+  el.className = 'msg ' + type;
+  const ticks = type === 'out' ? '<span style="color:#53bdeb;font-size:9px">✓✓</span> ' : '';
+  el.innerHTML = '<div class="msg-bub">' + html + '</div><div class="msg-time">' + ticks + time + '</div>';
+  chat.appendChild(el);
+  later(() => el.classList.add('show'), 50);
+  later(() => { chat.scrollTop = chat.scrollHeight; }, 100);
+}
+
+function addLesson() {
+  const el = document.createElement('div');
+  el.className = 'lesson-card';
+  el.innerHTML = '<div class="lesson-head"><div class="lesson-tag">📚 Day 1 of 90 — SkillStack NG</div><div class="lesson-title">What copy actually is (and why it works)</div></div><div class="lesson-body">Copy has one job — to make someone take action. Every word you write is either pushing the reader toward that action or pulling them away.<div class="lesson-task"><div class="task-label">✏️ Today\'s task</div>Write two descriptions of any product: A — regular writing. B — copy that sells. Reply with both.</div></div><div class="lesson-foot">7:02 AM</div>';
+  chat.appendChild(el);
+  later(() => el.classList.add('show'), 50);
+  later(() => { chat.scrollTop = chat.scrollHeight; }, 100);
+}
+
+function addFeedback() {
+  const el = document.createElement('div');
+  el.className = 'fb-card';
+  el.innerHTML = '<div class="fb-head">🤖 AI Coach Feedback — Day 1</div><div class="fb-body">✅ Strength: Version B creates real desire — Nigerian-specific and vivid.<br><br>⚠️ Improve: Add one sensory detail to make it land harder.<br><br>💡 Pro tip: Name the occasion. "The bag for owambe season" beats any generic claim.</div><div class="fb-foot">7:03 AM</div>';
+  chat.appendChild(el);
+  later(() => el.classList.add('show'), 50);
+  later(() => { chat.scrollTop = chat.scrollHeight; }, 100);
+}
+
+function addTyping() {
+  const el = document.createElement('div');
+  el.className = 'typing';
+  el.innerHTML = '<div class="td"></div><div class="td"></div><div class="td"></div>';
+  chat.appendChild(el);
+  later(() => el.classList.add('show'), 50);
+  later(() => { chat.scrollTop = chat.scrollHeight; }, 100);
+  return el;
+}
+
+function removeEl(el) {
+  el.classList.remove('show');
+  later(() => { if(el.parentNode) el.parentNode.removeChild(el); }, 300);
+}
+
+function runDemo() {
+  while(chat.children.length > 1) chat.removeChild(chat.lastChild);
+  document.getElementById('wa-status').textContent = 'online';
+  let t = 800;
+  later(() => addLesson(), t); t += 4000;
+  later(() => addMsg('out', 'A: A brown leather bag with gold handles and zip.<br><br>B: The bag that makes your outfit make sense — carry it to an interview and an owambe and both times it is right.', '7:02 AM'), t); t += 3000;
+  later(() => {
+    document.getElementById('wa-status').textContent = 'typing...';
+    const ty = addTyping();
+    later(() => {
+      document.getElementById('wa-status').textContent = 'online';
+      removeEl(ty);
+      addFeedback();
+    }, 3000);
+  }, t); t += 4500;
+  later(() => {
+    addMsg('in', '🔥 Streak: 1 day. See you tomorrow for Day 2 — Headlines: The 5 seconds that determine everything.', '7:03 AM');
+  }, t); t += 2000;
+  later(() => runDemo(), t + 3000);
+}
+
+later(() => runDemo(), 1000);
+</script>
+</body>
+</html>
