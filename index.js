@@ -118,13 +118,12 @@ function formatLesson(lesson, dayNumber) {
 async function activateSubscriber(whatsappNumber, name) {
   try {
     const cleanPhone = whatsappNumber.replace(/\D/g, '');
-    
-    // Ensure number starts with country code
+
     let finalPhone = cleanPhone;
     if (finalPhone.startsWith('0')) {
       finalPhone = '234' + finalPhone.substring(1);
     }
-    
+
     console.log('Activating subscriber: ' + finalPhone);
 
     let sub = await getSubscriber(finalPhone);
@@ -262,7 +261,6 @@ app.post('/paystack-webhook', async (req, res) => {
     const event = JSON.parse(req.body);
     console.log('Paystack event received:', event.event);
 
-    // Only process charge.success — ignore subscription.create to avoid duplicates
     if (event.event === 'charge.success') {
       const data = event.data;
       const customerName = data.customer && data.customer.first_name
@@ -402,6 +400,10 @@ app.get('/terms', (req, res) => {
 
 app.get('/beta', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'beta.html'));
+});
+
+app.get('/landing', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'landing.html'));
 });
 
 app.get('/', (req, res) => {
