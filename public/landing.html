@@ -9,359 +9,416 @@
     :root {
       --green: #00C48C;
       --green-dark: #009e72;
-      --ink: #0D1117;
-      --ink-2: #1C2431;
-      --muted: #5A6478;
-      --border: #232D3F;
-      --card: #141B27;
+      --dark: #0D1F17;
       --white: #FFFFFF;
-      --gold: #F5C842;
+      --off-white: #F7FAF8;
+      --light-gray: #F0F4F2;
+      --text: #1A2E1F;
+      --text-muted: #5A7A65;
+      --border: #D8EAE0;
+      --card-bg: #FFFFFF;
+      --gold: #F5A623;
     }
+
     html { scroll-behavior: smooth; }
+
     body {
-      background: var(--ink);
-      color: var(--white);
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      line-height: 1.6;
+      color: var(--text);
+      background: var(--white);
       overflow-x: hidden;
     }
 
-    /* NAV */
+    /* ── NAV ── */
     nav {
       position: sticky; top: 0; z-index: 100;
-      background: rgba(13,17,23,0.92);
+      background: rgba(13,31,23,0.97);
       backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
       padding: 0 24px;
       display: flex; align-items: center; justify-content: space-between;
       height: 60px;
     }
-    .nav-logo { font-weight: 800; font-size: 1.1rem; color: var(--white); text-decoration: none; }
+    .nav-logo { font-weight: 800; font-size: 1.1rem; color: #fff; text-decoration: none; }
     .nav-logo span { color: var(--green); }
     .nav-cta {
-      background: var(--green); color: var(--ink);
-      padding: 8px 18px; border-radius: 8px;
+      background: var(--green); color: var(--dark);
+      padding: 8px 20px; border-radius: 8px;
       font-weight: 700; font-size: 0.85rem;
-      text-decoration: none; white-space: nowrap;
+      text-decoration: none;
     }
 
-    /* SECTIONS */
+    /* ── HERO — dark green ── */
+    .hero-section {
+      background: linear-gradient(135deg, #0D1F17 0%, #112B1C 100%);
+      color: #fff;
+      padding: 72px 24px 80px;
+    }
+    .hero-inner {
+      max-width: 960px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 56px; align-items: center;
+    }
+    .hero-eyebrow {
+      display: inline-block;
+      background: rgba(0,196,140,0.15);
+      border: 1px solid rgba(0,196,140,0.3);
+      color: var(--green);
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      border-radius: 20px; padding: 4px 14px;
+      margin-bottom: 20px;
+    }
+    .hero-section h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800; line-height: 1.1;
+      margin-bottom: 18px; color: #fff;
+    }
+    .hero-section h1 em { color: var(--green); font-style: normal; }
+    .hero-section .lead {
+      font-size: 1.05rem; color: rgba(255,255,255,0.7);
+      line-height: 1.7; margin-bottom: 32px;
+    }
+    .btn-primary {
+      display: inline-block;
+      background: var(--green); color: var(--dark);
+      padding: 14px 28px; border-radius: 10px;
+      font-weight: 800; font-size: 1rem;
+      text-decoration: none; margin-right: 12px;
+      transition: background 0.15s;
+    }
+    .btn-primary:hover { background: var(--green-dark); }
+    .btn-ghost {
+      display: inline-block;
+      border: 1px solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.8);
+      padding: 14px 24px; border-radius: 10px;
+      font-weight: 600; font-size: 0.95rem;
+      text-decoration: none;
+    }
+    .hero-pills {
+      display: flex; gap: 10px; flex-wrap: wrap; margin-top: 24px;
+    }
+    .pill {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 20px; padding: 5px 14px;
+      font-size: 0.78rem; font-weight: 600;
+      color: rgba(255,255,255,0.7);
+    }
+
+    /* WhatsApp mockup */
+    .wa-mockup {
+      background: #E5DDD5;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+      max-width: 300px; margin: 0 auto;
+    }
+    .wa-hdr {
+      background: #075E54;
+      padding: 12px 16px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .wa-av {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--green);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 0.75rem; color: #fff;
+      flex-shrink: 0;
+    }
+    .wa-nm { font-size: 0.9rem; font-weight: 700; color: #fff; }
+    .wa-st { font-size: 0.7rem; color: rgba(255,255,255,0.7); }
+    .wa-body { padding: 12px 10px; display: flex; flex-direction: column; gap: 8px; }
+    .wa-bubble {
+      background: #fff;
+      border-radius: 10px 10px 10px 2px;
+      padding: 10px 12px;
+      font-size: 0.78rem; line-height: 1.5; color: #111;
+    }
+    .wa-bubble.sent {
+      background: #DCF8C6;
+      border-radius: 10px 10px 2px 10px;
+      align-self: flex-end;
+    }
+    .wa-tag {
+      display: inline-block;
+      background: rgba(7,94,84,0.1); color: #075E54;
+      font-size: 0.65rem; font-weight: 700;
+      border-radius: 3px; padding: 1px 5px; margin-bottom: 4px;
+    }
+    .wa-time { font-size: 0.62rem; color: #999; text-align: right; margin-top: 3px; }
+
+    /* ── LIGHT SECTIONS ── */
     section { padding: 80px 24px; }
     .container { max-width: 960px; margin: 0 auto; }
-    .center { text-align: center; }
-
+    .section-center { text-align: center; }
     .eyebrow {
       display: inline-block;
       font-size: 11px; font-weight: 700;
-      letter-spacing: 0.18em; text-transform: uppercase;
+      letter-spacing: 0.16em; text-transform: uppercase;
       color: var(--green);
-      background: rgba(0,196,140,0.1);
-      border: 1px solid rgba(0,196,140,0.2);
-      border-radius: 20px;
-      padding: 4px 14px;
-      margin-bottom: 20px;
+      margin-bottom: 12px;
     }
-
-    h1 {
-      font-size: clamp(2rem, 6vw, 3.4rem);
-      font-weight: 800; line-height: 1.1;
-      margin-bottom: 20px;
-    }
-    h1 em { color: var(--green); font-style: normal; }
     h2 {
-      font-size: clamp(1.5rem, 4vw, 2.2rem);
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
       font-weight: 800; line-height: 1.2;
-      margin-bottom: 16px;
+      color: var(--text); margin-bottom: 14px;
     }
-    .lead {
-      font-size: 1.1rem; color: #A8B4C8;
-      max-width: 580px; margin: 0 auto 36px;
+    .section-lead {
+      font-size: 1.05rem; color: var(--text-muted);
+      max-width: 560px; margin: 0 auto 48px;
       line-height: 1.7;
     }
 
-    /* BUTTONS */
-    .btn-primary {
-      display: inline-block;
-      background: var(--green); color: var(--ink);
-      padding: 14px 28px; border-radius: 10px;
-      font-weight: 800; font-size: 1rem;
-      text-decoration: none;
-      transition: background 0.15s, transform 0.15s;
-    }
-    .btn-primary:hover { background: var(--green-dark); transform: translateY(-1px); }
-    .btn-ghost {
-      display: inline-block;
-      border: 1px solid var(--border); color: #A8B4C8;
-      padding: 14px 28px; border-radius: 10px;
-      font-weight: 600; font-size: 1rem;
-      text-decoration: none;
-      transition: border-color 0.15s;
-    }
-    .btn-ghost:hover { border-color: var(--green); color: var(--white); }
-    .btn-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 36px; }
-
-    /* STAT PILLS */
-    .stat-pills {
-      display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
-      margin-bottom: 0;
-    }
-    .pill {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 20px; padding: 6px 16px;
-      font-size: 0.8rem; font-weight: 600; color: #A8B4C8;
-    }
-
-    /* HERO WHATSAPP MOCKUP */
-    .hero-grid {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 48px; align-items: center;
-      max-width: 960px; margin: 0 auto;
-    }
-    .wa-mockup {
-      background: #111B21;
-      border-radius: 20px;
-      padding: 20px;
-      border: 1px solid #2A3942;
-      max-width: 340px;
-      margin: 0 auto;
-    }
-    .wa-header {
-      display: flex; align-items: center; gap: 10px;
-      padding-bottom: 14px; border-bottom: 1px solid #2A3942; margin-bottom: 16px;
-    }
-    .wa-avatar {
-      width: 36px; height: 36px; border-radius: 50%;
-      background: var(--green);
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 800; font-size: 0.8rem; color: var(--ink);
-    }
-    .wa-name { font-size: 0.9rem; font-weight: 700; }
-    .wa-status { font-size: 0.7rem; color: var(--green); }
-    .wa-bubble {
-      background: #1F2C34; border-radius: 12px 12px 12px 2px;
-      padding: 12px 14px; margin-bottom: 10px;
-      font-size: 0.82rem; line-height: 1.55; color: #E9EDEF;
-      position: relative;
-    }
-    .wa-bubble.sent {
-      background: #005C4B; border-radius: 12px 12px 2px 12px;
-      margin-left: auto; max-width: 85%;
-    }
-    .wa-time { font-size: 0.65rem; color: #8696A0; margin-top: 4px; text-align: right; }
-    .wa-tag {
-      display: inline-block; background: rgba(0,196,140,0.15);
-      color: var(--green); font-size: 0.7rem; font-weight: 700;
-      border-radius: 4px; padding: 1px 6px; margin-bottom: 6px;
-    }
-
-    /* TRACKS */
+    /* ── TRACKS ── */
+    .tracks-section { background: var(--off-white); }
     .tracks-grid {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 16px; margin-top: 40px;
     }
     .track-card {
-      background: var(--card); border: 1px solid var(--border);
+      background: #fff;
+      border: 1px solid var(--border);
       border-radius: 16px; padding: 24px;
-      transition: border-color 0.2s;
+      transition: box-shadow 0.2s, border-color 0.2s;
     }
-    .track-card:hover { border-color: var(--green); }
+    .track-card:hover { border-color: var(--green); box-shadow: 0 4px 20px rgba(0,196,140,0.1); }
     .track-card.live { border-color: var(--green); }
     .track-badge {
-      display: inline-block; font-size: 0.7rem; font-weight: 700;
+      display: inline-block;
+      font-size: 0.68rem; font-weight: 700;
       letter-spacing: 0.08em; text-transform: uppercase;
       border-radius: 4px; padding: 3px 8px; margin-bottom: 12px;
     }
-    .badge-live { background: rgba(0,196,140,0.15); color: var(--green); }
-    .badge-soon { background: rgba(90,100,120,0.2); color: var(--muted); }
-    .track-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
-    .track-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.5; margin-bottom: 12px; }
-    .track-demand {
-      font-size: 0.7rem; font-weight: 600; color: #A8B4C8;
-    }
+    .badge-live { background: rgba(0,196,140,0.12); color: var(--green); }
+    .badge-soon { background: #F0F4F2; color: #8AAA95; }
+    .track-card h3 { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .track-card p { font-size: 0.82rem; color: var(--text-muted); line-height: 1.55; margin-bottom: 10px; }
+    .track-demand { font-size: 0.7rem; font-weight: 600; color: #8AAA95; }
     .track-demand span { color: var(--gold); }
 
-    /* HOW IT WORKS */
+    /* ── PROBLEM ── */
+    .problem-section { background: var(--white); }
+    .problem-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 24px; margin-top: 40px;
+    }
+    .problem-card {
+      background: var(--off-white);
+      border: 1px solid var(--border);
+      border-radius: 16px; padding: 28px;
+    }
+    .problem-card .icon { font-size: 2rem; margin-bottom: 14px; }
+    .problem-card h3 { font-size: 0.95rem; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .problem-card p { font-size: 0.82rem; color: var(--text-muted); line-height: 1.55; }
+
+    /* ── HOW IT WORKS — dark ── */
+    .how-section {
+      background: linear-gradient(135deg, #0D1F17 0%, #112B1C 100%);
+      color: #fff;
+    }
+    .how-section h2 { color: #fff; }
+    .how-section .section-lead { color: rgba(255,255,255,0.65); }
+    .how-section .eyebrow { color: var(--green); }
     .steps-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
       gap: 24px; margin-top: 40px;
     }
     .step-card {
-      background: var(--card); border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
       border-radius: 16px; padding: 24px;
     }
     .step-num {
       width: 36px; height: 36px; border-radius: 10px;
-      background: rgba(0,196,140,0.1); border: 1px solid rgba(0,196,140,0.2);
+      background: rgba(0,196,140,0.15);
+      border: 1px solid rgba(0,196,140,0.25);
       display: flex; align-items: center; justify-content: center;
       font-weight: 800; font-size: 0.85rem; color: var(--green);
       margin-bottom: 14px;
     }
-    .step-card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 8px; }
-    .step-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+    .step-card h3 { font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 8px; }
+    .step-card p { font-size: 0.82rem; color: rgba(255,255,255,0.6); line-height: 1.55; }
 
-    /* CURRICULUM */
+    /* ── CURRICULUM ── */
+    .curriculum-section { background: var(--off-white); }
     .weeks-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(210px,1fr));
       gap: 16px; margin-top: 40px;
     }
     .week-card {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 16px; padding: 20px;
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 16px; padding: 22px;
     }
     .week-label {
-      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em;
-      text-transform: uppercase; color: var(--green); margin-bottom: 8px;
+      font-size: 0.68rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--green); margin-bottom: 8px;
     }
-    .week-card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 10px; }
+    .week-card h3 { font-size: 0.95rem; font-weight: 700; color: var(--text); margin-bottom: 10px; }
     .week-card ul { list-style: none; }
     .week-card ul li {
-      font-size: 0.82rem; color: var(--muted); padding: 4px 0;
-      border-bottom: 1px solid var(--border);
+      font-size: 0.8rem; color: var(--text-muted);
+      padding: 5px 0; border-bottom: 1px solid var(--border);
     }
     .week-card ul li:last-child { border-bottom: none; }
 
-    /* RATES */
+    /* ── RATES ── */
+    .rates-section { background: var(--white); }
     .rates-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(155px,1fr));
       gap: 12px; margin-top: 40px;
     }
     .rate-card {
-      background: var(--card); border: 1px solid var(--border);
+      background: var(--off-white);
+      border: 1px solid var(--border);
       border-radius: 14px; padding: 20px 16px; text-align: center;
     }
-    .rate-card .label { font-size: 0.8rem; color: var(--muted); margin-bottom: 8px; }
-    .rate-card .amount { font-size: 1.05rem; font-weight: 800; color: var(--green); }
+    .rate-card .label { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 8px; }
+    .rate-card .amount { font-size: 1rem; font-weight: 800; color: var(--green); }
 
-    /* CERTIFICATE */
+    /* ── CERTIFICATE — light ── */
+    .cert-section { background: var(--off-white); }
     .cert-card {
-      background: var(--card); border: 1px solid var(--border);
+      background: #fff;
+      border: 1px solid var(--border);
       border-radius: 20px; padding: 40px;
-      display: flex; gap: 32px; align-items: center;
-      flex-wrap: wrap;
+      display: flex; gap: 32px; align-items: center; flex-wrap: wrap;
     }
     .cert-icon {
       width: 80px; height: 80px; border-radius: 20px;
-      background: rgba(245,200,66,0.1); border: 1px solid rgba(245,200,66,0.2);
+      background: rgba(245,166,35,0.1);
+      border: 1px solid rgba(245,166,35,0.2);
       display: flex; align-items: center; justify-content: center;
       font-size: 2.5rem; flex-shrink: 0;
     }
-    .cert-text h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; }
-    .cert-text p { font-size: 0.9rem; color: var(--muted); line-height: 1.6; max-width: 480px; }
-    .cert-features {
-      display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px;
-    }
+    .cert-text h3 { font-size: 1.2rem; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .cert-text p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.65; max-width: 460px; }
+    .cert-feats { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
     .cert-feat {
-      background: rgba(0,196,140,0.08); border: 1px solid rgba(0,196,140,0.15);
+      background: rgba(0,196,140,0.08);
+      border: 1px solid rgba(0,196,140,0.2);
       border-radius: 6px; padding: 4px 10px;
-      font-size: 0.75rem; font-weight: 600; color: var(--green);
+      font-size: 0.72rem; font-weight: 600; color: var(--green);
     }
 
-    /* TESTIMONIALS */
+    /* ── TESTIMONIALS — dark ── */
+    .testi-section {
+      background: linear-gradient(135deg, #0D1F17 0%, #112B1C 100%);
+    }
+    .testi-section h2 { color: #fff; }
+    .testi-section .section-lead { color: rgba(255,255,255,0.65); }
+    .testi-section .eyebrow { color: var(--green); }
     .testi-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr));
       gap: 16px; margin-top: 40px;
     }
     .testi-card {
-      background: var(--card); border: 1px solid var(--border);
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
       border-radius: 16px; padding: 24px;
     }
     .stars { color: var(--gold); font-size: 0.9rem; margin-bottom: 12px; }
     .testi-card blockquote {
-      font-size: 0.88rem; line-height: 1.65; color: #A8B4C8;
-      margin-bottom: 16px; font-style: italic;
+      font-size: 0.88rem; line-height: 1.65;
+      color: rgba(255,255,255,0.8);
+      font-style: italic; margin-bottom: 16px;
     }
     .testi-author { display: flex; align-items: center; gap: 12px; }
-    .testi-avatar {
+    .testi-av {
       width: 38px; height: 38px; border-radius: 50%;
       background: var(--green);
       display: flex; align-items: center; justify-content: center;
-      font-weight: 800; font-size: 0.75rem; color: var(--ink);
+      font-weight: 800; font-size: 0.75rem; color: var(--dark);
       flex-shrink: 0;
     }
-    .testi-name { font-size: 0.85rem; font-weight: 700; }
-    .testi-role { font-size: 0.75rem; color: var(--muted); }
+    .testi-name { font-size: 0.85rem; font-weight: 700; color: #fff; }
+    .testi-role { font-size: 0.72rem; color: rgba(255,255,255,0.5); }
 
-    /* PRICING */
+    /* ── PRICING — light ── */
+    .pricing-section { background: var(--white); }
     .pricing-card {
-      background: var(--card); border: 2px solid var(--green);
+      background: #fff;
+      border: 2px solid var(--green);
       border-radius: 24px; padding: 40px;
       max-width: 520px; margin: 40px auto 0;
       text-align: center;
+      box-shadow: 0 8px 40px rgba(0,196,140,0.12);
     }
-    .pricing-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
-    .pricing-card .sub { font-size: 0.85rem; color: var(--muted); margin-bottom: 28px; }
-    .price-main {
-      font-size: 3rem; font-weight: 800; color: var(--green);
-      line-height: 1;
-    }
-    .price-period { font-size: 1rem; color: var(--muted); font-weight: 400; }
-    .price-note { font-size: 0.82rem; color: var(--muted); margin: 8px 0 28px; }
-    .price-increasing {
-      background: rgba(245,200,66,0.08); border: 1px solid rgba(245,200,66,0.2);
+    .pricing-card h3 { font-size: 1.1rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .pricing-card .sub { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 28px; }
+    .price-main { font-size: 3rem; font-weight: 800; color: var(--green); line-height: 1; }
+    .price-period { font-size: 1rem; color: var(--text-muted); font-weight: 400; }
+    .price-note { font-size: 0.82rem; color: var(--text-muted); margin: 8px 0 20px; }
+    .price-urgency {
+      background: rgba(245,166,35,0.08);
+      border: 1px solid rgba(245,166,35,0.25);
       border-radius: 10px; padding: 10px 16px;
-      font-size: 0.82rem; color: var(--gold); font-weight: 600;
-      margin-bottom: 28px;
+      font-size: 0.82rem; color: #C27A00;
+      font-weight: 600; margin-bottom: 24px;
     }
     .features-list { list-style: none; text-align: left; margin-bottom: 28px; }
     .features-list li {
       display: flex; align-items: center; gap: 10px;
       padding: 8px 0; border-bottom: 1px solid var(--border);
-      font-size: 0.88rem; color: #A8B4C8;
+      font-size: 0.88rem; color: var(--text);
     }
     .features-list li:last-child { border-bottom: none; }
-    .features-list li::before { content: "✓"; color: var(--green); font-weight: 700; flex-shrink: 0; }
+    .features-list li::before { content: "✓"; color: var(--green); font-weight: 700; }
     .pricing-cta {
       display: block; width: 100%;
-      background: var(--green); color: var(--ink);
+      background: var(--green); color: var(--dark);
       padding: 16px; border-radius: 12px;
       font-weight: 800; font-size: 1.05rem;
-      text-decoration: none; text-align: center;
+      text-decoration: none;
       transition: background 0.15s;
     }
     .pricing-cta:hover { background: var(--green-dark); }
-    .pricing-small { font-size: 0.78rem; color: var(--muted); margin-top: 12px; }
+    .pricing-small { font-size: 0.78rem; color: var(--text-muted); margin-top: 12px; }
 
-    /* FAQ */
+    /* ── FAQ — light ── */
+    .faq-section { background: var(--off-white); }
     .faq-list { max-width: 680px; margin: 40px auto 0; }
     details {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 12px; margin-bottom: 10px;
-      overflow: hidden;
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 12px; margin-bottom: 10px; overflow: hidden;
     }
     summary {
       padding: 18px 20px; font-weight: 600; font-size: 0.92rem;
-      cursor: pointer; list-style: none;
+      color: var(--text); cursor: pointer; list-style: none;
       display: flex; justify-content: space-between; align-items: center;
     }
     summary::-webkit-details-marker { display: none; }
     summary::after { content: "+"; color: var(--green); font-size: 1.2rem; }
     details[open] summary::after { content: "−"; }
-    details p { padding: 0 20px 18px; font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+    details p { padding: 0 20px 18px; font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; }
 
-    /* FINAL CTA */
-    .final-cta {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 24px; padding: 60px 40px; text-align: center;
+    /* ── FINAL CTA — dark ── */
+    .final-section {
+      background: linear-gradient(135deg, #0D1F17 0%, #112B1C 100%);
+      color: #fff; text-align: center;
     }
+    .final-section h2 { color: #fff; }
+    .final-section .section-lead { color: rgba(255,255,255,0.65); max-width: 480px; }
+    .final-section .eyebrow { color: var(--green); }
 
-    /* FOOTER */
+    /* ── FOOTER ── */
     footer {
-      border-top: 1px solid var(--border); padding: 24px;
-      text-align: center; font-size: 0.8rem; color: var(--muted);
+      background: #081410;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 24px; text-align: center;
+      font-size: 0.8rem; color: rgba(255,255,255,0.4);
     }
     footer a { color: var(--green); text-decoration: none; }
 
-    /* DIVIDER */
-    .divider { border: none; border-top: 1px solid var(--border); margin: 0; }
-
+    /* ── RESPONSIVE ── */
     @media (max-width: 680px) {
-      .hero-grid { grid-template-columns: 1fr; }
+      .hero-inner { grid-template-columns: 1fr; }
       .wa-mockup { display: none; }
       section { padding: 56px 20px; }
       .cert-card { flex-direction: column; text-align: center; padding: 28px 20px; }
-      .cert-features { justify-content: center; }
+      .cert-feats { justify-content: center; }
       .pricing-card { padding: 28px 20px; }
-      .final-cta { padding: 40px 20px; }
     }
   </style>
 </head>
@@ -373,20 +430,18 @@
   <a class="nav-cta" href="https://paystack.shop/pay/2-h3igsfd2">Start for ₦5,000/month →</a>
 </nav>
 
-<!-- HERO -->
-<section style="padding-top:72px;">
-  <div class="hero-grid">
+<!-- HERO — dark green -->
+<div class="hero-section">
+  <div class="hero-inner">
     <div>
-      <span class="eyebrow">Now open — copywriting track</span>
+      <span class="hero-eyebrow">Now open — copywriting track</span>
       <h1>Learn one high-income skill in 90 days. <em>On WhatsApp.</em></h1>
-      <p class="lead" style="margin-left:0; text-align:left;">
-        SkillStack NG delivers one lesson to your WhatsApp every weekday. 15 minutes. AI feedback on every task. No app. No login. Just your phone and the discipline to show up.
-      </p>
-      <div class="btn-row" style="justify-content:flex-start;">
+      <p class="lead">One lesson to your WhatsApp every weekday. 15 minutes. AI feedback on every task. No app. No login. Just your phone.</p>
+      <div>
         <a class="btn-primary" href="https://paystack.shop/pay/2-h3igsfd2">Start for ₦5,000/month →</a>
         <a class="btn-ghost" href="/demo">See how it works</a>
       </div>
-      <div class="stat-pills" style="justify-content:flex-start;">
+      <div class="hero-pills">
         <span class="pill">65 lessons per track</span>
         <span class="pill">AI feedback daily</span>
         <span class="pill">Cancel anytime</span>
@@ -394,105 +449,97 @@
     </div>
     <div>
       <div class="wa-mockup">
-        <div class="wa-header">
-          <div class="wa-avatar">SN</div>
+        <div class="wa-hdr">
+          <div class="wa-av">SN</div>
           <div>
-            <div class="wa-name">SkillStack NG</div>
-            <div class="wa-status">● online</div>
+            <div class="wa-nm">SkillStack NG</div>
+            <div class="wa-st">● online</div>
           </div>
         </div>
-        <div class="wa-bubble">
-          <div class="wa-tag">DAY 1 OF 90</div><br/>
-          <strong>What is copywriting and why it pays</strong><br/><br/>
-          Copywriting is the art of writing words that make people take action. Every sales page, caption, email and ad you have ever read was written by a copywriter...<br/>
-          <div class="wa-time">07:01 ✓✓</div>
-        </div>
-        <div class="wa-bubble sent">
-          Here is my task submission — I wrote a headline for a Lagos skincare brand targeting working women...
-          <div class="wa-time">07:18 ✓✓</div>
-        </div>
-        <div class="wa-bubble">
-          <strong>Feedback on Day 1</strong><br/><br/>
-          ✅ Strong specificity — "working women" narrows the audience well<br/>
-          ⚠️ The word "quality" is doing no work here — replace with a concrete benefit<br/>
-          💡 Pro tip: put the outcome in the headline, not the product
-          <div class="wa-time">07:18 ✓✓</div>
+        <div class="wa-body">
+          <div class="wa-bubble">
+            <div class="wa-tag">DAY 1 OF 90</div><br/>
+            <strong>What is copywriting?</strong><br/><br/>
+            Copy has one job — to make someone take action. Every word either pushes the reader toward that action or pulls them away. Nothing is neutral.
+            <div class="wa-time">7:01 AM</div>
+          </div>
+          <div class="wa-bubble sent">
+            A: Brown leather bag, medium size.<br/><br/>
+            B: The bag that makes your outfit make sense — carry it to an interview and an owambe and both times it's right.
+            <div class="wa-time">7:18 AM ✓✓</div>
+          </div>
+          <div class="wa-bubble">
+            ✅ Strong — "makes your outfit make sense" is a real benefit<br/>
+            ⚠️ Version A says "quality" — that's claimed by everyone. Be specific.<br/>
+            💡 Name the occasion. "The bag for owambe season" beats any generic claim.
+            <div class="wa-time">7:18 AM</div>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</section>
+</div>
 
-<hr class="divider"/>
-
-<!-- SKILL TRACKS -->
-<section>
-  <div class="container center">
+<!-- TRACKS — light -->
+<section class="tracks-section">
+  <div class="container section-center">
     <span class="eyebrow">Skill tracks</span>
     <h2>One platform. Five high-income skills.</h2>
-    <p class="lead">Each track is 90 days of daily lessons built specifically for Nigerian professionals. Start with Copywriting today — more tracks opening soon.</p>
+    <p class="section-lead">Each track is 90 days of daily lessons built specifically for Nigerian professionals. Start with Copywriting today — more tracks opening soon.</p>
     <div class="tracks-grid">
-
       <div class="track-card live">
         <span class="track-badge badge-live">✦ Live now</span>
         <h3>Copywriting & Persuasion</h3>
         <p>Write sales copy, ads, email sequences, and landing pages. The #1 requested freelance skill in Nigeria.</p>
         <div class="track-demand">Demand: <span>★★★ HIGH</span></div>
       </div>
-
       <div class="track-card">
         <span class="track-badge badge-soon">Coming soon</span>
         <h3>Social Media Management</h3>
         <p>Manage brand accounts professionally. Content calendars, engagement strategy, analytics, client reporting.</p>
         <div class="track-demand">Demand: <span>★★★ HIGH</span></div>
       </div>
-
       <div class="track-card">
         <span class="track-badge badge-soon">Coming soon</span>
         <h3>Digital Marketing Fundamentals</h3>
         <p>Paid ads, SEO basics, email marketing and funnels — the full picture every Nigerian marketer needs.</p>
         <div class="track-demand">Demand: <span>★★★ HIGH</span></div>
       </div>
-
       <div class="track-card">
         <span class="track-badge badge-soon">Coming soon</span>
         <h3>Excel for Business</h3>
         <p>From basic formulas to dashboards. Used by every Nigerian office, bank, and SME that pays well.</p>
         <div class="track-demand">Demand: <span>★★ MEDIUM</span></div>
       </div>
-
       <div class="track-card">
         <span class="track-badge badge-soon">Coming soon</span>
         <h3>Data Analysis (Entry Level)</h3>
         <p>Google Sheets and Python basics. For those targeting tech-adjacent roles and remote work opportunities.</p>
         <div class="track-demand">Demand: <span>★★ MEDIUM</span></div>
       </div>
-
     </div>
   </div>
 </section>
 
-<hr class="divider"/>
-
-<!-- PROBLEM -->
-<section>
-  <div class="container center">
+<!-- PROBLEM — white -->
+<section class="problem-section">
+  <div class="container section-center">
     <span class="eyebrow">The problem</span>
     <h2>Most Nigerians who try to learn a skill never finish.</h2>
-    <p class="lead">Not because they are not serious. Because the format does not fit the life.</p>
-    <div class="steps-grid">
-      <div class="step-card">
-        <div style="font-size:1.8rem;margin-bottom:12px;">😓</div>
+    <p class="section-lead">Not because they are not serious. Because the format does not fit the life.</p>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="icon">😓</div>
         <h3>Course platforms require hours you don't have</h3>
         <p>A 6-hour video course requires 6 hours. A 15-minute WhatsApp lesson requires 15 minutes you already spend on your phone.</p>
       </div>
-      <div class="step-card">
-        <div style="font-size:1.8rem;margin-bottom:12px;">🌍</div>
+      <div class="problem-card">
+        <div class="icon">🌍</div>
         <h3>Foreign examples don't translate</h3>
         <p>Most courses use Starbucks and Apple as examples. Nigerian buyers think differently. Nigerian markets work differently.</p>
       </div>
-      <div class="step-card">
-        <div style="font-size:1.8rem;margin-bottom:12px;">🔇</div>
+      <div class="problem-card">
+        <div class="icon">🔇</div>
         <h3>No feedback on your actual work</h3>
         <p>Watching videos does not make you skilled. Writing and getting specific feedback on your specific work does.</p>
       </div>
@@ -500,46 +547,43 @@
   </div>
 </section>
 
-<hr class="divider"/>
-
-<!-- HOW IT WORKS -->
-<section>
-  <div class="container center">
+<!-- HOW IT WORKS — dark -->
+<section class="how-section">
+  <div class="container section-center">
     <span class="eyebrow">How it works</span>
     <h2>Four steps. 90 days. One skill that pays.</h2>
+    <p class="section-lead" style="color:rgba(255,255,255,0.65)">Simple by design. Powerful by result.</p>
     <div class="steps-grid">
       <div class="step-card">
         <div class="step-num">01</div>
         <h3>Lesson arrives on WhatsApp</h3>
-        <p>Every weekday morning your lesson appears at the time you choose. Read it on your commute, at lunch, or before your first meeting.</p>
+        <p>Every weekday at the time you choose. Read it on your commute, at lunch, or before your first meeting.</p>
       </div>
       <div class="step-card">
         <div class="step-num">02</div>
         <h3>You do the task</h3>
-        <p>Every lesson ends with a practical task. Apply what you just learned to a real Nigerian product, brand, or scenario.</p>
+        <p>Every lesson ends with a practical task. Apply what you just learned to a real Nigerian product or brand.</p>
       </div>
       <div class="step-card">
         <div class="step-num">03</div>
         <h3>AI coach gives you feedback</h3>
-        <p>An AI coach reads your submission and sends back specific, personal coaching immediately — every single day.</p>
+        <p>Submit your task and get specific, personal coaching immediately — every single day.</p>
       </div>
       <div class="step-card">
         <div class="step-num">04</div>
         <h3>Your skills compound</h3>
-        <p>By Day 30 you can write copy that converts. By Day 60 you can pitch clients. By Day 90 you have a portfolio and a rate card.</p>
+        <p>By Day 30 you can write copy that converts. By Day 60 you can pitch clients. By Day 90 you have a portfolio.</p>
       </div>
     </div>
   </div>
 </section>
 
-<hr class="divider"/>
-
-<!-- CURRICULUM -->
-<section>
-  <div class="container center">
-    <span class="eyebrow">The curriculum — copywriting track</span>
+<!-- CURRICULUM — light -->
+<section class="curriculum-section">
+  <div class="container section-center">
+    <span class="eyebrow">Copywriting track curriculum</span>
     <h2>65 lessons. 9 weeks. Everything you need.</h2>
-    <p class="lead">Every lesson was written specifically for Nigerian copywriters — Nigerian examples, Nigerian market context, Nigerian income opportunities.</p>
+    <p class="section-lead">Every lesson was written specifically for Nigerian copywriters — Nigerian examples, Nigerian market context, Nigerian income opportunities.</p>
     <div class="weeks-grid">
       <div class="week-card">
         <div class="week-label">Week 1–2</div>
@@ -585,14 +629,12 @@
   </div>
 </section>
 
-<hr class="divider"/>
-
-<!-- WHAT IT PAYS -->
-<section>
-  <div class="container center">
+<!-- RATES — white -->
+<section class="rates-section">
+  <div class="container section-center">
     <span class="eyebrow">What this skill pays</span>
     <h2>Nigerian copywriter rates in 2026.</h2>
-    <p class="lead">These are real rates paid by Nigerian brands right now. One client at these rates covers months of SkillStack NG.</p>
+    <p class="section-lead">Real rates paid by Nigerian brands right now. One client at these rates covers months of SkillStack NG.</p>
     <div class="rates-grid">
       <div class="rate-card"><div class="label">Landing page</div><div class="amount">₦100k–₦300k</div></div>
       <div class="rate-card"><div class="label">Email sequence</div><div class="amount">₦60k–₦150k</div></div>
@@ -604,12 +646,10 @@
   </div>
 </section>
 
-<hr class="divider"/>
-
-<!-- CERTIFICATE -->
-<section>
+<!-- CERTIFICATE — light -->
+<section class="cert-section">
   <div class="container">
-    <div class="center" style="margin-bottom:40px;">
+    <div class="section-center" style="margin-bottom:40px;">
       <span class="eyebrow">Completion certificate</span>
       <h2>Finish the track. Earn the proof.</h2>
     </div>
@@ -617,8 +657,8 @@
       <div class="cert-icon">🎓</div>
       <div class="cert-text">
         <h3>SkillStack NG Certificate of Completion</h3>
-        <p>Complete all 65 lessons and tasks in your chosen track and earn a verifiable certificate from SkillStack NG. Share it on LinkedIn, attach it to client proposals, and use it as proof that you did the work — not just watched a video.</p>
-        <div class="cert-features">
+        <p>Complete all 65 lessons and tasks in your chosen track and earn a verifiable certificate. Share it on LinkedIn, attach it to client proposals, and use it as proof that you did the work — not just watched a video.</p>
+        <div class="cert-feats">
           <span class="cert-feat">Issued on Day 90</span>
           <span class="cert-feat">LinkedIn-shareable</span>
           <span class="cert-feat">Shows completed track</span>
@@ -629,11 +669,9 @@
   </div>
 </section>
 
-<hr class="divider"/>
-
-<!-- TESTIMONIALS -->
-<section>
-  <div class="container center">
+<!-- TESTIMONIALS — dark -->
+<section class="testi-section">
+  <div class="container section-center">
     <span class="eyebrow">Beta tester feedback</span>
     <h2>What early users are saying.</h2>
     <div class="testi-grid">
@@ -641,7 +679,7 @@
         <div class="stars">★★★★★</div>
         <blockquote>"I have tried three copywriting courses before and abandoned all of them. SkillStack NG is different — the lesson is already on my phone before I am fully awake. I have not missed a day in two weeks."</blockquote>
         <div class="testi-author">
-          <div class="testi-avatar">AT</div>
+          <div class="testi-av">AT</div>
           <div>
             <div class="testi-name">Adaeze T.</div>
             <div class="testi-role">Marketing executive, Lagos</div>
@@ -652,7 +690,7 @@
         <div class="stars">★★★★★</div>
         <blockquote>"The AI feedback is what makes this different. It does not just tell me good job — it tells me exactly which word was weak and exactly how to fix it. I am actually learning, not just consuming."</blockquote>
         <div class="testi-author">
-          <div class="testi-avatar">EO</div>
+          <div class="testi-av">EO</div>
           <div>
             <div class="testi-name">Emeka O.</div>
             <div class="testi-role">Freelancer, Abuja</div>
@@ -663,7 +701,7 @@
         <div class="stars">★★★★★</div>
         <blockquote>"Day 12 and I already rewrote my brand captions. My engagement went up immediately. The Nigerian examples are what make it click — not Starbucks, not Apple. Actual Lagos brands."</blockquote>
         <div class="testi-author">
-          <div class="testi-avatar">FS</div>
+          <div class="testi-av">FS</div>
           <div>
             <div class="testi-name">Fatima S.</div>
             <div class="testi-role">Small business owner, Kano</div>
@@ -674,20 +712,18 @@
   </div>
 </section>
 
-<hr class="divider"/>
-
-<!-- PRICING -->
-<section>
-  <div class="container center">
+<!-- PRICING — white -->
+<section class="pricing-section">
+  <div class="container section-center">
     <span class="eyebrow">Pricing</span>
     <h2>Simple, honest pricing.</h2>
-    <p class="lead">One plan. Everything included. Cancel anytime.</p>
+    <p class="section-lead">One plan. Everything included. Cancel anytime.</p>
     <div class="pricing-card">
       <h3>SkillStack NG — Copywriting Track</h3>
       <p class="sub">90 days · 65 lessons · AI coaching every day</p>
       <div class="price-main">₦5,000 <span class="price-period">/month</span></div>
       <div class="price-note">That is ₦167 per day — less than a bottle of Lacasera</div>
-      <div class="price-increasing">⚡ Founding member rate — price increasing to ₦8,500 soon. Lock in ₦5,000 today.</div>
+      <div class="price-urgency">⚡ Founding member rate — price increasing to ₦8,500 soon. Lock in ₦5,000 today.</div>
       <ul class="features-list">
         <li>65 copywriting lessons</li>
         <li>AI feedback on every task</li>
@@ -703,11 +739,9 @@
   </div>
 </section>
 
-<hr class="divider"/>
-
-<!-- FAQ -->
-<section>
-  <div class="container center">
+<!-- FAQ — light -->
+<section class="faq-section">
+  <div class="container section-center">
     <span class="eyebrow">Questions</span>
     <h2>Everything you want to know.</h2>
     <div class="faq-list">
@@ -721,10 +755,10 @@
       </details>
       <details>
         <summary>How does the AI feedback work?</summary>
-        <p>Every task you submit is read by an AI coach trained specifically for Nigerian copywriting contexts. It sends back three things: one specific strength, one specific improvement, and one pro tip you can apply immediately. No generic praise. Specific, personal coaching every day.</p>
+        <p>Every task you submit is read by an AI coach trained specifically for Nigerian copywriting contexts. It sends back three things: one specific strength, one specific improvement, and one pro tip. No generic praise. Specific, personal coaching every day.</p>
       </details>
       <details>
-        <summary>When will I be able to get my first paying client?</summary>
+        <summary>When will I get my first paying client?</summary>
         <p>Students who complete the programme and apply the client pitch framework from Week 7 typically land their first client within 30 to 60 days of finishing. Results depend on effort — but the framework is built on what actually works in the Nigerian freelance market.</p>
       </details>
       <details>
@@ -739,18 +773,14 @@
   </div>
 </section>
 
-<hr class="divider"/>
-
-<!-- FINAL CTA -->
-<section>
-  <div class="container">
-    <div class="final-cta">
-      <span class="eyebrow">Start today</span>
-      <h2>Start your 90-day journey today.</h2>
-      <p class="lead">15 minutes a day. Your first lesson arrives on WhatsApp immediately after payment. No app. No login. Just your phone and the discipline to show up.</p>
-      <a class="btn-primary" href="https://paystack.shop/pay/2-h3igsfd2" style="font-size:1.1rem;padding:16px 36px;">Start for ₦5,000/month →</a>
-      <p style="font-size:0.8rem;color:var(--muted);margin-top:16px;">Cancel anytime · Nigerian-built · AI feedback daily · Price increasing to ₦8,500 soon</p>
-    </div>
+<!-- FINAL CTA — dark -->
+<section class="final-section">
+  <div class="container section-center">
+    <span class="eyebrow">Start today</span>
+    <h2>Start your 90-day journey today.</h2>
+    <p class="section-lead">15 minutes a day. Your first lesson arrives on WhatsApp immediately after payment. No app. No login.</p>
+    <a class="btn-primary" href="https://paystack.shop/pay/2-h3igsfd2" style="font-size:1.1rem;padding:16px 36px;">Start for ₦5,000/month →</a>
+    <p style="font-size:0.8rem;color:rgba(255,255,255,0.4);margin-top:16px;">Cancel anytime · Nigerian-built · AI feedback daily · Price increasing to ₦8,500 soon</p>
   </div>
 </section>
 
