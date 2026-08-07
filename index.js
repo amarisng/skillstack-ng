@@ -402,12 +402,12 @@ app.get('/beta', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'beta.html'));
 });
 
-app.get('/landing', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'landing.html'));
+app.get('/demo', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'public', 'landing.html'));
 });
 
 const PORT = process.env.PORT || 3000;
