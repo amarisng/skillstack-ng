@@ -134,7 +134,7 @@ async function activateSubscriber(whatsappNumber, name, planType = 'monthly') {
         return;
       }
       await supabase.from('subscribers').update({
-     active: 'true',
+        active: 'true',
         day_number: 1,
         streak: 1,
         plan_type: planType,
@@ -156,7 +156,10 @@ async function activateSubscriber(whatsappNumber, name, planType = 'monthly') {
 
     const lesson = await getLesson(1);
     if (lesson) {
-      await sendMessage(finalPhone, 'Payment confirmed! Welcome to SkillStack NG ' + (name || '') + '. Your 90 day copywriting journey starts NOW. Here is Day 1:');
+      const planMsg = planType === 'full'
+        ? 'Payment confirmed! Welcome to SkillStack NG ' + (name || '') + '. Your full 90-day copywriting journey is unlocked - no monthly renewals needed. Here is Day 1:'
+        : 'Payment confirmed! Welcome to SkillStack NG ' + (name || '') + '. Your 90 day copywriting journey starts NOW. Here is Day 1:';
+      await sendMessage(finalPhone, planMsg);
       await sendMessage(finalPhone, formatLesson(lesson, 1));
     }
 
@@ -284,7 +287,7 @@ app.post('/paystack-webhook', async (req, res) => {
         }
       }
 
- if (whatsappNumber) {
+      if (whatsappNumber) {
         const amount = data.amount / 100;
         const planType = amount >= 13000 ? 'full' : 'monthly';
         await activateSubscriber(whatsappNumber, customerName, planType);
@@ -293,13 +296,12 @@ app.post('/paystack-webhook', async (req, res) => {
       }
     }
 
-   } catch (err) {
+    res.status(200).send('OK');
+  } catch (err) {
     console.error('Paystack webhook error:', err.message);
     res.status(200).send('OK');
   }
 });
-
-That's the only remaining fix. The catch (err) block was accidentally deleted when you were editing. Add it back and commit — then the code is fully clean and done. ✅
 
 app.get('/webhook', (req, res) => {
   const mode = req.query['hub.mode'];
@@ -410,9 +412,11 @@ app.get('/beta', (req, res) => {
 app.get('/demo', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'demo.html'));
 });
+
 app.get('/thankyou', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'thankyou.html'));
 });
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'landing.html'));
 });
