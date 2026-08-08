@@ -403,7 +403,7 @@ app.get('/beta', (req, res) => {
 });
 
 app.get('/demo', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'public', 'demo.html'));
 });
 
 app.get('/', (req, res) => {
