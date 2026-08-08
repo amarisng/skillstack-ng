@@ -284,17 +284,15 @@ app.post('/paystack-webhook', async (req, res) => {
         }
       }
 
-    if (whatsappNumber) {
+ if (whatsappNumber) {
         const amount = data.amount / 100;
         const planType = amount >= 13000 ? 'full' : 'monthly';
         await activateSubscriber(whatsappNumber, customerName, planType);
       } else {
         console.log('No WhatsApp number found in custom fields. Metadata: ' + JSON.stringify(data.metadata));
       }
+    }
 
-    res.status(200).send('OK');
-  } catch (err) {
-    console.error('Paystack webhook error:', err.message);
     res.status(200).send('OK');
   }
 });
