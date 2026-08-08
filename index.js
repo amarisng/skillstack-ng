@@ -134,9 +134,10 @@ async function activateSubscriber(whatsappNumber, name, planType = 'monthly') {
         return;
       }
       await supabase.from('subscribers').update({
-        active: 'true',
+     active: 'true',
         day_number: 1,
         streak: 1,
+        plan_type: planType,
         last_active: new Date().toISOString().split('T')[0]
       }).eq('phone', finalPhone);
     } else {
@@ -148,6 +149,7 @@ async function activateSubscriber(whatsappNumber, name, planType = 'monthly') {
         time_preference: '07:00',
         active: 'true',
         streak: 1,
+        plan_type: planType,
         last_active: new Date().toISOString().split('T')[0]
       });
     }
@@ -290,7 +292,6 @@ app.post('/paystack-webhook', async (req, res) => {
       } else {
         console.log('No WhatsApp number found in custom fields. Metadata: ' + JSON.stringify(data.metadata));
       }
-    }
 
     res.status(200).send('OK');
   } catch (err) {
@@ -408,7 +409,9 @@ app.get('/beta', (req, res) => {
 app.get('/demo', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'demo.html'));
 });
-
+app.get('/thankyou', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'thankyou.html'));
+});
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'landing.html'));
 });
