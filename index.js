@@ -1,9 +1,9 @@
 const express = require('express');
+const twilio = require('twilio');
 const { createClient } = require('@supabase/supabase-js');
 const Anthropic = require('@anthropic-ai/sdk');
 const cron = require('node-cron');
 const path = require('path');
-const axios = require('axios');
 const crypto = require('crypto');
 const app = express();
 
@@ -21,61 +21,29 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
+const twilioClient = twilio(
+  process.env.TWILIO_SID,
+  process.env.TWILIO_AUTH_TOKEN
+);
+
+const TWILIO_NUMBER = process.env.TWILIO_WHATSAPP_NUMBER;
 const PAYSTACK_LINK = process.env.PAYSTACK_PAYMENT_LINK;
 const PAYSTACK_SECRET = process.env.PAYSTACK_SECRET_KEY;
 const PAYSTACK_TEST_SECRET = process.env.PAYSTACK_TEST_SECRET_KEY;
 const VERIFY_TOKEN = process.env.WEBHOOK_VERIFY_TOKEN || 'skillstack_verify_2024';
-const META_TOKEN = process.env.META_WHATSAPP_TOKEN;
-const META_PHONE_ID = process.env.META_PHONE_NUMBER_ID;
 
 async function sendMessage(to, body) {
   try {
     const cleanNumber = to.replace(/\D/g, '');
-    await axios.post(
-      'https://graph.facebook.com/v19.0/' + META_PHONE_ID + '/messages',
-      {
-        messaging_product: 'whatsapp',
-        to: cleanNumber,
-        type: 'text',
-        text: { body: body }
-      },
-      {
-        headers: {
-          'Authorization': 'Bearer ' + META_TOKEN,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
+    const formattedTo = 'whatsapp:+' + cleanNumber;
+    await twilioClient.messages.create({
+      from: TWILIO_NUMBER,
+      to: formattedTo,
+      body: body,
+    });
     console.log('Sent to ' + cleanNumber);
   } catch (err) {
-    console.error('Send error:', err.response ? JSON.stringify(err.response.data) : err.message);
-  }
-}
-
-async function sendLessonReadyTemplate(to) {
-  try {
-    const cleanNumber = to.replace(/\D/g, '');
-    await axios.post(
-      'https://graph.facebook.com/v19.0/' + META_PHONE_ID + '/messages',
-      {
-        messaging_product: 'whatsapp',
-        to: cleanNumber,
-        type: 'template',
-        template: {
-          name: 'lesson_ready',
-          language: { code: 'en' }
-        }
-      },
-      {
-        headers: {
-          'Authorization': 'Bearer ' + META_TOKEN,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-    console.log('Sent lesson_ready template to ' + cleanNumber);
-  } catch (err) {
-    console.error('Template send error:', err.response ? JSON.stringify(err.response.data) : err.message);
+    console.error('Send error:', err.message);
   }
 }
 
@@ -118,14 +86,12 @@ function formatLesson(lesson, dayNumber) {
 async function activateSubscriber(whatsappNumber, name, planType = 'monthly') {
   try {
     const cleanPhone = whatsappNumber.replace(/\D/g, '');
-
     let finalPhone = cleanPhone;
     if (finalPhone.startsWith('0')) {
       finalPhone = '234' + finalPhone.substring(1);
     }
 
     console.log('Activating subscriber: ' + finalPhone);
-
     let sub = await getSubscriber(finalPhone);
 
     if (sub) {
@@ -154,11 +120,11 @@ async function activateSubscriber(whatsappNumber, name, planType = 'monthly') {
       });
     }
 
-    const planMsg = planType === "full"
-      ? "Payment confirmed! Welcome to SkillStack NG " + (name || "") + ". Your full 90-day copywriting journey is unlocked - no monthly renewals needed."
-      : "Payment confirmed! Welcome to SkillStack NG " + (name || "") + ". Your 90-day copywriting journey starts NOW.";
+    const planMsg = planType === 'full'
+      ? 'Payment confirmed! Welcome to SkillStack NG ' + (name || '') + '. Your full 90-day copywriting journey is unlocked - no monthly renewals needed.'
+      : 'Payment confirmed! Welcome to SkillStack NG ' + (name || '') + '. Your 90-day copywriting journey starts NOW.';
     await sendMessage(finalPhone, planMsg);
-    await sendMessage(finalPhone, "One quick question — what time do you want your daily lesson delivered to this WhatsApp?\n\nReply with your preferred time:\n6AM\n7AM\n8AM\n12PM\n6PM\n9PM");
+    await sendMessage(finalPhone, 'One quick question — what time do you want your daily lesson delivered to this WhatsApp?\n\nReply with your preferred time:\n6AM\n7AM\n8AM\n12PM\n6PM\n9PM');
 
     console.log('Subscriber activated successfully: ' + finalPhone);
   } catch (err) {
@@ -167,11 +133,12 @@ async function activateSubscriber(whatsappNumber, name, planType = 'monthly') {
 }
 
 async function handleOnboarding(phone, message) {
-  const sub = await getSubscriber(phone);
+  const cleanPhone = phone.replace(/\D/g, '');
+  const sub = await getSubscriber(cleanPhone);
 
   if (!sub) {
     await supabase.from('subscribers').insert({
-      phone: phone,
+      phone: cleanPhone,
       name: '',
       day_number: 0,
       track: 'copywriting',
@@ -179,20 +146,20 @@ async function handleOnboarding(phone, message) {
       active: 'false',
       streak: 0,
     });
-    await sendMessage(phone, 'Welcome to SkillStack NG! Learn copywriting in 90 days - 15 minutes a day, Monday to Friday. No app needed. Reply 1 to get started.');
+    await sendMessage(cleanPhone, 'Welcome to SkillStack NG! Learn copywriting in 90 days - 15 minutes a day, Monday to Friday. No app needed. Reply 1 to get started.');
     return;
   }
 
   if (sub.active === 'false' && sub.name === '' && message === '1') {
-    await sendMessage(phone, 'Perfect choice. Copywriting earns Nigerian freelancers 150k-500k per month. What is your first name?');
-    await supabase.from('subscribers').update({ name: 'AWAITING' }).eq('phone', phone);
+    await sendMessage(cleanPhone, 'Perfect choice. Copywriting earns Nigerian freelancers 150k-500k per month. What is your first name?');
+    await supabase.from('subscribers').update({ name: 'AWAITING' }).eq('phone', cleanPhone);
     return;
   }
 
   if (sub.active === 'false' && sub.name === 'AWAITING') {
     const name = message.trim();
-    await supabase.from('subscribers').update({ name: name }).eq('phone', phone);
-    await sendMessage(phone, 'Nice to meet you ' + name + '! What time do you want your daily lesson? Reply: 6AM, 7AM, 8AM, 12PM, 6PM or 9PM');
+    await supabase.from('subscribers').update({ name: name }).eq('phone', cleanPhone);
+    await sendMessage(cleanPhone, 'Nice to meet you ' + name + '! What time do you want your daily lesson? Reply: 6AM, 7AM, 8AM, 12PM, 6PM or 9PM');
     return;
   }
 
@@ -203,8 +170,8 @@ async function handleOnboarding(phone, message) {
       '12PM': '12:00', '6PM': '18:00', '9PM': '21:00'
     };
     const timePreference = timeMap[message.toUpperCase()];
-    await supabase.from('subscribers').update({ time_preference: timePreference }).eq('phone', phone);
-    await sendMessage(phone, 'Perfect ' + sub.name + '! Your lesson will arrive Monday to Friday at ' + message.toUpperCase() + '.\n\nTo activate your subscription pay 5,000 per month here:\n' + PAYSTACK_LINK + '\n\nMake sure to enter this WhatsApp number (' + phone + ') in the WhatsApp Number field on the payment form so we can activate your account automatically after payment.');
+    await supabase.from('subscribers').update({ time_preference: timePreference }).eq('phone', cleanPhone);
+    await sendMessage(cleanPhone, 'Perfect ' + sub.name + '! Your lesson will arrive Monday to Friday at ' + message.toUpperCase() + '.\n\nTo activate your subscription pay here:\n\nMonthly - 5,000/month: ' + PAYSTACK_LINK + '\n\nFull 90 days - 13,000 (save 2,000): https://paystack.shop/pay/m0m9ofipj4\n\nMake sure to enter this WhatsApp number in the payment form.');
     return;
   }
 
@@ -219,61 +186,56 @@ async function handleOnboarding(phone, message) {
     await supabase.from('subscribers').update({
       time_preference: timePreference,
       last_active: new Date(Date.now() - 86400000).toISOString().split('T')[0]
-    }).eq('phone', phone);
+    }).eq('phone', cleanPhone);
     const lesson = await getLesson(1);
-    await sendMessage(phone, 'Perfect! Your lesson will arrive Monday to Friday at ' + message.toUpperCase() + '. Here is your Day 1 lesson right now:');
-    if (lesson) await sendMessage(phone, formatLesson(lesson, 1));
+    await sendMessage(cleanPhone, 'Perfect! Your lesson will arrive Monday to Friday at ' + message.toUpperCase() + '. Here is your Day 1 lesson right now:');
+    if (lesson) await sendMessage(cleanPhone, formatLesson(lesson, 1));
     return;
   }
 
   if (sub.active === 'true' && sub.day_number > 0) {
     const lesson = await getLesson(sub.day_number);
     if (!lesson) {
-      await sendMessage(phone, 'You have completed all available lessons. More coming soon!');
+      await sendMessage(cleanPhone, 'You have completed all available lessons. More coming soon!');
       return;
     }
     if (message.toUpperCase() === 'LESSON' || message.toUpperCase() === 'HI' || message.toUpperCase() === 'HELLO' || message.toUpperCase() === 'YES' || message.toUpperCase() === 'CONTINUE') {
-      await sendMessage(phone, formatLesson(lesson, sub.day_number));
+      await sendMessage(cleanPhone, formatLesson(lesson, sub.day_number));
       return;
     }
-    // Only give feedback and advance if it looks like a task submission (more than 5 words)
     const wordCount = message.trim().split(/\s+/).length;
     if (wordCount < 5) {
-      await sendMessage(phone, 'Welcome back! Here is your Day ' + sub.day_number + ' lesson:');
-      await sendMessage(phone, formatLesson(lesson, sub.day_number));
+      await sendMessage(cleanPhone, 'Welcome back! Here is your Day ' + sub.day_number + ' lesson:');
+      await sendMessage(cleanPhone, formatLesson(lesson, sub.day_number));
       return;
     }
     const feedback = await getFeedback(lesson.task, message, lesson.feedback_prompt);
-    await sendMessage(phone, 'Feedback on Day ' + sub.day_number + ':\n\n' + feedback + '\n\nStreak: ' + (sub.streak + 1) + ' days. Keep going!');
+    await sendMessage(cleanPhone, 'Feedback on Day ' + sub.day_number + ':\n\n' + feedback + '\n\nStreak: ' + (sub.streak + 1) + ' days. Keep going!');
     const nextDay = sub.day_number < 65 ? sub.day_number + 1 : sub.day_number;
     await supabase.from('subscribers').update({
       day_number: nextDay,
       streak: sub.streak + 1,
       last_active: new Date().toISOString().split('T')[0]
-    }).eq('phone', phone);
+    }).eq('phone', cleanPhone);
     return;
   }
 
   if (sub.active === 'false') {
-    await sendMessage(phone, 'To activate your subscription pay 5,000 per month here:\n' + PAYSTACK_LINK + '\n\nMake sure to enter your WhatsApp number in the WhatsApp Number field on the payment form.');
+    await sendMessage(cleanPhone, 'To activate your subscription pay here:\n\nMonthly - 5,000/month: ' + PAYSTACK_LINK + '\n\nFull 90 days - 13,000 (save 2,000): https://paystack.shop/pay/m0m9ofipj4');
     return;
   }
 
-  await sendMessage(phone, 'Welcome back! Reply 1 to start your copywriting journey.');
+  await sendMessage(cleanPhone, 'Welcome back! Reply 1 to start your copywriting journey.');
 }
 
 app.post('/paystack-webhook', async (req, res) => {
   try {
     const signature = req.headers['x-paystack-signature'];
-
     const hashLive = crypto.createHmac('sha512', PAYSTACK_SECRET)
-      .update(req.body)
-      .digest('hex');
-
+      .update(req.body).digest('hex');
     const hashTest = PAYSTACK_TEST_SECRET
       ? crypto.createHmac('sha512', PAYSTACK_TEST_SECRET)
-          .update(req.body)
-          .digest('hex')
+          .update(req.body).digest('hex')
       : null;
 
     if (hashLive !== signature && hashTest !== signature) {
@@ -287,11 +249,9 @@ app.post('/paystack-webhook', async (req, res) => {
     if (event.event === 'charge.success') {
       const data = event.data;
       const customerName = data.customer && data.customer.first_name
-        ? data.customer.first_name
-        : 'Subscriber';
+        ? data.customer.first_name : 'Subscriber';
 
       let whatsappNumber = null;
-
       if (data.metadata && data.metadata.custom_fields) {
         const whatsappField = data.metadata.custom_fields.find(
           f => f.variable_name === 'whatsapp_number' ||
@@ -310,7 +270,7 @@ app.post('/paystack-webhook', async (req, res) => {
         const planType = amount >= 13000 ? 'full' : 'monthly';
         await activateSubscriber(whatsappNumber, customerName, planType);
       } else {
-        console.log('No WhatsApp number found in custom fields. Metadata: ' + JSON.stringify(data.metadata));
+        console.log('No WhatsApp number found. Metadata: ' + JSON.stringify(data.metadata));
       }
     }
 
@@ -321,6 +281,7 @@ app.post('/paystack-webhook', async (req, res) => {
   }
 });
 
+// Meta webhook verification (kept for backup)
 app.get('/webhook', (req, res) => {
   const mode = req.query['hub.mode'];
   const token = req.query['hub.verify_token'];
@@ -333,25 +294,15 @@ app.get('/webhook', (req, res) => {
   }
 });
 
+// Twilio incoming messages
 app.post('/webhook', async (req, res) => {
   res.status(200).send('OK');
   try {
-    const body = req.body;
-    if (body.object === 'whatsapp_business_account') {
-      const entry = body.entry && body.entry[0];
-      const changes = entry && entry.changes && entry.changes[0];
-      const value = changes && changes.value;
-      const messages = value && value.messages;
-      if (messages && messages.length > 0) {
-        const msg = messages[0];
-        const from = msg.from;
-        const text = msg.text && msg.text.body;
-        if (from && text) {
-          console.log('Message from ' + from + ': ' + text);
-          await handleOnboarding(from, text);
-        }
-      }
-    }
+    const message = (req.body.Body || '').trim();
+    const from = (req.body.From || '').replace('whatsapp:+', '');
+    if (!from || !message) return;
+    console.log('Message from ' + from + ': ' + message);
+    await handleOnboarding(from, message);
   } catch (err) {
     console.error('Webhook error:', err.message);
   }
@@ -382,7 +333,7 @@ cron.schedule('0 * * * *', async () => {
     if (sub.last_active === today) continue;
     const lesson = await getLesson(sub.day_number);
     if (!lesson) {
-      console.log('No lesson found for day ' + sub.day_number + ' subscriber ' + sub.phone);
+      console.log('No lesson found for day ' + sub.day_number);
       continue;
     }
     await sendMessage(sub.phone, formatLesson(lesson, sub.day_number));
@@ -401,7 +352,7 @@ cron.schedule('0 8 * * 6', async () => {
     .eq('active', 'true');
   if (!subscribers) return;
   for (const sub of subscribers) {
-    await sendLessonReadyTemplate(sub.phone);
+    await sendMessage(sub.phone, 'Weekend review time! No new lesson today ' + sub.name + ' — pick your favourite task from this week and rewrite it. See if you can improve it. Your lessons resume Monday. Keep going!');
   }
 });
 
@@ -420,16 +371,16 @@ cron.schedule('0 9 * * *', async () => {
     const now = new Date();
     const watDay = new Date(now.getTime() + 60 * 60 * 1000).getDay();
     if (watDay === 0 || watDay === 6) continue;
-    await sendLessonReadyTemplate(sub.phone);
+    await sendMessage(sub.phone, 'Hey ' + sub.name + '! You missed yesterday\'s lesson. Reply CONTINUE and I will send it now. Your streak is at ' + sub.streak + ' days — keep it going!');
   }
 });
 
 app.get('/privacy', (req, res) => {
-  res.send('<!DOCTYPE html><html><head><title>SkillStack NG Privacy Policy</title><style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 20px;line-height:1.7;color:#333}h1{color:#075E54}h2{color:#128C7E;margin-top:32px}</style></head><body><h1>SkillStack NG Privacy Policy</h1><p>Last updated: August 2026</p><h2>Information We Collect</h2><p>We collect your WhatsApp phone number and name when you subscribe to SkillStack NG. We also store your lesson progress and streak data to deliver your daily lessons.</p><h2>How We Use Your Information</h2><p>Your phone number is used solely to deliver your daily copywriting lessons and AI feedback via WhatsApp. We do not sell, share, or use your data for advertising purposes.</p><h2>Data Storage</h2><p>Your data is stored securely on Supabase servers. We retain your data for as long as you are an active subscriber. You may request deletion of your data at any time.</p><h2>WhatsApp Messaging</h2><p>By subscribing to SkillStack NG you consent to receive WhatsApp messages from us including daily lessons, feedback, and account updates. You can unsubscribe at any time by replying STOP.</p><h2>Contact Us</h2><p>For privacy questions contact us at amarissynergylimited@gmail.com</p><p>SkillStack NG is operated by Amaris Synergy Limited, Lagos, Nigeria.</p></body></html>');
+  res.send('<!DOCTYPE html><html><head><title>Privacy Policy</title><style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 20px;line-height:1.7;color:#333}h1{color:#075E54}</style></head><body><h1>SkillStack NG Privacy Policy</h1><p>Last updated: August 2026</p><p>We collect your WhatsApp phone number and name to deliver daily lessons. We do not sell your data. Contact: amarissynergylimited@gmail.com</p></body></html>');
 });
 
 app.get('/terms', (req, res) => {
-  res.send('<!DOCTYPE html><html><head><title>SkillStack NG Terms of Service</title><style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 20px;line-height:1.7;color:#333}h1{color:#075E54}h2{color:#128C7E;margin-top:32px}</style></head><body><h1>SkillStack NG Terms of Service</h1><p>Last updated: August 2026</p><h2>Service Description</h2><p>SkillStack NG is a WhatsApp-based copywriting education platform operated by Amaris Synergy Limited. Subscribers receive daily copywriting lessons and AI-powered feedback via WhatsApp.</p><h2>Subscription</h2><p>Subscription is billed at 5,000 NGN per month. Payment is processed via Paystack. Your subscription renews automatically each month until cancelled.</p><h2>Cancellation</h2><p>You may cancel your subscription at any time by contacting us at amarissynergylimited@gmail.com. Refunds are not provided for partial months.</p><h2>Content</h2><p>All lesson content is the intellectual property of Amaris Synergy Limited. Subscribers may not reproduce or distribute lesson content without permission.</p><h2>Limitation of Liability</h2><p>SkillStack NG provides educational content only. We do not guarantee specific income outcomes from completing the programme.</p><h2>Contact</h2><p>amarissynergylimited@gmail.com</p></body></html>');
+  res.send('<!DOCTYPE html><html><head><title>Terms</title><style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 20px;line-height:1.7;color:#333}h1{color:#075E54}</style></head><body><h1>SkillStack NG Terms of Service</h1><p>Last updated: August 2026</p><p>Subscription is billed at 5,000 NGN per month. Cancel anytime by emailing amarissynergylimited@gmail.com.</p></body></html>');
 });
 
 app.get('/beta', (req, res) => {
