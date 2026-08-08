@@ -4,279 +4,416 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>You're In — SkillStack NG</title>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --green: #00C48C;
-      --green-dark: #009e72;
-      --ink: #0D1117;
-      --muted: #5A6478;
-      --border: #232D3F;
-      --card: #141B27;
-      --white: #FFFFFF;
-    }
-    html { scroll-behavior: smooth; }
+
     body {
-      background: var(--ink);
-      color: var(--white);
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #F7FAF8;
+      color: #1A2E1F;
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      overflow-x: hidden;
     }
-    #confetti-canvas {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      pointer-events: none;
-      z-index: 0;
+
+    /* NAV */
+    nav {
+      background: #0D1F17;
+      padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 60px;
     }
+    .nav-logo { font-weight: 800; font-size: 1.1rem; color: #fff; text-decoration: none; }
+    .nav-logo span { color: #00C48C; }
+
+    /* HERO */
     .hero {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      max-width: 680px;
-      padding: 72px 24px 48px;
+      background: #fff;
+      border-bottom: 1px solid #D8EAE0;
+      padding: 56px 24px 48px;
       text-align: center;
     }
     .check-ring {
-      width: 88px; height: 88px;
+      width: 80px; height: 80px;
       border-radius: 50%;
-      background: rgba(0,196,140,0.12);
-      border: 2px solid var(--green);
+      background: rgba(0,196,140,0.1);
+      border: 2px solid #00C48C;
       display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 28px;
+      margin: 0 auto 24px;
       animation: pop 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
     }
-    .check-ring svg { width: 40px; height: 40px; }
     @keyframes pop {
       from { transform: scale(0.4); opacity: 0; }
       to   { transform: scale(1);   opacity: 1; }
     }
+    .check-ring svg { width: 36px; height: 36px; }
     .eyebrow {
       display: inline-block;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--green);
-      margin-bottom: 16px;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: #00C48C; margin-bottom: 12px;
     }
     .hero h1 {
-      font-family: 'Syne', sans-serif;
-      font-size: clamp(2rem, 8vw, 3.2rem);
-      font-weight: 800;
-      line-height: 1.1;
-      margin-bottom: 20px;
+      font-size: clamp(1.8rem, 6vw, 2.8rem);
+      font-weight: 800; line-height: 1.15;
+      color: #1A2E1F; margin-bottom: 14px;
     }
-    .hero h1 span { color: var(--green); }
+    .hero h1 span { color: #00C48C; }
     .hero p {
-      font-size: 1.05rem;
+      font-size: 1rem; color: #5A7A65;
+      max-width: 480px; margin: 0 auto;
       line-height: 1.7;
-      color: #A8B4C8;
-      max-width: 500px;
-      margin: 0 auto 40px;
+    }
+
+    /* WHATSAPP CARD */
+    .wa-section {
+      padding: 48px 24px;
+      background: #F7FAF8;
     }
     .wa-card {
-      position: relative;
-      z-index: 1;
-      width: calc(100% - 48px);
-      max-width: 560px;
-      background: var(--card);
-      border: 1px solid var(--border);
+      background: #fff;
+      border: 1px solid #D8EAE0;
       border-radius: 20px;
       padding: 32px 28px;
-      margin: 0 auto 40px;
-      text-align: left;
+      max-width: 560px;
+      margin: 0 auto;
     }
     .wa-card-header {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 20px;
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 24px;
     }
     .wa-icon {
-      width: 48px; height: 48px;
-      border-radius: 14px;
+      width: 48px; height: 48px; border-radius: 14px;
       background: #25D366;
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
     }
     .wa-icon svg { width: 26px; height: 26px; }
-    .wa-card-header h2 { font-size: 1.15rem; font-weight: 700; }
-    .wa-card-header p { font-size: 0.85rem; color: var(--muted); margin-top: 2px; }
-    .steps {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
+    .wa-card-header h2 { font-size: 1.1rem; font-weight: 700; color: #1A2E1F; }
+    .wa-card-header p { font-size: 0.82rem; color: #5A7A65; margin-top: 2px; }
+
+    .steps { list-style: none; display: flex; flex-direction: column; gap: 14px; }
     .steps li {
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-      font-size: 0.9rem;
-      color: #A8B4C8;
-      line-height: 1.5;
+      display: flex; align-items: flex-start; gap: 12px;
+      font-size: 0.88rem; color: #5A7A65; line-height: 1.55;
     }
     .step-num {
-      width: 26px; height: 26px;
-      border-radius: 50%;
-      background: rgba(0,196,140,0.15);
-      color: var(--green);
-      font-weight: 700;
-      font-size: 0.75rem;
+      width: 26px; height: 26px; border-radius: 50%;
+      background: rgba(0,196,140,0.12);
+      color: #00C48C; font-weight: 700; font-size: 0.75rem;
       display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-      margin-top: 1px;
+      flex-shrink: 0; margin-top: 1px;
     }
-    .steps li strong { color: var(--white); }
+    .steps li strong { color: #1A2E1F; }
+
     .wa-number {
       margin-top: 24px;
-      background: rgba(0,196,140,0.08);
-      border: 1px solid rgba(0,196,140,0.25);
-      border-radius: 12px;
-      padding: 14px 18px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
+      background: rgba(0,196,140,0.06);
+      border: 1px solid rgba(0,196,140,0.2);
+      border-radius: 12px; padding: 14px 18px;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
     }
     .wa-number span {
-      font-family: 'Syne', sans-serif;
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--green);
+      font-size: 1.1rem; font-weight: 800;
+      color: #00C48C; letter-spacing: 0.04em;
     }
     .copy-btn {
-      background: var(--green);
-      color: var(--ink);
-      border: none;
-      border-radius: 8px;
-      padding: 8px 16px;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 0.8rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 0.15s;
-      white-space: nowrap;
+      background: #00C48C; color: #0D1F17;
+      border: none; border-radius: 8px;
+      padding: 8px 18px;
+      font-family: inherit; font-size: 0.8rem; font-weight: 700;
+      cursor: pointer; transition: background 0.15s; white-space: nowrap;
     }
-    .copy-btn:hover { background: var(--green-dark); }
+    .copy-btn:hover { background: #009e72; }
     .copy-btn.copied { background: #2ecc71; }
-    .next-section {
-      position: relative;
-      z-index: 1;
-      width: calc(100% - 48px);
-      max-width: 560px;
-      margin: 0 auto 40px;
+
+    /* TIMELINE */
+    .timeline-section {
+      background: #fff;
+      border-top: 1px solid #D8EAE0;
+      border-bottom: 1px solid #D8EAE0;
+      padding: 48px 24px;
     }
+    .timeline-inner { max-width: 560px; margin: 0 auto; }
     .section-label {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 20px;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: #5A7A65; margin-bottom: 24px;
     }
-    .tl-item {
-      display: flex;
-      gap: 20px;
-      position: relative;
-    }
+    .tl-item { display: flex; gap: 16px; }
     .tl-left {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 32px;
-      flex-shrink: 0;
+      display: flex; flex-direction: column; align-items: center;
+      width: 32px; flex-shrink: 0;
     }
     .tl-dot {
-      width: 32px; height: 32px;
-      border-radius: 50%;
-      background: var(--card);
-      border: 2px solid var(--border);
+      width: 32px; height: 32px; border-radius: 50%;
+      background: #F7FAF8; border: 2px solid #D8EAE0;
       display: flex; align-items: center; justify-content: center;
-      font-size: 1rem;
-      flex-shrink: 0;
+      font-size: 0.95rem; flex-shrink: 0;
     }
-    .tl-dot.active {
-      border-color: var(--green);
-      background: rgba(0,196,140,0.1);
-    }
-    .tl-line {
-      flex: 1;
-      width: 2px;
-      background: var(--border);
-      margin: 4px 0;
-      min-height: 28px;
-    }
-    .tl-content { padding-bottom: 32px; flex: 1; }
-    .tl-content h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; }
-    .tl-content p { font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
+    .tl-dot.active { border-color: #00C48C; background: rgba(0,196,140,0.08); }
+    .tl-line { flex: 1; width: 2px; background: #D8EAE0; margin: 4px 0; min-height: 28px; }
+    .tl-content { padding-bottom: 28px; flex: 1; }
     .tl-tag {
       display: inline-block;
-      font-size: 0.7rem;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--green);
-      background: rgba(0,196,140,0.1);
-      border-radius: 4px;
-      padding: 2px 7px;
-      margin-bottom: 6px;
+      font-size: 0.68rem; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: #00C48C; background: rgba(0,196,140,0.1);
+      border-radius: 4px; padding: 2px 7px; margin-bottom: 6px;
     }
-    .social-section {
-      position: relative;
-      z-index: 1;
-      width: calc(100% - 48px);
-      max-width: 560px;
-      margin: 0 auto 64px;
-    }
+    .tl-content h3 { font-size: 0.92rem; font-weight: 700; color: #1A2E1F; margin-bottom: 4px; }
+    .tl-content p { font-size: 0.82rem; color: #5A7A65; line-height: 1.55; }
+
+    /* SOCIAL */
+    .social-section { padding: 48px 24px; background: #F7FAF8; }
+    .social-inner { max-width: 560px; margin: 0 auto; }
     .social-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 12px; margin-top: 20px;
     }
     .social-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 20px 16px;
-      text-align: center;
-      text-decoration: none;
+      background: #fff; border: 1px solid #D8EAE0;
+      border-radius: 16px; padding: 20px 14px;
+      text-align: center; text-decoration: none;
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
       transition: border-color 0.2s, transform 0.2s;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
     }
-    .social-card:hover { border-color: var(--green); transform: translateY(-3px); }
+    .social-card:hover { border-color: #00C48C; transform: translateY(-2px); }
     .social-icon {
-      width: 40px; height: 40px;
-      border-radius: 12px;
+      width: 40px; height: 40px; border-radius: 12px;
       display: flex; align-items: center; justify-content: center;
     }
     .social-icon.fb { background: #1877F2; }
-    .social-icon.tw { background: #000000; }
+    .social-icon.tw { background: #000; }
     .social-icon.ig { background: linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); }
     .social-icon svg { width: 20px; height: 20px; }
-    .social-card span { font-size: 0.75rem; font-weight: 600; color: #A8B4C8; }
-    .social-card .handle { font-size: 0.7rem; color: var(--muted); }
+    .social-card .sname { font-size: 0.75rem; font-weight: 700; color: #1A2E1F; }
+    .social-card .shandle { font-size: 0.68rem; color: #5A7A65; }
+
+    /* FOOTER */
     footer {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      border-top: 1px solid var(--border);
-      padding: 24px;
-      text-align: center;
-      font-size: 0.8rem;
-      color: var(--muted);
+      background: #0D1F17;
+      padding: 24px; text-align: center;
+      font-size: 0.78rem; color: rgba(255,255,255,0.4);
     }
-    footer a { color: var(--green); text-decoration: none; }
+    footer a { color: #00C48C; text-decoration: none; }
+
+    /* CONFETTI */
+    #confetti-canvas {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none; z-index: 999;
+    }
+
     @media (max-width: 480px) {
       .wa-number { flex-direction: column; align-items: flex-start; gap: 10px; }
-      .copy-btn { width: 100%; }
+      .copy-btn { width: 100%; text-align: center; }
+      .wa-card { padding: 24px 18px; }
     }
+  </style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="/">Skill<span>Stack</span> NG</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="check-ring">
+    <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M10 20.5L17 27L30 13" stroke="#00C48C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+  <p class="eyebrow">Payment confirmed</p>
+  <h1>You're officially <span>in.</span></h1>
+  <p>Your spot is secured. Your 90-day copywriting journey starts the moment you send us a WhatsApp message. One skill. 15 minutes a day. Real income.</p>
+</div>
+
+<!-- WHATSAPP CARD -->
+<div class="wa-section">
+  <div class="wa-card">
+    <div class="wa-card-header">
+      <div class="wa-icon">
+        <svg viewBox="0 0 24 24" fill="white">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+          <path d="M12 0C5.373 0 0 5.373 0 12c0 2.128.557 4.123 1.528 5.855L0 24l6.335-1.508A11.955 11.955 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.79 9.79 0 01-5.007-1.374l-.359-.214-3.72.886.929-3.593-.234-.373A9.787 9.787 0 012.182 12C2.182 6.579 6.579 2.182 12 2.182c5.42 0 9.818 4.397 9.818 9.818 0 5.42-4.398 9.818-9.818 9.818z"/>
+        </svg>
+      </div>
+      <div>
+        <h2>One step left — activate your lessons</h2>
+        <p>Takes 30 seconds. Do it now while you're here.</p>
+      </div>
+    </div>
+
+    <ul class="steps">
+      <li>
+        <div class="step-num">1</div>
+        <div>Save our WhatsApp number to your contacts as <strong>SkillStack NG</strong></div>
+      </li>
+      <li>
+        <div class="step-num">2</div>
+        <div>Send us a WhatsApp message saying <strong>Hi</strong> to start your onboarding</div>
+      </li>
+      <li>
+        <div class="step-num">3</div>
+        <div>Set your name and lesson time — your <strong>Day 1 lesson arrives immediately</strong></div>
+      </li>
+    </ul>
+
+    <div class="wa-number">
+      <span>+234 708 688 3495</span>
+      <button class="copy-btn" id="copyBtn" onclick="copyNumber()">Copy number</button>
+    </div>
+  </div>
+</div>
+
+<!-- TIMELINE -->
+<div class="timeline-section">
+  <div class="timeline-inner">
+    <p class="section-label">What happens next</p>
+
+    <div class="tl-item">
+      <div class="tl-left">
+        <div class="tl-dot active">📱</div>
+        <div class="tl-line"></div>
+      </div>
+      <div class="tl-content">
+        <div class="tl-tag">Today</div>
+        <h3>Send us "Hi" on WhatsApp</h3>
+        <p>Our bot activates your account, collects your name and preferred lesson time, then sends Day 1 immediately.</p>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-left">
+        <div class="tl-dot">📚</div>
+        <div class="tl-line"></div>
+      </div>
+      <div class="tl-content">
+        <div class="tl-tag">Monday – Friday</div>
+        <h3>A new lesson at your chosen time</h3>
+        <p>Every weekday a fresh lesson lands in your WhatsApp. 15 minutes. Read, learn, do the task.</p>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-left">
+        <div class="tl-dot">🤖</div>
+        <div class="tl-line"></div>
+      </div>
+      <div class="tl-content">
+        <div class="tl-tag">After every task</div>
+        <h3>AI feedback, instantly</h3>
+        <p>Submit your task and our AI coach gives you personalised feedback in seconds. No waiting. No generic advice.</p>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-left">
+        <div class="tl-dot">🎓</div>
+      </div>
+      <div class="tl-content">
+        <div class="tl-tag">Day 90</div>
+        <h3>Certificate + a marketable skill</h3>
+        <p>Complete the track and earn your SkillStack NG certificate — ready to share on LinkedIn and with clients.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SOCIAL -->
+<div class="social-section">
+  <div class="social-inner">
+    <p class="section-label">Follow us for tips, wins & updates</p>
+    <div class="social-grid">
+      <a class="social-card" href="https://www.facebook.com/profile.php?id=61592782356112" target="_blank" rel="noopener">
+        <div class="social-icon fb">
+          <svg viewBox="0 0 24 24" fill="white"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.514c-1.491 0-1.956.93-1.956 1.886v2.268h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>
+        </div>
+        <span class="sname">Facebook</span>
+        <span class="shandle">SkillStack NG</span>
+      </a>
+      <a class="social-card" href="https://twitter.com/skillstackng" target="_blank" rel="noopener">
+        <div class="social-icon tw">
+          <svg viewBox="0 0 24 24" fill="white"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </div>
+        <span class="sname">X (Twitter)</span>
+        <span class="shandle">@skillstackng</span>
+      </a>
+      <a class="social-card" href="https://instagram.com/skillstack_ng" target="_blank" rel="noopener">
+        <div class="social-icon ig">
+          <svg viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+        </div>
+        <span class="sname">Instagram</span>
+        <span class="shandle">@skillstack_ng</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>Questions? Email <a href="mailto:skillstackng@gmail.com">skillstackng@gmail.com</a> or message us on WhatsApp</p>
+  <p style="margin-top:8px;">© 2025 SkillStack NG · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></p>
+</footer>
+
+<script>
+  function copyNumber() {
+    navigator.clipboard.writeText('+2347086883495').then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = 'Copied ✓';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Copy number';
+        btn.classList.remove('copied');
+      }, 2500);
+    });
+  }
+
+  // Confetti
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+
+  const COLORS = ['#00C48C','#F5C842','#1A2E1F','#4ECDC4','#FF6B6B'];
+  const pieces = Array.from({length: 100}, () => ({
+    x: Math.random() * window.innerWidth,
+    y: Math.random() * -window.innerHeight,
+    w: Math.random() * 8 + 4,
+    h: Math.random() * 14 + 6,
+    color: COLORS[Math.floor(Math.random() * COLORS.length)],
+    speed: Math.random() * 2 + 1,
+    angle: Math.random() * Math.PI * 2,
+    spin: (Math.random() - 0.5) * 0.1,
+  }));
+
+  let frame = 0;
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    frame++;
+    pieces.forEach(p => {
+      p.y += p.speed;
+      p.angle += p.spin;
+      if (p.y > canvas.height + 20) { p.y = -20; p.x = Math.random() * canvas.width; }
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.angle);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = 0.8;
+      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      ctx.restore();
+    });
+    if (frame < 350) requestAnimationFrame(animate);
+    else ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+  animate();
+</script>
+</body>
+</html>
