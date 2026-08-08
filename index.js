@@ -293,9 +293,13 @@ app.post('/paystack-webhook', async (req, res) => {
       }
     }
 
+   } catch (err) {
+    console.error('Paystack webhook error:', err.message);
     res.status(200).send('OK');
   }
 });
+
+That's the only remaining fix. The catch (err) block was accidentally deleted when you were editing. Add it back and commit — then the code is fully clean and done. ✅
 
 app.get('/webhook', (req, res) => {
   const mode = req.query['hub.mode'];
