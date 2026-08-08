@@ -217,16 +217,19 @@ async function handleOnboarding(phone, message) {
       await sendMessage(phone, 'You have completed all available lessons. More coming soon!');
       return;
     }
-    if (message.toUpperCase() === 'LESSON' || message.toUpperCase() === 'HI' || message.toUpperCase() === 'HELLO' || message.toUpperCase() === 'YES') {
+    if (message.toUpperCase() === 'LESSON' || message.toUpperCase() === 'HI' || message.toUpperCase() === 'HELLO' || message.toUpperCase() === 'YES' || message.toUpperCase() === 'CONTINUE') {
       await sendMessage(phone, formatLesson(lesson, sub.day_number));
       return;
     }
-    if (message.toUpperCase() === 'CONTINUE') {
+    // Only give feedback and advance if it looks like a task submission (more than 5 words)
+    const wordCount = message.trim().split(/\s+/).length;
+    if (wordCount < 5) {
+      await sendMessage(phone, 'Welcome back! Here is your Day ' + sub.day_number + ' lesson:');
       await sendMessage(phone, formatLesson(lesson, sub.day_number));
       return;
     }
     const feedback = await getFeedback(lesson.task, message, lesson.feedback_prompt);
-    await sendMessage(phone, 'Feedback on Day ' + sub.day_number + ':\n\n' + feedback + '\n\nStreak: ' + sub.streak + ' days. See you next lesson!');
+    await sendMessage(phone, 'Feedback on Day ' + sub.day_number + ':\n\n' + feedback + '\n\nStreak: ' + (sub.streak + 1) + ' days. Keep going!');
     const nextDay = sub.day_number < 65 ? sub.day_number + 1 : sub.day_number;
     await supabase.from('subscribers').update({
       day_number: nextDay,
@@ -345,7 +348,8 @@ cron.schedule('0 * * * *', async () => {
   const currentHour = now.getUTCHours();
   const currentMinute = now.getUTCMinutes();
   if (currentMinute > 5) return;
-  const watDay = new Date(now.getTime() + 60 * 60 * 1000).getDay();
+  const watNow = new Date(now.getTime() + 60 * 60 * 1000);
+  const watDay = watNow.getDay();
   if (watDay === 0 || watDay === 6) {
     console.log('Weekend — no lessons today.');
     return;
@@ -361,8 +365,16 @@ cron.schedule('0 * * * *', async () => {
   const today = new Date().toISOString().split('T')[0];
   for (const sub of subscribers) {
     if (sub.last_active === today) continue;
-    await sendLessonReadyTemplate(sub.phone);
-    console.log('Sent lesson_ready template to ' + sub.phone);
+    const lesson = await getLesson(sub.day_number);
+    if (!lesson) {
+      console.log('No lesson found for day ' + sub.day_number + ' subscriber ' + sub.phone);
+      continue;
+    }
+    await sendMessage(sub.phone, formatLesson(lesson, sub.day_number));
+    await supabase.from('subscribers').update({
+      last_active: today
+    }).eq('phone', sub.phone);
+    console.log('Sent Day ' + sub.day_number + ' lesson to ' + sub.phone);
   }
 });
 
