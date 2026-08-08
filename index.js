@@ -154,14 +154,11 @@ async function activateSubscriber(whatsappNumber, name, planType = 'monthly') {
       });
     }
 
-    const lesson = await getLesson(1);
-    if (lesson) {
-      const planMsg = planType === 'full'
-        ? 'Payment confirmed! Welcome to SkillStack NG ' + (name || '') + '. Your full 90-day copywriting journey is unlocked - no monthly renewals needed. Here is Day 1:'
-        : 'Payment confirmed! Welcome to SkillStack NG ' + (name || '') + '. Your 90 day copywriting journey starts NOW. Here is Day 1:';
-      await sendMessage(finalPhone, planMsg);
-      await sendMessage(finalPhone, formatLesson(lesson, 1));
-    }
+    const planMsg = planType === "full"
+      ? "Payment confirmed! Welcome to SkillStack NG " + (name || "") + ". Your full 90-day copywriting journey is unlocked - no monthly renewals needed."
+      : "Payment confirmed! Welcome to SkillStack NG " + (name || "") + ". Your 90-day copywriting journey starts NOW.";
+    await sendMessage(finalPhone, planMsg);
+    await sendMessage(finalPhone, "One quick question — what time do you want your daily lesson delivered to this WhatsApp?\n\nReply with your preferred time:\n6AM\n7AM\n8AM\n12PM\n6PM\n9PM");
 
     console.log('Subscriber activated successfully: ' + finalPhone);
   } catch (err) {
@@ -208,6 +205,24 @@ async function handleOnboarding(phone, message) {
     const timePreference = timeMap[message.toUpperCase()];
     await supabase.from('subscribers').update({ time_preference: timePreference }).eq('phone', phone);
     await sendMessage(phone, 'Perfect ' + sub.name + '! Your lesson will arrive Monday to Friday at ' + message.toUpperCase() + '.\n\nTo activate your subscription pay 5,000 per month here:\n' + PAYSTACK_LINK + '\n\nMake sure to enter this WhatsApp number (' + phone + ') in the WhatsApp Number field on the payment form so we can activate your account automatically after payment.');
+    return;
+  }
+
+  // Handle time preference reply from newly activated subscribers
+  const validTimes2 = ['6AM', '7AM', '8AM', '12PM', '6PM', '9PM'];
+  if (sub.active === 'true' && sub.day_number === 1 && validTimes2.includes(message.toUpperCase())) {
+    const timeMap2 = {
+      '6AM': '06:00', '7AM': '07:00', '8AM': '08:00',
+      '12PM': '12:00', '6PM': '18:00', '9PM': '21:00'
+    };
+    const timePreference = timeMap2[message.toUpperCase()];
+    await supabase.from('subscribers').update({
+      time_preference: timePreference,
+      last_active: new Date(Date.now() - 86400000).toISOString().split('T')[0]
+    }).eq('phone', phone);
+    const lesson = await getLesson(1);
+    await sendMessage(phone, 'Perfect! Your lesson will arrive Monday to Friday at ' + message.toUpperCase() + '. Here is your Day 1 lesson right now:');
+    if (lesson) await sendMessage(phone, formatLesson(lesson, 1));
     return;
   }
 
