@@ -115,7 +115,7 @@ function formatLesson(lesson, dayNumber) {
   return 'Day ' + dayNumber + ' of 90 - SkillStack NG\n\n' + lesson.title + '\n\n' + lesson.content + '\n\n---\nTODAYS TASK\n' + lesson.task + '\n\nReply with your answer and I will give you personal feedback.';
 }
 
-async function activateSubscriber(whatsappNumber, name) {
+async function activateSubscriber(whatsappNumber, name, planType = 'monthly') {
   try {
     const cleanPhone = whatsappNumber.replace(/\D/g, '');
 
@@ -282,8 +282,11 @@ app.post('/paystack-webhook', async (req, res) => {
         }
       }
 
-      if (whatsappNumber) {
-        await activateSubscriber(whatsappNumber, customerName);
+     if (whatsappNumber) {
+  const amount = data.amount / 100;
+  const planType = amount >= 13000 ? 'full' : 'monthly';
+  await activateSubscriber(whatsappNumber, customerName, planType);
+}
       } else {
         console.log('No WhatsApp number found in custom fields. Metadata: ' + JSON.stringify(data.metadata));
       }
