@@ -661,7 +661,9 @@ app.get('/terms', (req, res) => {
 });
 
 
-app.get('/affiliate', (req, res) => {
+app.get('/copywriting', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'copywriting.html'));
+}); (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'affiliate.html'));
 });
 
