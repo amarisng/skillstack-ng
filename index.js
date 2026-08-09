@@ -661,6 +661,59 @@ app.get('/terms', (req, res) => {
 });
 
 
+app.get('/affiliate', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'affiliate.html'));
+});
+
+app.post('/affiliate-signup', async (req, res) => {
+  try {
+    const { name, phone, email, channel, bank, account, accountName } = req.body;
+
+    // Clean phone number
+    let cleanPhone = phone.replace(/\D/g, '');
+    if (cleanPhone.startsWith('0')) cleanPhone = '234' + cleanPhone.substring(1);
+
+    // Generate unique affiliate code
+    const code = name.split(' ')[0].toLowerCase().replace(/[^a-z]/g, '') +
+      Math.floor(1000 + Math.random() * 9000);
+
+    // Save to Supabase
+    await supabase.from('affiliates').insert({
+      name,
+      phone: cleanPhone,
+      email,
+      channel,
+      bank_name: bank,
+      account_number: account,
+      account_name: accountName,
+      affiliate_code: code,
+      status: 'pending',
+      total_earnings: 0,
+      pending_payout: 0,
+      referral_count: 0,
+      created_at: new Date().toISOString()
+    });
+
+    // Notify Amaris via WhatsApp
+    await sendMessage('2347063667303',
+      'New affiliate application!\n\n' +
+      'Name: ' + name + '\n' +
+      'Phone: ' + cleanPhone + '\n' +
+      'Email: ' + email + '\n' +
+      'Channel: ' + channel + '\n' +
+      'Bank: ' + bank + ' — ' + account + ' (' + accountName + ')\n' +
+      'Code: ' + code + '\n\n' +
+      'Approve by updating their status in Supabase to "approved" and sending them their link:\n' +
+      'https://paystack.shop/pay/2-h3igsfd2?ref=' + code
+    );
+
+    res.status(200).json({ success: true });
+  } catch (err) {
+    console.error('Affiliate signup error:', err.message);
+    res.status(500).json({ success: false });
+  }
+});
+
 app.get('/beta', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'beta.html'));
 });
