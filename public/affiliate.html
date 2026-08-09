@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Earn With SkillStack NG — Affiliate Programme</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green: #00C48C;
+      --green-dark: #009e72;
+      --dark: #0D1F17;
+      --white: #FFFFFF;
+      --off-white: #F7FAF8;
+      --text: #1A2E1F;
+      --muted: #5A7A65;
+      --border: #D8EAE0;
+      --gold: #F5A623;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--white);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* NAV */
+    nav {
+      background: var(--dark);
+      padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 60px; position: sticky; top: 0; z-index: 100;
+    }
+    .nav-logo { font-weight: 800; font-size: 1.1rem; color: #fff; text-decoration: none; }
+    .nav-logo span { color: var(--green); }
+    .nav-cta {
+      background: var(--green); color: var(--dark);
+      padding: 8px 18px; border-radius: 8px;
+      font-weight: 700; font-size: 0.85rem; text-decoration: none;
+    }
+
+    /* HERO */
+    .hero {
+      background: linear-gradient(135deg, #0D1F17 0%, #112B1C 100%);
+      color: #fff; padding: 72px 24px 80px; text-align: center;
+    }
+    .eyebrow {
+      display: inline-block;
+      background: rgba(0,196,140,0.15);
+      border: 1px solid rgba(0,196,140,0.3);
+      color: var(--green);
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      border-radius: 20px; padding: 4px 14px; margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 6vw, 3.2rem);
+      font-weight: 800; line-height: 1.1; margin-bottom: 18px;
+    }
+    .hero h1 em { color: var(--green); font-style: normal; }
+    .hero p {
+      font-size: 1.05rem; color: rgba(255,255,255,0.7);
+      max-width: 520px; margin: 0 auto 40px; line-height: 1.7;
+    }
+
+    /* EARNINGS CARDS */
+    .earn-grid {
+      display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+      margin-bottom: 40px;
+    }
+    .earn-card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px; padding: 24px 28px; text-align: center;
+      min-width: 160px;
+    }
+    .earn-card .label { font-size: 0.78rem; color: rgba(255,255,255,0.6); margin-bottom: 8px; }
+    .earn-card .amount { font-size: 1.6rem; font-weight: 800; color: var(--green); }
+    .earn-card .sub { font-size: 0.72rem; color: rgba(255,255,255,0.5); margin-top: 4px; }
+
+    .btn-primary {
+      display: inline-block;
+      background: var(--green); color: var(--dark);
+      padding: 14px 32px; border-radius: 10px;
+      font-weight: 800; font-size: 1rem; text-decoration: none;
+      transition: background 0.15s;
+    }
+    .btn-primary:hover { background: var(--green-dark); }
+
+    /* HOW IT WORKS */
+    .how-section { background: var(--off-white); padding: 72px 24px; text-align: center; }
+    .how-section h2 { font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 800; margin-bottom: 12px; }
+    .how-section p { font-size: 0.95rem; color: var(--muted); max-width: 480px; margin: 0 auto 40px; }
+    .steps-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px; max-width: 860px; margin: 0 auto;
+    }
+    .step-card {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 16px; padding: 24px; text-align: left;
+    }
+    .step-num {
+      width: 34px; height: 34px; border-radius: 10px;
+      background: rgba(0,196,140,0.1); border: 1px solid rgba(0,196,140,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 0.82rem; color: var(--green);
+      margin-bottom: 12px;
+    }
+    .step-card h3 { font-size: 0.92rem; font-weight: 700; margin-bottom: 6px; }
+    .step-card p { font-size: 0.8rem; color: var(--muted); line-height: 1.55; }
+
+    /* COMMISSION TABLE */
+    .commission-section { background: #fff; padding: 72px 24px; text-align: center; }
+    .commission-section h2 { font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 800; margin-bottom: 12px; }
+    .commission-section p { font-size: 0.95rem; color: var(--muted); max-width: 480px; margin: 0 auto 40px; }
+    .commission-table {
+      max-width: 620px; margin: 0 auto;
+      border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
+    }
+    .ct-row {
+      display: grid; grid-template-columns: 2fr 1fr 1fr;
+      padding: 14px 20px; border-bottom: 1px solid var(--border);
+      font-size: 0.88rem; align-items: center;
+    }
+    .ct-row:last-child { border-bottom: none; }
+    .ct-header {
+      background: var(--dark); color: #fff;
+      font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    .ct-row:nth-child(even):not(.ct-header) { background: var(--off-white); }
+    .ct-row .earn { font-weight: 800; color: var(--green); }
+
+    /* CALCULATOR */
+    .calc-section { background: var(--off-white); padding: 72px 24px; text-align: center; }
+    .calc-section h2 { font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 800; margin-bottom: 12px; }
+    .calc-section p { font-size: 0.95rem; color: var(--muted); max-width: 480px; margin: 0 auto 40px; }
+    .calculator {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 20px; padding: 36px; max-width: 480px; margin: 0 auto;
+    }
+    .calc-group { margin-bottom: 24px; text-align: left; }
+    .calc-group label {
+      display: block; font-size: 0.85rem; font-weight: 600;
+      color: var(--text); margin-bottom: 8px;
+    }
+    .calc-group input[type=range] { width: 100%; accent-color: var(--green); }
+    .calc-group .range-val {
+      font-size: 1.4rem; font-weight: 800; color: var(--green);
+      margin-bottom: 4px;
+    }
+    .calc-result {
+      background: rgba(0,196,140,0.06);
+      border: 1px solid rgba(0,196,140,0.2);
+      border-radius: 12px; padding: 20px;
+      margin-top: 8px;
+    }
+    .calc-result .result-label { font-size: 0.8rem; color: var(--muted); margin-bottom: 4px; }
+    .calc-result .result-amount { font-size: 2rem; font-weight: 800; color: var(--green); }
+
+    /* SIGNUP FORM */
+    .signup-section {
+      background: linear-gradient(135deg, #0D1F17 0%, #112B1C 100%);
+      padding: 72px 24px; text-align: center; color: #fff;
+    }
+    .signup-section h2 { font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 800; margin-bottom: 12px; color: #fff; }
+    .signup-section p { font-size: 0.95rem; color: rgba(255,255,255,0.65); max-width: 480px; margin: 0 auto 40px; }
+    .signup-form {
+      background: #fff; border-radius: 20px; padding: 36px;
+      max-width: 480px; margin: 0 auto; text-align: left;
+    }
+    .form-group { margin-bottom: 18px; }
+    .form-group label {
+      display: block; font-size: 0.85rem; font-weight: 600;
+      color: var(--text); margin-bottom: 6px;
+    }
+    .form-group input, .form-group select {
+      width: 100%; padding: 12px 14px;
+      border: 1px solid var(--border); border-radius: 10px;
+      font-family: inherit; font-size: 0.9rem; color: var(--text);
+      outline: none; transition: border-color 0.15s;
+    }
+    .form-group input:focus, .form-group select:focus { border-color: var(--green); }
+    .form-submit {
+      width: 100%; background: var(--green); color: var(--dark);
+      border: none; padding: 14px; border-radius: 10px;
+      font-family: inherit; font-size: 1rem; font-weight: 800;
+      cursor: pointer; transition: background 0.15s; margin-top: 8px;
+    }
+    .form-submit:hover { background: var(--green-dark); }
+    .form-note { font-size: 0.75rem; color: var(--muted); margin-top: 12px; text-align: center; }
+
+    /* SUCCESS MESSAGE */
+    .success-msg {
+      display: none;
+      background: rgba(0,196,140,0.08);
+      border: 1px solid rgba(0,196,140,0.25);
+      border-radius: 12px; padding: 20px;
+      text-align: center; margin-top: 16px;
+    }
+    .success-msg h3 { color: var(--green); font-size: 1rem; margin-bottom: 8px; }
+    .success-msg p { font-size: 0.85rem; color: var(--muted); }
+
+    /* FAQ */
+    .faq-section { background: var(--off-white); padding: 72px 24px; }
+    .faq-inner { max-width: 680px; margin: 0 auto; text-align: center; }
+    .faq-inner h2 { font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 800; margin-bottom: 40px; }
+    details {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 12px; margin-bottom: 10px; overflow: hidden;
+      text-align: left;
+    }
+    summary {
+      padding: 18px 20px; font-weight: 600; font-size: 0.92rem;
+      color: var(--text); cursor: pointer; list-style: none;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: "+"; color: var(--green); font-size: 1.2rem; }
+    details[open] summary::after { content: "−"; }
+    details p { padding: 0 20px 18px; font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+
+    /* FOOTER */
+    footer {
+      background: #081410; padding: 24px; text-align: center;
+      font-size: 0.78rem; color: rgba(255,255,255,0.35);
+    }
+    footer a { color: var(--green); text-decoration: none; }
+
+    @media (max-width: 480px) {
+      .earn-grid { flex-direction: column; align-items: center; }
+      .signup-form { padding: 24px 18px; }
+      .calculator { padding: 24px 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="/">Skill<span>Stack</span> NG</a>
+  <a class="nav-cta" href="#signup">Join as affiliate →</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <span class="eyebrow">Affiliate programme</span>
+  <h1>Earn ₦1,500–₦2,500 for every person you refer to <em>SkillStack NG</em></h1>
+  <p>Share a link. Your referral subscribes. You earn. Simple as that. No cap on earnings — the more you refer, the more you make.</p>
+
+  <div class="earn-grid">
+    <div class="earn-card">
+      <div class="label">Per monthly referral</div>
+      <div class="amount">₦1,500</div>
+      <div class="sub">30% of ₦5,000</div>
+    </div>
+    <div class="earn-card">
+      <div class="label">Per 90-day referral</div>
+      <div class="amount">₦2,500</div>
+      <div class="sub">19% of ₦13,000</div>
+    </div>
+    <div class="earn-card">
+      <div class="label">Payout threshold</div>
+      <div class="amount">₦5,000</div>
+      <div class="sub">~3–4 referrals</div>
+    </div>
+    <div class="earn-card">
+      <div class="label">Payout method</div>
+      <div class="amount">Bank</div>
+      <div class="sub">Direct transfer</div>
+    </div>
+  </div>
+
+  <a class="btn-primary" href="#signup">Join the programme free →</a>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="how-section">
+  <h2>How it works</h2>
+  <p>Four simple steps from signup to your first payout.</p>
+  <div class="steps-grid">
+    <div class="step-card">
+      <div class="step-num">01</div>
+      <h3>Apply below</h3>
+      <p>Fill in the form below with your name, WhatsApp number, and bank details. We approve within 24 hours.</p>
+    </div>
+    <div class="step-card">
+      <div class="step-num">02</div>
+      <h3>Get your unique link</h3>
+      <p>We send you a unique referral link via WhatsApp. Share it anywhere — Twitter, Instagram, WhatsApp groups, Telegram.</p>
+    </div>
+    <div class="step-card">
+      <div class="step-num">03</div>
+      <h3>Your referral subscribes</h3>
+      <p>When someone clicks your link and pays for SkillStack NG, the sale is tracked and credited to your account automatically.</p>
+    </div>
+    <div class="step-card">
+      <div class="step-num">04</div>
+      <h3>Get paid to your bank</h3>
+      <p>Once you hit ₦5,000 in earnings (about 3–4 referrals) we transfer directly to your bank account. No waiting.</p>
+    </div>
+  </div>
+</div>
+
+<!-- COMMISSION TABLE -->
+<div class="commission-section">
+  <h2>Commission structure</h2>
+  <p>Clear, honest rates. No hidden deductions.</p>
+  <div class="commission-table">
+    <div class="ct-row ct-header">
+      <div>Plan</div>
+      <div>Price</div>
+      <div>You earn</div>
+    </div>
+    <div class="ct-row">
+      <div>Monthly subscription</div>
+      <div>₦5,000</div>
+      <div class="earn">₦1,500</div>
+    </div>
+    <div class="ct-row">
+      <div>Full 90 days</div>
+      <div>₦13,000</div>
+      <div class="earn">₦2,500</div>
+    </div>
+    <div class="ct-row">
+      <div>Monthly renewal (month 2+)</div>
+      <div>₦5,000</div>
+      <div class="earn">₦500</div>
+    </div>
+  </div>
+  <p style="font-size:0.8rem;color:var(--muted);margin-top:16px;max-width:480px;margin-left:auto;margin-right:auto;">
+    You earn ₦500 on every month your referral renews their monthly subscription — not just the first payment. A subscriber who stays 6 months earns you ₦1,500 upfront + ₦2,500 in renewal commissions.
+  </p>
+</div>
+
+<!-- CALCULATOR -->
+<div class="calc-section">
+  <h2>Calculate your earnings</h2>
+  <p>See what you could earn based on how many people you refer per month.</p>
+  <div class="calculator">
+    <div class="calc-group">
+      <div class="range-val" id="refCount">5 referrals/month</div>
+      <label>Monthly referrals</label>
+      <input type="range" min="1" max="50" value="5" id="refSlider" oninput="calcEarnings()"/>
+    </div>
+    <div class="calc-group">
+      <div class="range-val" id="planSplit">50% monthly / 50% full</div>
+      <label>Plan split</label>
+      <input type="range" min="0" max="100" value="50" id="splitSlider" oninput="calcEarnings()"/>
+    </div>
+    <div class="calc-result">
+      <div class="result-label">Estimated monthly earnings</div>
+      <div class="result-amount" id="calcResult">₦10,000</div>
+      <div style="font-size:0.72rem;color:#5A7A65;margin-top:4px;" id="calcBreakdown">5 referrals × mix of plans</div>
+    </div>
+  </div>
+</div>
+
+<!-- SIGNUP FORM -->
+<div class="signup-section" id="signup">
+  <h2>Join the programme</h2>
+  <p>Free to join. No experience needed. Just share the link and earn.</p>
+  <div class="signup-form">
+    <div class="form-group">
+      <label>Full name</label>
+      <input type="text" id="affName" placeholder="Your full name"/>
+    </div>
+    <div class="form-group">
+      <label>WhatsApp number</label>
+      <input type="tel" id="affPhone" placeholder="08012345678"/>
+    </div>
+    <div class="form-group">
+      <label>Email address</label>
+      <input type="email" id="affEmail" placeholder="you@example.com"/>
+    </div>
+    <div class="form-group">
+      <label>How will you promote SkillStack NG?</label>
+      <select id="affChannel">
+        <option value="">Select your main channel</option>
+        <option>Twitter / X</option>
+        <option>Instagram</option>
+        <option>WhatsApp groups</option>
+        <option>Telegram</option>
+        <option>LinkedIn</option>
+        <option>Facebook</option>
+        <option>TikTok</option>
+        <option>My own audience / newsletter</option>
+        <option>Word of mouth / friends</option>
+        <option>Multiple channels</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Bank name</label>
+      <input type="text" id="affBank" placeholder="e.g. GTBank, Opay, Kuda"/>
+    </div>
+    <div class="form-group">
+      <label>Account number</label>
+      <input type="text" id="affAccount" placeholder="10-digit account number"/>
+    </div>
+    <div class="form-group">
+      <label>Account name</label>
+      <input type="text" id="affAccountName" placeholder="Name on the account"/>
+    </div>
+    <button class="form-submit" onclick="submitAffiliate()">Apply to join →</button>
+    <p class="form-note">We review applications within 24 hours and send your unique link via WhatsApp.</p>
+
+    <div class="success-msg" id="successMsg">
+      <h3>✅ Application received!</h3>
+      <p>We will review your application and send your unique referral link to your WhatsApp within 24 hours. Welcome to the team!</p>
+    </div>
+  </div>
+</div>
+
+<!-- FAQ -->
+<div class="faq-section">
+  <div class="faq-inner">
+    <h2>Common questions</h2>
+    <details>
+      <summary>Is there a cost to join?</summary>
+      <p>No. Joining the SkillStack NG affiliate programme is completely free. There are no fees, no minimum requirements, and no approval score. We just want people who will genuinely recommend the product.</p>
+    </details>
+    <details>
+      <summary>How is my referral tracked?</summary>
+      <p>You receive a unique payment link. When someone clicks your link and pays, the sale is automatically tracked to your account. We record every payment made through your link in our system.</p>
+    </details>
+    <details>
+      <summary>When do I get paid?</summary>
+      <p>Payouts happen every Friday for affiliates who have reached the ₦5,000 threshold. We transfer directly to the bank account you provide during signup. You will receive a WhatsApp confirmation when the transfer is made.</p>
+    </details>
+    <details>
+      <summary>Do I earn on renewals?</summary>
+      <p>Yes. You earn ₦500 every month a subscriber you referred renews their monthly plan. A subscriber who stays for 6 months earns you ₦1,500 on the first payment plus ₦500 × 5 months = ₦2,500 in renewals. Total: ₦4,000 from one referral.</p>
+    </details>
+    <details>
+      <summary>Do I need to be a SkillStack NG subscriber?</summary>
+      <p>No — but we strongly recommend it. Affiliates who have gone through the lessons speak more authentically and convert much better than those who have not. If you are not yet a subscriber, consider joining the full 90-day plan for ₦13,000.</p>
+    </details>
+    <details>
+      <summary>Is there a limit to how much I can earn?</summary>
+      <p>No limit at all. Some of our top affiliates will earn hundreds of thousands of naira per month. The more people you refer, the more you earn. There is no cap.</p>
+    </details>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2025 SkillStack NG · <a href="/">Home</a> · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></p>
+</footer>
+
+<script>
+  function calcEarnings() {
+    const refs = parseInt(document.getElementById('refSlider').value);
+    const split = parseInt(document.getElementById('splitSlider').value);
+
+    const monthlyRefs = Math.round(refs * (split / 100));
+    const fullRefs = refs - monthlyRefs;
+
+    const earnings = (monthlyRefs * 1500) + (fullRefs * 2500);
+
+    document.getElementById('refCount').textContent = refs + ' referral' + (refs === 1 ? '' : 's') + '/month';
+    document.getElementById('planSplit').textContent = split + '% monthly / ' + (100 - split) + '% full plan';
+    document.getElementById('calcResult').textContent = '₦' + earnings.toLocaleString();
+    document.getElementById('calcBreakdown').textContent =
+      monthlyRefs + ' monthly (₦' + (monthlyRefs * 1500).toLocaleString() + ') + ' +
+      fullRefs + ' full plan (₦' + (fullRefs * 2500).toLocaleString() + ')';
+  }
+
+  async function submitAffiliate() {
+    const name = document.getElementById('affName').value.trim();
+    const phone = document.getElementById('affPhone').value.trim();
+    const email = document.getElementById('affEmail').value.trim();
+    const channel = document.getElementById('affChannel').value;
+    const bank = document.getElementById('affBank').value.trim();
+    const account = document.getElementById('affAccount').value.trim();
+    const accountName = document.getElementById('affAccountName').value.trim();
+
+    if (!name || !phone || !email || !channel || !bank || !account || !accountName) {
+      alert('Please fill in all fields before submitting.');
+      return;
+    }
+
+    const btn = document.querySelector('.form-submit');
+    btn.textContent = 'Submitting...';
+    btn.disabled = true;
+
+    try {
+      const response = await fetch('/affiliate-signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, phone, email, channel, bank, account, accountName })
+      });
+
+      if (response.ok) {
+        document.getElementById('successMsg').style.display = 'block';
+        btn.style.display = 'none';
+      } else {
+        throw new Error('Server error');
+      }
+    } catch (err) {
+      alert('Something went wrong. Please email amarissynergylimited@gmail.com to apply manually.');
+      btn.textContent = 'Apply to join →';
+      btn.disabled = false;
+    }
+  }
+</script>
+</body>
+</html>
