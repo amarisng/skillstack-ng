@@ -94,9 +94,10 @@ async function activateSubscriber(whatsappNumber, name, planType = 'monthly') {
     console.log('Activating subscriber: ' + finalPhone);
     let sub = await getSubscriber(finalPhone);
 
-    // Set subscription expiry — 32 days for monthly, 95 days for full plan
+    // Set subscription expiry — 95 days for copywriting full, 65 days for SMM full, 32 days for monthly
+    const expiryDays = planType === 'full' ? 95 : 32;
     const expiryDate = new Date();
-    expiryDate.setDate(expiryDate.getDate() + (planType === 'full' ? 95 : 32));
+    expiryDate.setDate(expiryDate.getDate() + expiryDays);
     const subscriptionExpires = expiryDate.toISOString().split('T')[0];
 
     if (sub) {
@@ -277,7 +278,9 @@ app.post('/paystack-webhook', async (req, res) => {
 
       if (whatsappNumber) {
         const amount = data.amount / 100;
-        const planType = amount >= 13000 ? 'full' : 'monthly';
+        let planType = 'monthly';
+        if (amount >= 13000) planType = 'full'; // Copywriting full 90 days
+        else if (amount >= 9000) planType = 'full'; // SMM full 60 days
         await activateSubscriber(whatsappNumber, customerName, planType);
       } else {
         console.log('No WhatsApp number found. Metadata: ' + JSON.stringify(data.metadata));
@@ -663,9 +666,7 @@ app.get('/terms', (req, res) => {
 </html>`);
 });
 
-app.get('/social-media-management', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'social-media-management.html'));
-});
+
 app.get('/copywriting', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'copywriting.html'));
 });
