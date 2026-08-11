@@ -57,12 +57,12 @@ async function getSubscriber(phone) {
   return data;
 }
 
-async function getLesson(lessonNumber) {
+async function getLesson(lessonNumber, track = 'copywriting') {
   const { data } = await supabase
     .from('lessons')
     .select('*')
     .eq('lesson_number', lessonNumber)
-    .eq('track', 'copywriting')
+    .eq('track', track)
     .single();
   return data;
 }
@@ -153,13 +153,16 @@ async function handleOnboarding(phone, message) {
       active: 'false',
       streak: 0,
     });
-    await sendMessage(cleanPhone, 'Welcome to SkillStack NG! Learn copywriting in 90 days - 15 minutes a day, Monday to Friday. No app needed. Reply 1 to get started.');
+    await sendMessage(cleanPhone, 'Welcome to SkillStack NG! 🎓\n\nWe deliver high-income skill lessons to your WhatsApp every weekday — 15 minutes a day, AI feedback on every task.\n\nChoose your track:\n\n1️⃣ Copywriting & Persuasion — 90 days\nWrite sales copy, ads, email sequences, and landing pages. Earn ₦100k–₦500k per project.\n\n2️⃣ Social Media Management — 60 days\nManage brand accounts professionally. Earn ₦80k–₦900k per month.\n\nReply 1 for Copywriting or 2 for Social Media Management to get started.');
     return;
   }
 
-  if (sub.active === 'false' && sub.name === '' && message === '1') {
-    await sendMessage(cleanPhone, 'Perfect choice. Copywriting earns Nigerian freelancers 150k-500k per month. What is your first name?');
-    await supabase.from('subscribers').update({ name: 'AWAITING' }).eq('phone', cleanPhone);
+  // Handle track selection
+  if (sub.active === 'false' && sub.name === '' && (message === '1' || message === '2')) {
+    const selectedTrack = message === '1' ? 'copywriting' : 'social_media_management';
+    const trackName = message === '1' ? 'Copywriting & Persuasion (90 days)' : 'Social Media Management (60 days)';
+    await supabase.from('subscribers').update({ track: selectedTrack, name: 'AWAITING' }).eq('phone', cleanPhone);
+    await sendMessage(cleanPhone, 'Great choice! ' + trackName + ' it is.\n\nFirst — what is your first name?');
     return;
   }
 
@@ -194,14 +197,14 @@ async function handleOnboarding(phone, message) {
       time_preference: timePreference,
       last_active: new Date(Date.now() - 86400000).toISOString().split('T')[0]
     }).eq('phone', cleanPhone);
-    const lesson = await getLesson(1);
+    const lesson = await getLesson(1, sub.track || 'copywriting');
     await sendMessage(cleanPhone, 'Perfect! Your lesson will arrive Monday to Friday at ' + message.toUpperCase() + '. Here is your Day 1 lesson right now:');
     if (lesson) await sendMessage(cleanPhone, formatLesson(lesson, 1));
     return;
   }
 
   if (sub.active === 'true' && sub.day_number > 0) {
-    const lesson = await getLesson(sub.day_number);
+    const lesson = await getLesson(sub.day_number, sub.track || 'copywriting');
     if (!lesson) {
       await sendMessage(cleanPhone, 'You have completed all available lessons. More coming soon!');
       return;
@@ -338,7 +341,7 @@ cron.schedule('0 * * * *', async () => {
   const today = new Date().toISOString().split('T')[0];
   for (const sub of subscribers) {
     if (sub.last_active === today) continue;
-    const lesson = await getLesson(sub.day_number);
+    const lesson = await getLesson(sub.day_number, sub.track || 'copywriting');
     if (!lesson) {
       console.log('No lesson found for day ' + sub.day_number);
       continue;
@@ -660,9 +663,7 @@ app.get('/terms', (req, res) => {
 </html>`);
 });
 
-app.get('/social-media-management', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'social-media-management.html'));
-});
+
 app.get('/copywriting', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'copywriting.html'));
 });
