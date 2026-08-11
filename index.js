@@ -666,9 +666,30 @@ app.get('/terms', (req, res) => {
 </html>`);
 });
 
-app.get('/social-media-management', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'social-media-management.html'));
+
+app.get('/choose', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'choose.html'));
 });
+
+app.post('/waitlist', async (req, res) => {
+  try {
+    const { name, phone, track } = req.body;
+    let cleanPhone = (phone || '').replace(/\D/g, '');
+    if (cleanPhone.startsWith('0')) cleanPhone = '234' + cleanPhone.substring(1);
+    await supabase.from('waitlist').insert({
+      name, phone: cleanPhone, track,
+      created_at: new Date().toISOString()
+    });
+    await sendMessage('2347063667303',
+      'New waitlist signup!\nName: ' + name + '\nPhone: ' + cleanPhone + '\nTrack: ' + track
+    );
+    res.status(200).json({ success: true });
+  } catch (err) {
+    console.error('Waitlist error:', err.message);
+    res.status(200).json({ success: true });
+  }
+});
+
 app.get('/copywriting', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'copywriting.html'));
 });
