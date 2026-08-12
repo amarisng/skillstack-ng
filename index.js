@@ -474,7 +474,7 @@ app.get('/privacy', (req, res) => {
   <p>This Privacy Policy describes how Amaris Synergy Limited ("we", "us", or "our") collects, uses, and protects your personal information when you use SkillStack NG ("the Service"). By subscribing to SkillStack NG you agree to the terms of this Privacy Policy.</p>
 
   <h2>1. Who We Are</h2>
-  <p>SkillStack NG is operated by Amaris Synergy Limited, a company registered in Nigeria. Our registered address is 12 Babatunde Street, Lagos, Nigeria. You can contact us at amarissynergylimited@gmail.com.</p>
+  <p>SkillStack NG is operated by Amaris Synergy Limited, a company registered in Nigeria. Our registered address is 12 Babatunde Street, Lagos, Nigeria. You can contact us at hello@skillstackng.com.</p>
 
   <h2>2. Information We Collect</h2>
   <p>We collect the following information when you use SkillStack NG:</p>
@@ -516,7 +516,7 @@ app.get('/privacy', (req, res) => {
   <p>While we take reasonable precautions, no method of transmission over the internet or electronic storage is 100% secure. We cannot guarantee absolute security of your data.</p>
 
   <h2>6. Data Retention</h2>
-  <p>We retain your personal information for as long as your account is active or as needed to provide our service. If you cancel your subscription, we retain your data for 90 days in case you wish to reactivate, after which it is deleted from our active systems. You may request immediate deletion at any time by emailing amarissynergylimited@gmail.com.</p>
+  <p>We retain your personal information for as long as your account is active or as needed to provide our service. If you cancel your subscription, we retain your data for 90 days in case you wish to reactivate, after which it is deleted from our active systems. You may request immediate deletion at any time by emailing hello@skillstackng.com.</p>
 
   <h2>7. Your Rights</h2>
   <p>You have the following rights regarding your personal information:</p>
@@ -528,7 +528,7 @@ app.get('/privacy', (req, res) => {
     <li><strong>Objection</strong> — you may object to certain uses of your data</li>
     <li><strong>Withdrawal of consent</strong> — you may stop receiving WhatsApp messages at any time by replying STOP</li>
   </ul>
-  <p>To exercise any of these rights, contact us at amarissynergylimited@gmail.com. We will respond within 30 days.</p>
+  <p>To exercise any of these rights, contact us at hello@skillstackng.com. We will respond within 30 days.</p>
 
   <h2>8. WhatsApp Messaging</h2>
   <p>By subscribing to SkillStack NG you consent to receive WhatsApp messages from us including daily lessons, task feedback, account notifications, and subscription alerts. Standard WhatsApp data rates may apply depending on your mobile carrier. You may unsubscribe at any time by replying STOP to any message.</p>
@@ -543,7 +543,7 @@ app.get('/privacy', (req, res) => {
   <p>For any privacy-related questions, requests, or complaints, contact us at:</p>
   <p><strong>Amaris Synergy Limited</strong><br/>
   12 Babatunde Street, Lagos, Nigeria<br/>
-  Email: amarissynergylimited@gmail.com</p>
+  Email: hello@skillstackng.com</p>
 </body>
 </html>`);
 });
@@ -605,7 +605,7 @@ app.get('/terms', (req, res) => {
   </ul>
 
   <h2>5. Cancellation Policy</h2>
-  <p>You may cancel your monthly subscription at any time by emailing amarissynergylimited@gmail.com. Upon cancellation:</p>
+  <p>You may cancel your monthly subscription at any time by emailing hello@skillstackng.com. Upon cancellation:</p>
   <ul>
     <li>Your subscription will remain active until the end of the current billing period</li>
     <li>You will not be charged for the following month</li>
@@ -619,7 +619,7 @@ app.get('/terms', (req, res) => {
     <li><strong>Technical failure:</strong> If our platform fails to deliver lessons for more than 5 consecutive weekdays due to a technical issue on our end, you are entitled to a pro-rated refund for the affected period</li>
     <li><strong>Duplicate payment:</strong> If you are charged twice for the same subscription period, we will refund the duplicate charge within 5 business days</li>
   </ul>
-  <p>We do not offer refunds for change of mind, failure to engage with lessons, or dissatisfaction with lesson content after more than 7 days of access. To request a refund email amarissynergylimited@gmail.com with your WhatsApp number and reason.</p>
+  <p>We do not offer refunds for change of mind, failure to engage with lessons, or dissatisfaction with lesson content after more than 7 days of access. To request a refund email hello@skillstackng.com with your WhatsApp number and reason.</p>
 
   <h2>7. Lesson Delivery</h2>
   <p>Lessons are delivered Monday to Friday only. No lessons are sent on weekends, Nigerian public holidays, or during scheduled maintenance periods. We aim to deliver lessons reliably but do not guarantee uninterrupted service. In the event of technical disruption we will notify subscribers and extend affected subscriptions accordingly.</p>
@@ -661,7 +661,7 @@ app.get('/terms', (req, res) => {
   <p>For any questions about these Terms, contact us at:</p>
   <p><strong>Amaris Synergy Limited</strong><br/>
   12 Babatunde Street, Lagos, Nigeria<br/>
-  Email: amarissynergylimited@gmail.com</p>
+  Email: hello@skillstackng.com</p>
 </body>
 </html>`);
 });
@@ -689,9 +689,7 @@ app.post('/waitlist', async (req, res) => {
     res.status(200).json({ success: true });
   }
 });
-app.get('/social-media-management', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'social-media-management.html'));
-});
+
 app.get('/copywriting', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'copywriting.html'));
 });
