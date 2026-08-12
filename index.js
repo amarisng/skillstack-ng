@@ -206,6 +206,23 @@ if (sub && sub.active === 'false' &&
   }
 
   // Handle time preference reply from newly activated subscribers
+if (sub && sub.active === 'false' && sub.name && sub.name.endsWith('_CONFIRMING')) {
+    const realName = sub.name.replace('_CONFIRMING', '');
+    if (message.toUpperCase() === 'YES') {
+      await supabase.from('subscribers').update({ name: realName }).eq('phone', cleanPhone);
+      const isSMM = sub.track === 'social_media_management';
+      const monthlyLink = isSMM ? 'https://paystack.shop/pay/ec2kdwv0ku' : PAYSTACK_LINK;
+      const fullLink = isSMM ? 'https://paystack.shop/pay/ok8zxwq28f' : 'https://paystack.shop/pay/m0m9ofipj4';
+      const fullPrice = isSMM ? '9,000 for 60 days (save 1,000)' : '13,000 for 90 days (save 2,000)';
+      await sendMessage(cleanPhone, 'Perfect ' + realName + '! Your lesson will arrive Monday to Friday at your chosen time.\n\nTo activate your subscription pay here:\n\nMonthly — ₦5,000/month:\n' + monthlyLink + '\n\nFull plan — ₦' + fullPrice + ':\n' + fullLink + '\n\nMake sure to enter this WhatsApp number (' + cleanPhone + ') in the payment form.');
+    } else if (message.toUpperCase() === 'BACK' || message.toUpperCase() === 'CHANGE') {
+      await supabase.from('subscribers').update({ name: realName, track: 'copywriting' }).eq('phone', cleanPhone);
+      await sendMessage(cleanPhone, 'No problem. Which track do you want?\n\n1️⃣ Copywriting & Persuasion — 90 days. Earn ₦100k–₦500k per project.\n2️⃣ Social Media Management — 60 days. Earn ₦80k–₦900k per month.\n\nReply 1 or 2.');
+    } else {
+      await sendMessage(cleanPhone, 'Please reply YES to confirm or BACK to change your track.');
+    }
+    return;
+  }
   const validTimes2 = ['6AM', '7AM', '8AM', '12PM', '6PM', '9PM'];
   if (sub.active === 'true' && sub.day_number === 1 && validTimes2.includes(message.toUpperCase())) {
     const timeMap2 = {
