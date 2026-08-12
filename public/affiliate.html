@@ -337,12 +337,6 @@
 <div class="calc-section">
   <h2>Calculate your earnings</h2>
   <p>See what you could earn based on how many people you refer per month.</p>
-<div style="background:#fff;border:1px solid #D8EAE0;border-radius:12px;padding:16px 20px;max-width:480px;margin:0 auto 24px;text-align:left;font-size:0.82rem;color:#5A7A65;line-height:1.6;">
-  <strong style="color:#1A2E1F;">How the slider works:</strong><br/>
-  Slide <strong>left</strong> → more referrals pay full ₦13,000 upfront (you earn ₦2,500 each)<br/>
-  Slide <strong>right</strong> → more referrals pay ₦5,000/month (you earn ₦1,500 each)<br/>
-  Most Nigerian buyers prefer the full plan to avoid monthly card charges — so sliding left is usually more realistic.
-</div>
   <div class="calculator">
     <div class="calc-group">
       <div class="range-val" id="refCount">5 referrals/month</div>
@@ -350,8 +344,8 @@
       <input type="range" min="1" max="50" value="5" id="refSlider" oninput="calcEarnings()"/>
     </div>
     <div class="calc-group">
-      <div class="range-val" id="planSplit">50% monthly / 50% full</div>
-      <label>Plan split</label>
+      <div class="range-val" id="planSplit">50% pay full 90 days · 50% pay monthly</div>
+      <label>How many will pay full 90 days? (slide right = more full plan buyers)</label>
       <input type="range" min="0" max="100" value="50" id="splitSlider" oninput="calcEarnings()"/>
     </div>
     <div class="calc-result">
@@ -456,19 +450,20 @@
 <script>
   function calcEarnings() {
     const refs = parseInt(document.getElementById('refSlider').value);
-    const split = parseInt(document.getElementById('splitSlider').value);
+    const fullPct = parseInt(document.getElementById('splitSlider').value);
+    const monthlyPct = 100 - fullPct;
 
-    const monthlyRefs = Math.round(refs * (split / 100));
-    const fullRefs = refs - monthlyRefs;
+    const fullRefs = Math.round(refs * (fullPct / 100));
+    const monthlyRefs = refs - fullRefs;
 
     const earnings = (monthlyRefs * 1500) + (fullRefs * 2500);
 
     document.getElementById('refCount').textContent = refs + ' referral' + (refs === 1 ? '' : 's') + '/month';
-    document.getElementById('planSplit').textContent = split + '% monthly / ' + (100 - split) + '% full plan';
+    document.getElementById('planSplit').textContent = fullPct + '% pay full 90 days · ' + monthlyPct + '% pay monthly';
     document.getElementById('calcResult').textContent = '₦' + earnings.toLocaleString();
     document.getElementById('calcBreakdown').textContent =
       monthlyRefs + ' monthly (₦' + (monthlyRefs * 1500).toLocaleString() + ') + ' +
-      fullRefs + ' full plan (₦' + (fullRefs * 2500).toLocaleString() + ')';
+      fullRefs + ' full 90-day (₦' + (fullRefs * 2500).toLocaleString() + ')';
   }
 
   async function submitAffiliate() {
@@ -503,7 +498,7 @@
         throw new Error('Server error');
       }
     } catch (err) {
-      alert('Something went wrong. Please email amarissynergylimited@gmail.com to apply manually.');
+      alert('Something went wrong. Please email hello@skillstackng.com to apply manually.');
       btn.textContent = 'Apply to join →';
       btn.disabled = false;
     }
