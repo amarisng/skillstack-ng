@@ -193,16 +193,16 @@ if (sub && sub.active === 'false' &&
       '12PM': '12:00', '6PM': '18:00', '9PM': '21:00'
     };
     const timePreference = timeMap[message.toUpperCase()];
-    await supabase.from('subscribers').update({ time_preference: timePreference }).eq('phone', cleanPhone);
-
-    // Send correct payment links based on selected track
-    const isSMM = sub.track === 'social_media_management';
-    const monthlyLink = isSMM ? 'https://paystack.shop/pay/ec2kdwv0ku' : PAYSTACK_LINK;
-    const fullLink = isSMM ? 'https://paystack.shop/pay/ok8zxwq28f' : 'https://paystack.shop/pay/m0m9ofipj4';
-    const fullPrice = isSMM ? '9,000 for 60 days (save 1,000)' : '13,000 for 90 days (save 2,000)';
-
-    await sendMessage(cleanPhone, 'Perfect ' + sub.name + '! Your lesson will arrive Monday to Friday at ' + message.toUpperCase() + '.\n\nTo activate your subscription pay here:\n\nMonthly — ₦5,000/month:\n' + monthlyLink + '\n\nFull plan — ₦' + fullPrice + ':\n' + fullLink + '\n\nMake sure to enter this WhatsApp number in the payment form.');
+    await supabase.from('subscribers').update({
+      time_preference: timePreference,
+      name: sub.name + '_CONFIRMING'
+    }).eq('phone', cleanPhone);
+    const trackLabel = sub.track === 'social_media_management'
+      ? 'Social Media Management — 60 days'
+      : 'Copywriting & Persuasion — 90 days';
+    await sendMessage(cleanPhone, 'Almost done ' + sub.name + '! Just to confirm:\n\n📚 Track: ' + trackLabel + '\n⏰ Time: ' + message.toUpperCase() + '\n\nIs this correct?\n\nReply YES to proceed to payment\nReply BACK to change your track');
     return;
+  }
   }
 
   // Handle time preference reply from newly activated subscribers
