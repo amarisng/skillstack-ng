@@ -182,7 +182,14 @@ async function handleOnboarding(phone, message) {
     };
     const timePreference = timeMap[message.toUpperCase()];
     await supabase.from('subscribers').update({ time_preference: timePreference }).eq('phone', cleanPhone);
-    await sendMessage(cleanPhone, 'Perfect ' + sub.name + '! Your lesson will arrive Monday to Friday at ' + message.toUpperCase() + '.\n\nTo activate your subscription pay here:\n\nMonthly - 5,000/month: ' + PAYSTACK_LINK + '\n\nFull 90 days - 13,000 (save 2,000): https://paystack.shop/pay/m0m9ofipj4\n\nMake sure to enter this WhatsApp number in the payment form.');
+
+    // Send correct payment links based on selected track
+    const isSMM = sub.track === 'social_media_management';
+    const monthlyLink = isSMM ? 'https://paystack.shop/pay/ec2kdwv0ku' : PAYSTACK_LINK;
+    const fullLink = isSMM ? 'https://paystack.shop/pay/ok8zxwq28f' : 'https://paystack.shop/pay/m0m9ofipj4';
+    const fullPrice = isSMM ? '9,000 for 60 days (save 1,000)' : '13,000 for 90 days (save 2,000)';
+
+    await sendMessage(cleanPhone, 'Perfect ' + sub.name + '! Your lesson will arrive Monday to Friday at ' + message.toUpperCase() + '.\n\nTo activate your subscription pay here:\n\nMonthly — ₦5,000/month:\n' + monthlyLink + '\n\nFull plan — ₦' + fullPrice + ':\n' + fullLink + '\n\nMake sure to enter this WhatsApp number in the payment form.');
     return;
   }
 
@@ -232,11 +239,15 @@ async function handleOnboarding(phone, message) {
   }
 
   if (sub.active === 'false') {
-    await sendMessage(cleanPhone, 'To activate your subscription pay here:\n\nMonthly - 5,000/month: ' + PAYSTACK_LINK + '\n\nFull 90 days - 13,000 (save 2,000): https://paystack.shop/pay/m0m9ofipj4');
+    const isSMM = sub.track === 'social_media_management';
+    const monthlyLink = isSMM ? 'https://paystack.shop/pay/ec2kdwv0ku' : PAYSTACK_LINK;
+    const fullLink = isSMM ? 'https://paystack.shop/pay/ok8zxwq28f' : 'https://paystack.shop/pay/m0m9ofipj4';
+    const fullPrice = isSMM ? '9,000 for 60 days' : '13,000 for 90 days';
+    await sendMessage(cleanPhone, 'To activate your subscription pay here:\n\nMonthly — ₦5,000/month:\n' + monthlyLink + '\n\nFull plan — ₦' + fullPrice + ':\n' + fullLink);
     return;
   }
 
-  await sendMessage(cleanPhone, 'Welcome back! Reply 1 to start your copywriting journey.');
+  await sendMessage(cleanPhone, 'Welcome back! Reply 1 for Copywriting or 2 for Social Media Management to get started.');
 }
 
 app.post('/paystack-webhook', async (req, res) => {
