@@ -700,7 +700,9 @@ app.post('/waitlist', async (req, res) => {
     res.status(200).json({ success: true });
   }
 });
-
+app.get('/social-media-management', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'social-media-management.html'));
+});
 app.get('/copywriting', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'copywriting.html'));
 });
