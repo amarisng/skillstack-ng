@@ -143,7 +143,19 @@ async function activateSubscriber(whatsappNumber, name, planType = 'monthly') {
 async function handleOnboarding(phone, message) {
   const cleanPhone = phone.replace(/\D/g, '');
   const sub = await getSubscriber(cleanPhone);
-
+if (sub && sub.active === 'false' &&
+      (message.toUpperCase() === 'RESTART' ||
+       message.toUpperCase() === 'CHANGE' ||
+       message.toUpperCase() === 'BACK')) {
+    await supabase.from('subscribers').update({
+      name: '',
+      track: 'copywriting',
+      time_preference: '07:00',
+      day_number: 0
+    }).eq('phone', cleanPhone);
+    await sendMessage(cleanPhone, 'No problem. Let us start over.\n\nReply 1 for Copywriting or 2 for Social Media Management to get started.');
+    return;
+  }
   if (!sub) {
     await supabase.from('subscribers').insert({
       phone: cleanPhone,
