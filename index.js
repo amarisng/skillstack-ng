@@ -154,10 +154,15 @@ async function handleOnboarding(phone, message) {
       active: 'false',
       streak: 0,
     });
-    await sendMessage(cleanPhone, 'Welcome to SkillStack NG! 🎓\n\nWe deliver high-income skill lessons to your WhatsApp every weekday — 15 minutes a day, AI feedback on every task.\n\nChoose your track:\n\n1️⃣ Copywriting & Persuasion — 90 days\nWrite sales copy, ads, email sequences, and landing pages. Earn ₦100k–₦500k per project.\n\n2️⃣ Social Media Management — 60 days\nManage brand accounts professionally. Earn ₦80k–₦900k per month.\n\nReply 1 for Copywriting or 2 for Social Media Management to get started.');
+    await sendMessage(cleanPhone, 'Welcome to SkillStack NG! 🎓\n\nWe deliver high-income skill lessons to your WhatsApp every weekday — 15 minutes a day, AI feedback on every task.\n\nChoose your track:\n\n1️⃣ Copywriting & Persuasion — 90 days\nWrite sales copy, ads, email sequences, and landing pages. Earn ₦100k–₦500k per project.\n\n2️⃣ Social Media Management — 60 days\nManage brand accounts professionally. Earn ₦80k–₦900k per month.\n\nReply 1 for Copywriting or 2 for Social Media Management to get started.\n\nMade a mistake? Reply CHANGETRACK at any time before payment to restart.');
     return;
   }
-
+// Allow inactive subscribers to correct their track before payment
+if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
+  await supabase.from('subscribers').update({ track: 'copywriting', name: '' }).eq('phone', cleanPhone);
+  await sendMessage(cleanPhone, 'No problem! Let\'s start over.\n\nChoose your track:\n\n1️⃣ Copywriting & Persuasion — 90 days\n2️⃣ Social Media Management — 60 days\n\nReply 1 or 2.');
+  return;
+}
   // Handle track selection
   if (sub.active === 'false' && sub.name === '' && (message === '1' || message === '2')) {
     const selectedTrack = message === '1' ? 'copywriting' : 'social_media_management';
