@@ -1,14 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-4WPE8R55VQ"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-4WPE8R55VQ');
-</script>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Content Writing Track — SkillStack NG</title>
@@ -870,8 +862,8 @@
     <h2>90 days from now you will either have this skill or you won't.</h2>
     <p>The lessons take 15 minutes. The decision takes 30 seconds. Everything else is just showing up.</p>
     <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-      <a class="btn-primary" href="https://paystack.shop/pay/6gz2f87ft4" onclick="event.preventDefault();payWithPaystack(13000,'cw-full','content_writing')" style="font-size:1.05rem;padding:16px 32px;">Pay once — ₦13,000 for full 90 days →</a>
-      <a href="https://paystack.shop/pay/yn75oepjbw" onclick="event.preventDefault();payWithPaystack(5000,'cw-monthly','content_writing')" style="border:1px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.8);padding:16px 28px;border-radius:10px;font-weight:600;font-size:0.95rem;text-decoration:none;">₦5,000/month</a>
+      <a class="btn-primary" href="https://paystack.shop/pay/6gz2f87ft4" style="font-size:1.05rem;padding:16px 32px;">Pay once — ₦13,000 for full 90 days →</a>
+      <a href="https://paystack.shop/pay/yn75oepjbw" style="border:1px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.8);padding:16px 28px;border-radius:10px;font-weight:600;font-size:0.95rem;text-decoration:none;">₦5,000/month</a>
     </div>
     <p style="font-size:0.78rem;color:rgba(255,255,255,0.4);margin-top:16px;">First lesson arrives on WhatsApp immediately after payment · Cancel anytime · Price increasing to ₦8,500 soon</p>
   </div>
@@ -896,47 +888,6 @@
     if (ref) localStorage.setItem("ssng_ref", ref);
   })();
 </script>
-<script src="https://js.paystack.co/v1/inline.js"></script>
-<script>
-function payWithPaystack(amount, planKey, track) {
-  var ref = localStorage.getItem("ssng_ref") || "";
-  var links = {
-    "copywriting-monthly": "https://paystack.shop/pay/2-h3igsfd2",
-    "copywriting-full": "https://paystack.shop/pay/m0m9ofipj4",
-    "smm-monthly": "https://paystack.shop/pay/ec2kdwv0ku",
-    "smm-full": "https://paystack.shop/pay/ok8zxwq28f",
-    "cw-monthly": "https://paystack.shop/pay/yn75oepjbw",
-    "cw-full": "https://paystack.shop/pay/6gz2f87ft4",
-    "beta": "https://paystack.shop/pay/tfv3ii1iq0"
-  };
 
-  var isMonthly = planKey.indexOf("monthly") !== -1 || planKey === "beta";
-
-  if (isMonthly) {
-    window.location.href = links[planKey] + (ref ? "?ref=" + ref : "");
-    return;
-  }
-
-  var handler = PaystackPop.setup({
-    key: "pk_live_840844c2b25d6ed006362384bf987d6514c8f20d",
-    email: "customer@skillstackng.com",
-    amount: amount * 100,
-    currency: "NGN",
-    metadata: {
-      custom_fields: [
-        { display_name: "Track", variable_name: "track", value: track },
-        { display_name: "Affiliate Ref", variable_name: "affiliate_ref", value: ref }
-      ]
-    },
-    callback: function(response) {
-      if (ref) localStorage.removeItem("ssng_ref");
-      window.location.href = "/thankyou";
-    },
-    onClose: function() {}
-  });
-  try { handler.openIframe(); }
-  catch(e) { window.location.href = links[planKey] + (ref ? "?ref=" + ref : ""); }
-}
-</script>
 </body>
 </html>
