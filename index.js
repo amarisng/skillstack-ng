@@ -26,19 +26,16 @@ const anthropic = new Anthropic({
 // CONSTANTS
 // ─────────────────────────────────────────────
 const META_API_VERSION   = 'v19.0';
-const PHONE_NUMBER_ID    = process.env.META_PHONE_NUMBER_ID;   // 1169972786209768
+const PHONE_NUMBER_ID    = process.env.META_PHONE_NUMBER_ID;
 const META_ACCESS_TOKEN  = process.env.META_ACCESS_TOKEN;
 const VERIFY_TOKEN       = process.env.WEBHOOK_VERIFY_TOKEN || 'skillstack_verify_2024';
 
-const LESSON_READY_TEMPLATE = 'lesson_ready'; // approved Utility template
+const LESSON_READY_TEMPLATE = 'lesson_ready';
 
 // ─────────────────────────────────────────────
 // META GRAPH API HELPERS
 // ─────────────────────────────────────────────
 
-/**
- * Send a free-form text message (only valid within a 24-hour service window).
- */
 async function sendTextMessage(to, text) {
   try {
     await axios.post(
@@ -62,10 +59,6 @@ async function sendTextMessage(to, text) {
   }
 }
 
-/**
- * Send the approved lesson_ready Utility template.
- * This opens the 24-hour window once the subscriber replies.
- */
 async function sendLessonReadyTemplate(to) {
   try {
     await axios.post(
@@ -77,7 +70,6 @@ async function sendLessonReadyTemplate(to) {
         template: {
           name: LESSON_READY_TEMPLATE,
           language: { code: 'en' },
-          // No variable components — template body is static
         },
       },
       {
@@ -114,12 +106,12 @@ async function upsertSubscriber(phone, updates) {
   if (error) console.error('[ERR] upsertSubscriber:', error);
 }
 
-async function getLesson(lessonNumber) {
+async function getLesson(lessonNumber, track) {
   const { data, error } = await supabase
     .from('lessons')
     .select('*')
     .eq('lesson_number', lessonNumber)
-    .eq('track', 'copywriting')
+    .eq('track', track || 'copywriting')
     .single();
   if (error) console.error('[ERR] getLesson:', error);
   return data || null;
@@ -129,15 +121,10 @@ async function getLesson(lessonNumber) {
 // AI FEEDBACK
 // ─────────────────────────────────────────────
 
-async function getAIFeedback(lessonTitle, taskDescription, subscriberSubmission) {
+async function getAIFeedback(lessonTitle, taskDescription, subscriberSubmission, feedbackPrompt) {
   try {
-    const message = await anthropic.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 600,
-      messages: [
-        {
-          role: 'user',
-          content: `You are a supportive copywriting coach at SkillStack NG, a micro-learning platform for Nigerians learning high-income skills.
+    const prompt = feedbackPrompt ||
+      `You are a supportive coach at SkillStack NG, a micro-learning platform for Nigerians learning high-income skills.
 
 Lesson: "${lessonTitle}"
 Task: "${taskDescription}"
@@ -145,17 +132,20 @@ Subscriber's submission: "${subscriberSubmission}"
 
 Give warm, practical feedback in 3 short sections:
 1. ✅ What they did well (1-2 sentences)
-2. 💡 One thing to improve (1-2 sentences, specific)  
+2. 💡 One thing to improve (1-2 sentences, specific)
 3. 🚀 Encouragement + what's coming tomorrow (1 sentence)
 
-Keep it under 120 words. Write like a friendly Nigerian mentor who genuinely wants them to succeed.`,
-        },
-      ],
+Keep it under 120 words. Write like a friendly Nigerian mentor who genuinely wants them to succeed.`;
+
+    const message = await anthropic.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 600,
+      messages: [{ role: 'user', content: prompt }],
     });
     return message.content[0].text;
   } catch (err) {
     console.error('[ERR] getAIFeedback:', err.message);
-    return "Great work submitting your task! Your coach will review it. Keep going — consistency is everything. See you tomorrow! 🚀";
+    return "Great work submitting your task! Keep going — consistency is everything. See you tomorrow! 🚀";
   }
 }
 
@@ -163,18 +153,16 @@ Keep it under 120 words. Write like a friendly Nigerian mentor who genuinely wan
 // LESSON DELIVERY
 // ─────────────────────────────────────────────
 
-/**
- * Send the full lesson content to a subscriber.
- * Called after they reply to the lesson_ready template (opening the 24hr window).
- */
 async function deliverFullLesson(phone, subscriber) {
   const lessonNum = subscriber.current_lesson || 1;
-  const lesson = await getLesson(lessonNum);
+  const track = subscriber.track || 'copywriting';
+  const lesson = await getLesson(lessonNum, track);
 
   if (!lessonNum || lessonNum > 65) {
+    const trackName = track === 'content_writing' ? 'Content Writing' : track === 'social_media_management' ? 'Social Media Management' : 'Copywriting';
     await sendTextMessage(
       phone,
-      `🎓 *Congratulations!*\n\nYou've completed all 65 lessons of the SkillStack NG Copywriting Track!\n\nYou're now a trained copywriter. Go out there and get clients. We're proud of you. 🙌\n\nLook out for our next track coming soon.`
+      `🎓 *Congratulations!*\n\nYou've completed all 65 lessons of the SkillStack NG ${trackName} Track!\n\nYou're now a trained ${trackName.toLowerCase()} professional. Go out there and get clients. We're proud of you. 🙌\n\nLook out for our next track coming soon.`
     );
     await upsertSubscriber(phone, { status: 'completed' });
     return;
@@ -185,7 +173,6 @@ async function deliverFullLesson(phone, subscriber) {
     return;
   }
 
-  // Format and send the lesson
   const lessonText =
     `📚 *Day ${lesson.lesson_number}: ${lesson.title}*\n` +
     `━━━━━━━━━━━━━━━━━━━━\n\n` +
@@ -196,14 +183,13 @@ async function deliverFullLesson(phone, subscriber) {
 
   await sendTextMessage(phone, lessonText);
 
-  // Mark that lesson has been delivered; waiting for task submission
   await upsertSubscriber(phone, {
     lesson_delivered_at: new Date().toISOString(),
     awaiting_task: true,
     last_active: new Date().toISOString(),
   });
 
-  console.log(`[LESSON] Lesson ${lessonNum} delivered to ${phone}`);
+  console.log(`[LESSON] Lesson ${lessonNum} (${track}) delivered to ${phone}`);
 }
 
 // ─────────────────────────────────────────────
@@ -218,15 +204,49 @@ async function handleOnboarding(phone, messageText, subscriber) {
   if (!subscriber || stage === 'new') {
     await upsertSubscriber(phone, {
       status: 'onboarding',
-      onboarding_stage: 'name',
+      onboarding_stage: 'track_select',
       current_lesson: 1,
       streak: 0,
     });
     await sendTextMessage(
       phone,
       `👋 Welcome to *SkillStack NG*!\n\nWe teach Nigerians high-income skills in 15 minutes a day — delivered right here on WhatsApp.\n\n` +
-      `Our current track: *Copywriting* 📝\n65 lessons. 90 days. Real skills. Real income potential.\n\n` +
-      `Let's get you started. *What's your first name?*`
+      `Choose your track:\n\n` +
+      `1️⃣ *Copywriting & Persuasion* — 90 days\nWrite sales copy, ads, email sequences, and landing pages. Earn ₦100k–₦500k per project.\n\n` +
+      `2️⃣ *Social Media Management* — 90 days\nManage brand accounts professionally. Earn ₦80k–₦900k per month.\n\n` +
+      `3️⃣ *Content Writing* — 90 days\nWrite blogs, newsletters, LinkedIn content and ghostwriting. Earn ₦50k–₦500k per month.\n\n` +
+      `Reply *1*, *2*, or *3* to get started.`
+    );
+    return;
+  }
+
+  // ── Stage: track selection ──
+  if (stage === 'track_select') {
+    const trackMap = {
+      '1': 'copywriting',
+      '2': 'social_media_management',
+      '3': 'content_writing',
+    };
+    const trackNameMap = {
+      '1': 'Copywriting & Persuasion (90 days)',
+      '2': 'Social Media Management (90 days)',
+      '3': 'Content Writing (90 days)',
+    };
+    const selectedTrack = trackMap[text];
+    const trackName = trackNameMap[text];
+
+    if (!selectedTrack) {
+      await sendTextMessage(phone, `Please reply with *1*, *2*, or *3* to choose your track.`);
+      return;
+    }
+
+    await upsertSubscriber(phone, {
+      track: selectedTrack,
+      onboarding_stage: 'name',
+    });
+    await sendTextMessage(
+      phone,
+      `Great choice! *${trackName}* it is. 🎯\n\nWhat's your first name?`
     );
     return;
   }
@@ -236,29 +256,33 @@ async function handleOnboarding(phone, messageText, subscriber) {
     const name = messageText.trim().split(' ')[0];
     await upsertSubscriber(phone, {
       name,
-      onboarding_stage: 'goal',
-    });
-    await sendTextMessage(
-      phone,
-      `Nice to meet you, *${name}*! 🙌\n\nQuick question — *why do you want to learn copywriting?*\n\n` +
-      `Reply with a number:\n1️⃣ I want to freelance and earn from clients\n2️⃣ I want to improve my own business marketing\n3️⃣ I want to work in marketing/advertising\n4️⃣ Just curious / exploring`
-    );
-    return;
-  }
-
-  // ── Stage: waiting for goal ──
-  if (stage === 'goal') {
-    const goalMap = { '1': 'freelancing', '2': 'business marketing', '3': 'marketing career', '4': 'exploring' };
-    const goal = goalMap[text] || 'personal growth';
-    await upsertSubscriber(phone, {
-      goal,
       onboarding_stage: 'payment_pending',
     });
+    const track = subscriber.track || 'copywriting';
+    const isCW  = track === 'content_writing';
+    const isSMM = track === 'social_media_management';
+
+    const monthlyLink = isCW  ? 'https://paystack.shop/pay/01d0empofc'
+                      : isSMM ? 'https://paystack.shop/pay/ec2kdwv0ku'
+                      : process.env.PAYSTACK_PAYMENT_LINK;
+
+    const fullLink = isCW  ? 'https://paystack.shop/pay/6gz2f87ft4'
+                   : isSMM ? 'https://paystack.shop/pay/ok8zxwq28f'
+                   : 'https://paystack.shop/pay/m0m9ofipj4';
+
+    const fullPrice = isSMM ? '9,000 for 60 days (save 1,000)' : '13,000 for 90 days (save 2,000)';
+
     await sendTextMessage(
       phone,
-      `Love that. ${goal === 'freelancing' ? 'Freelancing is one of the fastest ways to earn in Nigeria right now.' : 'Great reason to start.'} 💪\n\n` +
-      `Here's what's included:\n✅ 65 expert-written lessons\n✅ Daily AI feedback on your tasks\n✅ Monday–Friday delivery (weekends = rest)\n✅ Streak tracking to keep you accountable\n\n` +
-      `*Investment: ₦5,000/month*\n\nPay here 👇\n${process.env.PAYSTACK_PAYMENT_LINK}\n\n` +
+      `Nice to meet you, *${name}*! 🙌\n\nHere's what's included in your track:\n` +
+      `✅ 65 expert-written lessons\n` +
+      `✅ Daily AI feedback on your tasks\n` +
+      `✅ Monday–Friday delivery (weekends = rest)\n` +
+      `✅ Streak tracking to keep you accountable\n\n` +
+      `To activate your subscription pay here:\n\n` +
+      `Monthly — ₦5,000/month:\n${monthlyLink}\n\n` +
+      `Full plan — ₦${fullPrice}:\n${fullLink}\n\n` +
+      `Make sure to enter this WhatsApp number in the payment form.\n\n` +
       `Once you've paid, reply *DONE* and your lessons start the next morning. 🚀`
     );
     return;
@@ -282,9 +306,26 @@ async function handleOnboarding(phone, messageText, subscriber) {
         `_Tip: Save this number as "SkillStack NG" so you never miss a message._\n\nSee you tomorrow! 🎯`
       );
     } else {
+      const track = subscriber.track || 'copywriting';
+      const isCW2  = track === 'content_writing';
+      const isSMM2 = track === 'social_media_management';
+
+      const monthlyLink2 = isCW2  ? 'https://paystack.shop/pay/01d0empofc'
+                         : isSMM2 ? 'https://paystack.shop/pay/ec2kdwv0ku'
+                         : process.env.PAYSTACK_PAYMENT_LINK;
+
+      const fullLink2 = isCW2  ? 'https://paystack.shop/pay/6gz2f87ft4'
+                      : isSMM2 ? 'https://paystack.shop/pay/ok8zxwq28f'
+                      : 'https://paystack.shop/pay/m0m9ofipj4';
+
+      const fullPrice2 = isSMM2 ? '9,000 for 60 days (save 1,000)' : '13,000 for 90 days (save 2,000)';
+
       await sendTextMessage(
         phone,
-        `To complete your enrollment, pay ₦5,000 here:\n${process.env.PAYSTACK_PAYMENT_LINK}\n\nThen reply *DONE* and we'll activate your account. 👆`
+        `To activate your subscription pay here:\n\n` +
+        `Monthly — ₦5,000/month:\n${monthlyLink2}\n\n` +
+        `Full plan — ₦${fullPrice2}:\n${fullLink2}\n\n` +
+        `Make sure to enter this WhatsApp number in the payment form.`
       );
     }
     return;
@@ -299,13 +340,11 @@ async function handleActiveSubscriber(phone, messageText, subscriber) {
   const text = messageText.trim();
   const lowerText = text.toLowerCase();
 
-  // Manual lesson trigger (support / missed reply)
   if (lowerText === 'lesson' || lowerText === 'send lesson') {
     await deliverFullLesson(phone, subscriber);
     return;
   }
 
-  // Status check
   if (lowerText === 'status' || lowerText === 'progress') {
     const name = subscriber.name || 'Learner';
     const lesson = subscriber.current_lesson || 1;
@@ -323,7 +362,6 @@ async function handleActiveSubscriber(phone, messageText, subscriber) {
     return;
   }
 
-  // Help menu
   if (lowerText === 'help' || lowerText === 'menu') {
     await sendTextMessage(
       phone,
@@ -337,30 +375,28 @@ async function handleActiveSubscriber(phone, messageText, subscriber) {
     return;
   }
 
-  // ── OPTION A CORE FLOW ──
-  // Subscriber replied to the lesson_ready template → deliver the lesson
   if (subscriber.template_sent && !subscriber.lesson_delivered_at) {
     await deliverFullLesson(phone, subscriber);
     await upsertSubscriber(phone, { template_sent: false });
     return;
   }
 
-  // Subscriber is submitting a task
   if (subscriber.awaiting_task && text.length > 20) {
-    const lessonNum = (subscriber.current_lesson || 1);
-    const lesson = await getLesson(lessonNum);
+    const lessonNum = subscriber.current_lesson || 1;
+    const track = subscriber.track || 'copywriting';
+    const lesson = await getLesson(lessonNum, track);
 
     await sendTextMessage(phone, `⏳ Analysing your submission...`);
 
     const feedback = await getAIFeedback(
       lesson?.title || `Day ${lessonNum}`,
       lesson?.task || 'Complete the task',
-      text
+      text,
+      lesson?.feedback_prompt || null
     );
 
     await sendTextMessage(phone, `🤖 *AI Feedback on Your Task:*\n\n${feedback}`);
 
-    // Advance to next lesson
     const nextLesson = lessonNum + 1;
     const newStreak = (subscriber.streak || 0) + 1;
 
@@ -381,8 +417,6 @@ async function handleActiveSubscriber(phone, messageText, subscriber) {
     return;
   }
 
-  // Generic reply — light acknowledgement, don't spam
-  // (Could be a reply to template that arrives before lesson_delivered_at logic catches it)
   if (subscriber.template_sent) {
     await deliverFullLesson(phone, subscriber);
     await upsertSubscriber(phone, { template_sent: false });
@@ -394,12 +428,10 @@ async function handleActiveSubscriber(phone, messageText, subscriber) {
 // WEBHOOK ROUTES
 // ─────────────────────────────────────────────
 
-// Verification
 app.get('/webhook', (req, res) => {
   const mode      = req.query['hub.mode'];
   const token     = req.query['hub.verify_token'];
   const challenge = req.query['hub.challenge'];
-
   if (mode === 'subscribe' && token === VERIFY_TOKEN) {
     console.log('[WEBHOOK] Verified');
     return res.status(200).send(challenge);
@@ -407,36 +439,27 @@ app.get('/webhook', (req, res) => {
   res.sendStatus(403);
 });
 
-// Incoming messages
 app.post('/webhook', async (req, res) => {
-  res.sendStatus(200); // always ACK immediately
-
+  res.sendStatus(200);
   try {
     const entry    = req.body?.entry?.[0];
     const change   = entry?.changes?.[0];
     const value    = change?.value;
     const messages = value?.messages;
-
     if (!messages || messages.length === 0) return;
-
     const msg  = messages[0];
-    const from = msg.from;                                      // e.g. "2348012345678"
+    const from = msg.from;
     const type = msg.type;
-
     let messageText = '';
     if (type === 'text') {
       messageText = msg.text?.body || '';
     } else if (type === 'interactive') {
       messageText = msg.interactive?.button_reply?.title || msg.interactive?.list_reply?.title || '';
     } else {
-      // Non-text (image, audio, etc.) — acknowledge and return
       return;
     }
-
     console.log(`[INCOMING] From: ${from} | Text: "${messageText}"`);
-
     const subscriber = await getSubscriber(from);
-
     if (!subscriber || subscriber.status === 'onboarding' || !subscriber.onboarding_stage || subscriber.onboarding_stage !== 'complete') {
       await handleOnboarding(from, messageText, subscriber);
     } else {
@@ -451,17 +474,6 @@ app.post('/webhook', async (req, res) => {
 // CRON JOBS
 // ─────────────────────────────────────────────
 
-/**
- * Daily lesson notification — runs Mon–Fri at 7:00 AM WAT (6:00 AM UTC).
- * Sends the lesson_ready template to all active subscribers who haven't
- * received today's lesson yet.
- *
- * OPTION A FLOW:
- *   1. Bot sends lesson_ready template (this cron)
- *   2. Subscriber replies (any text)
- *   3. 24-hour window opens
- *   4. handleActiveSubscriber() detects template_sent=true → delivers full lesson
- */
 cron.schedule('0 6 * * 1-5', async () => {
   console.log('[CRON] Daily lesson notification running...');
   try {
@@ -470,19 +482,16 @@ cron.schedule('0 6 * * 1-5', async () => {
       .select('*')
       .eq('status', 'active')
       .lte('current_lesson', 65);
-
     if (error) { console.error('[ERR] Cron fetch:', error); return; }
     if (!subscribers || subscribers.length === 0) { console.log('[CRON] No active subscribers.'); return; }
-
     for (const sub of subscribers) {
       try {
         await sendLessonReadyTemplate(sub.phone);
         await upsertSubscriber(sub.phone, {
           template_sent: true,
           template_sent_at: new Date().toISOString(),
-          lesson_delivered_at: null, // reset so today's lesson can be delivered
+          lesson_delivered_at: null,
         });
-        // Small delay to avoid rate limiting
         await new Promise(r => setTimeout(r, 500));
       } catch (err) {
         console.error(`[ERR] Cron send to ${sub.phone}:`, err.message);
@@ -492,28 +501,17 @@ cron.schedule('0 6 * * 1-5', async () => {
   } catch (err) {
     console.error('[ERR] Cron job:', err);
   }
-}, {
-  timezone: 'Africa/Lagos',
-});
+}, { timezone: 'Africa/Lagos' });
 
-/**
- * Saturday review message — runs every Saturday at 10:00 AM WAT.
- */
 cron.schedule('0 10 * * 6', async () => {
   console.log('[CRON] Saturday review running...');
   try {
-    const { data: subscribers } = await supabase
-      .from('subscribers')
-      .select('*')
-      .eq('status', 'active');
-
+    const { data: subscribers } = await supabase.from('subscribers').select('*').eq('status', 'active');
     if (!subscribers) return;
-
     for (const sub of subscribers) {
       const name = sub.name || 'Learner';
       const lessonsThisWeek = Math.min(5, (sub.current_lesson || 1) - 1);
       const streak = sub.streak || 0;
-
       await sendTextMessage(
         sub.phone,
         `🎉 *Week in Review, ${name}!*\n\n` +
@@ -527,26 +525,15 @@ cron.schedule('0 10 * * 6', async () => {
   } catch (err) {
     console.error('[ERR] Saturday cron:', err);
   }
-}, {
-  timezone: 'Africa/Lagos',
-});
+}, { timezone: 'Africa/Lagos' });
 
-/**
- * Re-engagement — runs every Wednesday at 11:00 AM WAT.
- * Pings subscribers who haven't submitted a task in 3+ days.
- */
 cron.schedule('0 11 * * 3', async () => {
   console.log('[CRON] Re-engagement check running...');
   try {
     const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
     const { data: subscribers } = await supabase
-      .from('subscribers')
-      .select('*')
-      .eq('status', 'active')
-      .lt('last_active', threeDaysAgo);
-
+      .from('subscribers').select('*').eq('status', 'active').lt('last_active', threeDaysAgo);
     if (!subscribers || subscribers.length === 0) return;
-
     for (const sub of subscribers) {
       const name = sub.name || 'there';
       await sendTextMessage(
@@ -561,21 +548,14 @@ cron.schedule('0 11 * * 3', async () => {
   } catch (err) {
     console.error('[ERR] Re-engagement cron:', err);
   }
-}, {
-  timezone: 'Africa/Lagos',
-});
+}, { timezone: 'Africa/Lagos' });
 
 // ─────────────────────────────────────────────
-// HEALTH CHECK + DEMO PAGE
+// HEALTH CHECK
 // ─────────────────────────────────────────────
 
 app.get('/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    service: 'SkillStack NG',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-  });
+  res.json({ status: 'ok', service: 'SkillStack NG', timestamp: new Date().toISOString(), uptime: process.uptime() });
 });
 
 app.get('/', (req, res) => {
@@ -589,7 +569,6 @@ app.get('/', (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`SkillStack NG bot running on port ${PORT}`);
-  console.log(`Meta Phone Number ID: ${PHONE_NUMBER_ID}`);
   console.log(`Template: ${LESSON_READY_TEMPLATE}`);
   console.log(`Cron jobs: Mon-Fri 7am WAT (lessons), Sat 10am WAT (review), Wed 11am WAT (re-engagement)`);
 });
