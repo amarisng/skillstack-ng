@@ -191,7 +191,7 @@ const trackName = message === '1' ? 'Copywriting & Persuasion (90 days)' : messa
     // Send correct payment links based on selected track
     const isSMM = sub.track === 'social_media_management';
 const isCW = sub.track === 'content_writing';
-cconsconst monthlyLink = isSMM ? 'https://paystack.shop/pay/p1kkgoo91-' : isCW ? 'https://paystack.shop/pay/yn75oepjbw' : 'https://paystack.shop/pay/2-h3igsfd2';
+const monthlyLink = isSMM ? 'https://paystack.shop/pay/p1kkgoo91-' : isCW ? 'https://paystack.shop/pay/yn75oepjbw' : 'https://paystack.shop/pay/2-h3igsfd2';
 const fullLink = isSMM ? 'https://paystack.shop/pay/ok8zxwq28f' : isCW ? 'https://paystack.shop/pay/6gz2f87ft4' : 'https://paystack.shop/pay/m0m9ofipj4';
 const fullPrice = isSMM ? '9,000 for 60 days (save 1,000)' : isCW ? '13,000 for 90 days (save 2,000)' : '13,000 for 90 days (save 2,000)';
 
