@@ -536,8 +536,7 @@
     <div class="price-display">
       <div class="original-price">Usually ₦5,000/month</div>
       <div class="beta-price">₦100 <span>/ one time only</span></div>
-      <div class="price-note">One-time ₦100fetch('/track-referral',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ref:'Ayanfe247'})}).then(r=>r.json()).then(d=>console.log(d)) registration fee — no monthly charge during beta period</div>
-    </div>
+     <div class="price-note">One-time ₦100 registration fee — no monthly charge during beta period</div>
     <a href="https://paystack.shop/pay/tfv3ii1iq0" class="cta-btn" target="_blank">
       Activate my beta access →
     </a>
@@ -552,10 +551,21 @@
 <footer>
   <p>SkillStack NG is operated by <a href="#">Amaris Synergy Limited</a>, Lagos, Nigeria. &nbsp;·&nbsp; <a href="/privacy">Privacy Policy</a> &nbsp;·&nbsp; <a href="/terms">Terms of Service</a></p>
 </footer>
-fetch('/track-referral', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ ref: 'Ayanfe247' })
-}).then(r => r.json()).then(d => console.log(d))
+<script>
+  (function() {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get('ref');
+    if (ref) localStorage.setItem('ssng_ref', ref);
+
+    const storedRef = localStorage.getItem('ssng_ref');
+    if (!storedRef) return;
+
+    document.querySelectorAll('a[href*="paystack.shop"]').forEach(function(link) {
+      const url = new URL(link.href);
+      url.searchParams.set('ref', storedRef);
+      link.href = url.toString();
+    });
+  })();
+</script>
 </body>
 </html>
