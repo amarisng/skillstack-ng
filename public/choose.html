@@ -77,8 +77,15 @@
 
     /* TRACK CARDS */
     .tracks-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 24px; margin-bottom: 48px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px; margin-bottom: 48px;
+    }
+    @media (max-width: 900px) {
+      .tracks-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 620px) {
+      .tracks-grid { grid-template-columns: 1fr; }
     }
 
     .track-card {
@@ -361,7 +368,7 @@
     <!-- SOCIAL MEDIA MANAGEMENT -->
     <div class="track-card live">
       <div class="track-header">
-        <span class="track-badge badge-new">✦ New track</span>
+        <span class="track-badge badge-live">✦ Live now</span>
         <h2>Social Media Management</h2>
         <p>Manage brand accounts professionally. Strategy, content, analytics, client acquisition, and business building.</p>
         <div class="track-meta">
@@ -398,7 +405,7 @@
     <!-- CONTENT WRITING -->
     <div class="track-card live">
       <div class="track-header">
-        <span class="track-badge badge-new">✦ New track</span>
+        <span class="track-badge badge-live">✦ Live now</span>
         <h2>Content Writing</h2>
         <p>Write articles, blogs, web copy, and newsletters. One of the most in-demand remote writing skills in Nigeria.</p>
         <div class="track-meta">
@@ -533,7 +540,6 @@
       alert('Please enter your name and WhatsApp number.');
       return;
     }
-    // Save to backend
     try {
       await fetch('/waitlist', {
         method: 'POST',
@@ -566,6 +572,14 @@ function payWithPaystack(amount, planKey, track) {
     "cw-full": "https://paystack.shop/pay/6gz2f87ft4",
     "beta": "https://paystack.shop/pay/tfv3ii1iq0"
   };
+
+  var isMonthly = planKey.indexOf("monthly") !== -1 || planKey === "beta";
+
+  if (isMonthly) {
+    window.location.href = links[planKey] + (ref ? "?ref=" + ref : "");
+    return;
+  }
+
   var handler = PaystackPop.setup({
     key: "pk_live_840844c2b25d6ed006362384bf987d6514c8f20d",
     email: "customer@skillstackng.com",
@@ -584,7 +598,7 @@ function payWithPaystack(amount, planKey, track) {
     onClose: function() {}
   });
   try { handler.openIframe(); }
-  catch(e) { window.location.href = (links[planKey] || links["copywriting-monthly"]) + (ref ? "?ref=" + ref : ""); }
+  catch(e) { window.location.href = links[planKey] + (ref ? "?ref=" + ref : ""); }
 }
 </script>
 </body>
