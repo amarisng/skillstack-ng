@@ -768,8 +768,35 @@ app.post('/affiliate-signup', async (req, res) => {
   }
 });
 
-app.get('/beta', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'beta.html'));
+app.get('/approve-affiliate', async (req, res) => {
+  try {
+    const phone = (req.query.phone || '').replace(/\D/g, '');
+    if (!phone) return res.status(400).send('Phone number required');
+
+    const { data: affiliate } = await supabase
+      .from('affiliates')
+      .select('*')
+      .eq('phone', phone)
+      .single();
+
+    if (!affiliate) return res.status(404).send('Affiliate not found');
+    if (affiliate.status !== 'approved') return res.status(400).send('Affiliate not approved yet — update status in Supabase first');
+
+    const link = 'https://paystack.shop/pay/2-h3igsfd2?ref=' + affiliate.affiliate_code;
+
+    await sendMessage(phone,
+      'Congratulations ' + affiliate.name + '! Your SkillStack NG affiliate application has been approved.\n\n' +
+      'Your unique referral link:\n' + link + '\n\n' +
+      'Share this link with anyone interested in learning Copywriting, Social Media Management, or Content Writing on WhatsApp.\n\n' +
+      'You earn a commission on every successful payment made through your link. We will notify you when a referral converts and process payouts weekly.\n\n' +
+      'Questions? Reply here anytime.'
+    );
+
+    res.status(200).send('Affiliate notified successfully: ' + phone);
+  } catch (err) {
+    console.error('Approve affiliate error:', err.message);
+    res.status(500).send('Error: ' + err.message);
+  }
 });
 
 app.get('/demo', (req, res) => {
