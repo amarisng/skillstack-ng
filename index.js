@@ -154,7 +154,7 @@ async function handleOnboarding(phone, message) {
       active: 'false',
       streak: 0,
     });
-    await sendMessage(cleanPhone, 'Welcome to SkillStack NG! 🎓\n\nWe deliver high-income skill lessons to your WhatsApp every weekday — 15 minutes a day, AI feedback on every task.\n\nChoose your track:\n\n1️⃣ Copywriting & Persuasion — 90 days\nWrite sales copy, ads, email sequences, and landing pages. Earn ₦100k–₦500k per project.\n\n2️⃣ Social Media Management — 60 days\nManage brand accounts professionally. Earn ₦80k–₦900k per month.\n\nReply 1 for Copywriting or 2 for Social Media Management to get started.\n\nMade a mistake? Reply CHANGETRACK at any time before payment to restart.');
+    await sendMessage(cleanPhone, 'Welcome to SkillStack NG! 🎓\n\nWe deliver high-income skill lessons to your WhatsApp every weekday — 15 minutes a day, AI feedback on every task.\n\nChoose your track:\n\n1️⃣ Copywriting & Persuasion — 90 days\nWrite sales copy, ads, email sequences, and landing pages. Earn ₦100k–₦500k per project.\n\n2️⃣ Social Media Management — 60 days\nManage brand accounts professionally. Earn ₦80k–₦900k per month.\n\n3️⃣ Content Writing — 90 days\nWrite articles, blogs, and web content professionally. Earn ₦80k–₦400k per month.\n\nReply 1, 2 or 3 to get started.\n\nMade a mistake? Reply CHANGETRACK at any time before payment to restart.');
     return;
   }
 // Allow inactive subscribers to correct their track before payment
