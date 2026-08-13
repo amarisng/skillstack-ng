@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Content Writing Track — SkillStack NG</title>
+  <meta name="description" content="Learn content writing in 90 days on WhatsApp. 15 minutes a day, AI feedback on every task, Nigerian examples throughout. ₦5,000/month or ₦13,000 for full 90 days."/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green: #00C48C;
+      --green-dark: #009e72;
+      --dark: #0D1F17;
+      --white: #FFFFFF;
+      --off-white: #F7FAF8;
+      --text: #1A2E1F;
+      --muted: #5A7A65;
+      --border: #D8EAE0;
+      --gold: #F5A623;
+      --red: #E53E3E;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--text); background: var(--white); overflow-x: hidden;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(13,31,23,0.97);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 60px;
+    }
+    .nav-logo { font-weight: 800; font-size: 1.1rem; color: #fff; text-decoration: none; }
+    .nav-logo span { color: var(--green); }
+    .nav-cta {
+      background: var(--green); color: var(--dark);
+      padding: 8px 20px; border-radius: 8px;
+      font-weight: 700; font-size: 0.85rem; text-decoration: none;
+    }
+
+    /* ANNOUNCEMENT BAR */
+    .announcement {
+      background: var(--gold);
+      color: var(--dark);
+      text-align: center;
+      padding: 10px 24px;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    /* HERO */
+    .hero {
+      background: linear-gradient(135deg, #0D1F17 0%, #0A2218 100%);
+      color: #fff;
+      padding: 72px 24px 80px;
+    }
+    .hero-inner {
+      max-width: 860px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 56px; align-items: center;
+    }
+    .eyebrow {
+      display: inline-block;
+      background: rgba(0,196,140,0.15);
+      border: 1px solid rgba(0,196,140,0.3);
+      color: var(--green);
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      border-radius: 20px; padding: 4px 14px; margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      font-weight: 800; line-height: 1.15; margin-bottom: 18px;
+    }
+    .hero h1 em { color: var(--green); font-style: normal; }
+    .hero-lead {
+      font-size: 1rem; color: rgba(255,255,255,0.7);
+      line-height: 1.7; margin-bottom: 28px;
+    }
+    .hero-bullets { list-style: none; margin-bottom: 32px; }
+    .hero-bullets li {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 0.88rem; color: rgba(255,255,255,0.8);
+      padding: 6px 0; line-height: 1.5;
+    }
+    .hero-bullets li::before {
+      content: "✓"; color: var(--green); font-weight: 800;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn-primary {
+      display: inline-block;
+      background: var(--green); color: var(--dark);
+      padding: 14px 28px; border-radius: 10px;
+      font-weight: 800; font-size: 1rem; text-decoration: none;
+      transition: background 0.15s;
+    }
+    .btn-primary:hover { background: var(--green-dark); }
+    .btn-ghost {
+      display: inline-block;
+      border: 1px solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.8);
+      padding: 14px 22px; border-radius: 10px;
+      font-weight: 600; font-size: 0.95rem; text-decoration: none;
+    }
+
+    /* INCOME PROOF */
+    .income-section { background: var(--white); padding: 72px 24px; }
+    .container { max-width: 860px; margin: 0 auto; }
+    .section-center { text-align: center; }
+    h2 {
+      font-size: clamp(1.5rem, 4vw, 2.2rem);
+      font-weight: 800; line-height: 1.2; margin-bottom: 12px;
+    }
+    .section-lead {
+      font-size: 1rem; color: var(--muted);
+      max-width: 540px; margin: 0 auto 48px; line-height: 1.7;
+    }
+
+    /* PROBLEM SECTION */
+    .problem-section {
+      background: #FFF8F8;
+      border-top: 1px solid #FFD5D5;
+      border-bottom: 1px solid #FFD5D5;
+      padding: 72px 24px;
+    }
+    .problem-section h2 { color: var(--red); }
+    .problem-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px; margin-top: 40px;
+    }
+    .problem-card {
+      background: #fff; border: 1px solid #FFD5D5;
+      border-radius: 16px; padding: 24px;
+    }
+    .problem-card .icon { font-size: 1.8rem; margin-bottom: 12px; }
+    .problem-card h3 { font-size: 0.92rem; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+    .problem-card p { font-size: 0.8rem; color: var(--muted); line-height: 1.55; }
+
+    /* SOLUTION */
+    .solution-section {
+      background: linear-gradient(135deg, #0D1F17 0%, #112B1C 100%);
+      padding: 72px 24px; color: #fff; text-align: center;
+    }
+    .solution-section h2 { color: #fff; }
+    .solution-section .section-lead { color: rgba(255,255,255,0.65); }
+    .solution-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px; margin-top: 40px; max-width: 860px; margin-left: auto; margin-right: auto;
+    }
+    .solution-card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px; padding: 24px; text-align: left;
+    }
+    .solution-card .icon { font-size: 1.8rem; margin-bottom: 12px; }
+    .solution-card h3 { font-size: 0.92rem; font-weight: 700; color: #fff; margin-bottom: 6px; }
+    .solution-card p { font-size: 0.8rem; color: rgba(255,255,255,0.6); line-height: 1.55; }
+
+    /* FOR WHO */
+    .forwho-section { background: var(--off-white); padding: 72px 24px; }
+    .persona-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px; margin-top: 40px;
+    }
+    .persona-card {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 16px; padding: 24px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .persona-card:hover { border-color: var(--green); box-shadow: 0 4px 20px rgba(0,196,140,0.08); }
+    .persona-tag {
+      display: inline-block;
+      background: rgba(0,196,140,0.1); color: var(--green);
+      font-size: 0.68rem; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      border-radius: 4px; padding: 3px 8px; margin-bottom: 10px;
+    }
+    .persona-card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 6px; }
+    .persona-card p { font-size: 0.8rem; color: var(--muted); line-height: 1.55; }
+
+    /* CURRICULUM */
+    .curriculum-section { background: #fff; padding: 72px 24px; }
+    .week-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px; margin-top: 40px;
+    }
+    .week-card {
+      background: var(--off-white); border: 1px solid var(--border);
+      border-radius: 16px; padding: 22px;
+    }
+    .week-label {
+      font-size: 0.68rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--green); margin-bottom: 8px;
+    }
+    .week-card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 10px; }
+    .week-card ul { list-style: none; }
+    .week-card ul li {
+      font-size: 0.8rem; color: var(--muted);
+      padding: 5px 0; border-bottom: 1px solid var(--border);
+      display: flex; align-items: flex-start; gap: 8px;
+    }
+    .week-card ul li:last-child { border-bottom: none; }
+    .week-card ul li::before { content: "→"; color: var(--green); flex-shrink: 0; font-size: 0.75rem; }
+
+    /* INCOME RATES */
+    .rates-section { background: var(--off-white); padding: 72px 24px; }
+    .rates-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px; margin-top: 40px;
+    }
+    .rate-card {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 14px; padding: 20px 16px; text-align: center;
+    }
+    .rate-card .label { font-size: 0.78rem; color: var(--muted); margin-bottom: 8px; }
+    .rate-card .amount { font-size: 1rem; font-weight: 800; color: var(--green); }
+
+    /* SAMPLE LESSON */
+    .sample-section {
+      background: linear-gradient(135deg, #0D1F17 0%, #112B1C 100%);
+      padding: 72px 24px; color: #fff; text-align: center;
+    }
+    .sample-section h2 { color: #fff; }
+    .sample-section .section-lead { color: rgba(255,255,255,0.65); }
+    .wa-mockup {
+      background: #E5DDD5; border-radius: 20px;
+      overflow: hidden; max-width: 360px; margin: 40px auto 0;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+    }
+    .wa-hdr {
+      background: #075E54; padding: 12px 16px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .wa-av {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--green);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 0.75rem; color: var(--dark);
+    }
+    .wa-nm { font-size: 0.9rem; font-weight: 700; color: #fff; }
+    .wa-st { font-size: 0.7rem; color: rgba(255,255,255,0.7); }
+    .wa-body { padding: 12px 10px; display: flex; flex-direction: column; gap: 8px; }
+    .wa-bubble {
+      background: #fff; border-radius: 10px 10px 10px 2px;
+      padding: 10px 12px; font-size: 0.78rem; line-height: 1.5; color: #111;
+    }
+    .wa-bubble.sent {
+      background: #DCF8C6; border-radius: 10px 10px 2px 10px;
+      align-self: flex-end;
+    }
+    .wa-tag {
+      display: inline-block;
+      background: rgba(7,94,84,0.1); color: #075E54;
+      font-size: 0.65rem; font-weight: 700;
+      border-radius: 3px; padding: 1px 5px; margin-bottom: 4px;
+    }
+    .wa-time { font-size: 0.62rem; color: #999; text-align: right; margin-top: 3px; }
+
+    /* TESTIMONIALS */
+    .testi-section { background: var(--off-white); padding: 72px 24px; }
+    .testi-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px; margin-top: 40px;
+    }
+    .testi-card {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 16px; padding: 24px;
+    }
+    .stars { color: var(--gold); font-size: 0.9rem; margin-bottom: 12px; }
+    .testi-card blockquote {
+      font-size: 0.88rem; line-height: 1.65;
+      color: var(--text); font-style: italic; margin-bottom: 16px;
+    }
+    .testi-author { display: flex; align-items: center; gap: 12px; }
+    .testi-av {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: var(--green);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 0.75rem; color: var(--dark);
+      flex-shrink: 0;
+    }
+    .testi-name { font-size: 0.85rem; font-weight: 700; }
+    .testi-role { font-size: 0.72rem; color: var(--muted); }
+
+    /* PRICING */
+    .pricing-section { background: var(--white); padding: 72px 24px; }
+    .pricing-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 20px; max-width: 760px; margin: 40px auto 0;
+    }
+    .pricing-card {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 24px; padding: 36px 28px;
+      text-align: center; position: relative;
+      display: flex; flex-direction: column;
+    }
+    .pricing-card.featured {
+      border: 2px solid var(--green);
+      box-shadow: 0 8px 40px rgba(0,196,140,0.12);
+    }
+    .best-badge {
+      position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+      background: var(--green); color: var(--dark);
+      font-size: 0.72rem; font-weight: 800;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      border-radius: 20px; padding: 4px 16px; white-space: nowrap;
+    }
+    .pricing-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
+    .pricing-card .sub { font-size: 0.8rem; color: var(--muted); margin-bottom: 20px; }
+    .price-main { font-size: 2.6rem; font-weight: 800; color: var(--green); line-height: 1; }
+    .price-period { font-size: 0.95rem; color: var(--muted); font-weight: 400; }
+    .price-note { font-size: 0.78rem; color: var(--muted); margin: 8px 0 16px; }
+    .price-saving {
+      display: inline-block;
+      background: rgba(0,196,140,0.08); border: 1px solid rgba(0,196,140,0.2);
+      border-radius: 6px; padding: 3px 10px;
+      font-size: 0.75rem; font-weight: 700; color: var(--green); margin-bottom: 16px;
+    }
+    .price-urgency {
+      background: rgba(245,166,35,0.08); border: 1px solid rgba(245,166,35,0.25);
+      border-radius: 10px; padding: 8px 14px;
+      font-size: 0.78rem; color: #C27A00; font-weight: 600; margin-bottom: 20px;
+    }
+    .features-list { list-style: none; text-align: left; margin-bottom: 24px; flex: 1; }
+    .features-list li {
+      display: flex; align-items: center; gap: 10px;
+      padding: 7px 0; border-bottom: 1px solid var(--border);
+      font-size: 0.82rem; color: var(--text);
+    }
+    .features-list li:last-child { border-bottom: none; }
+    .features-list li::before { content: "✓"; color: var(--green); font-weight: 700; flex-shrink: 0; }
+    .pricing-cta {
+      display: block; width: 100%;
+      background: var(--green); color: var(--dark);
+      padding: 14px; border-radius: 12px;
+      font-weight: 800; font-size: 0.95rem; text-decoration: none;
+      transition: background 0.15s; margin-top: auto;
+    }
+    .pricing-cta:hover { background: var(--green-dark); }
+    .pricing-cta.secondary {
+      background: transparent; border: 2px solid var(--green); color: var(--green);
+    }
+    .pricing-cta.secondary:hover { background: rgba(0,196,140,0.08); }
+    .pricing-small { font-size: 0.72rem; color: var(--muted); margin-top: 10px; }
+    .transfer-note {
+      display: flex; align-items: center; gap: 6px; justify-content: center;
+      font-size: 0.72rem; color: var(--green); font-weight: 600; margin-top: 8px;
+    }
+    @media (max-width: 600px) { .pricing-grid { grid-template-columns: 1fr; } }
+
+    /* GUARANTEE */
+    .guarantee-section { background: var(--off-white); padding: 48px 24px; }
+    .guarantee-card {
+      max-width: 680px; margin: 0 auto;
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 20px; padding: 32px;
+      display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap;
+    }
+    .guarantee-icon { font-size: 2.5rem; flex-shrink: 0; }
+    .guarantee-text h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+    .guarantee-text p { font-size: 0.85rem; color: var(--muted); line-height: 1.65; }
+
+    /* FAQ */
+    .faq-section { background: var(--white); padding: 72px 24px; }
+    .faq-list { max-width: 680px; margin: 40px auto 0; }
+    details {
+      background: var(--off-white); border: 1px solid var(--border);
+      border-radius: 12px; margin-bottom: 10px; overflow: hidden;
+    }
+    summary {
+      padding: 18px 20px; font-weight: 600; font-size: 0.92rem;
+      color: var(--text); cursor: pointer; list-style: none;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: "+"; color: var(--green); font-size: 1.2rem; }
+    details[open] summary::after { content: "−"; }
+    details p { padding: 0 20px 18px; font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+
+    /* FINAL CTA */
+    .final-section {
+      background: linear-gradient(135deg, #0D1F17 0%, #112B1C 100%);
+      padding: 80px 24px; color: #fff; text-align: center;
+    }
+    .final-section h2 { color: #fff; margin-bottom: 16px; }
+    .final-section p { color: rgba(255,255,255,0.65); font-size: 1rem; line-height: 1.7; margin-bottom: 36px; max-width: 520px; margin-left: auto; margin-right: auto; }
+
+    /* FOOTER */
+    footer {
+      background: #081410;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 24px; text-align: center;
+      font-size: 0.8rem; color: rgba(255,255,255,0.4);
+    }
+    footer a { color: var(--green); text-decoration: none; }
+
+    /* RESPONSIVE */
+    @media (max-width: 680px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .wa-mockup { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="/">Skill<span>Stack</span> NG</a>
+  <a class="nav-cta" href="#pricing">Start for ₦5,000/month →</a>
+</nav>
+
+<!-- ANNOUNCEMENT -->
+<div class="announcement">
+  ⚡ Founding member rate — price increasing to ₦8,500/month soon. Lock in ₦5,000 now.
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div>
+      <span class="eyebrow">Track 3 — Now live</span>
+      <h1>Become a professional content writer in <em>90 days.</em> On WhatsApp.</h1>
+      <p class="hero-lead">One lesson to your WhatsApp every weekday. 15 minutes. AI feedback on every article, blog post, and web copy task you submit. No app. No login.</p>
+      <ul class="hero-bullets">
+        <li>65 lessons covering articles, blogs, SEO content, and web copy</li>
+        <li>Nigerian brands and platforms used as examples throughout</li>
+        <li>AI coach reviews every task you submit — same day, every day</li>
+        <li>Portfolio and client pitch package ready by Day 90</li>
+      </ul>
+      <div class="hero-btns">
+        <a class="btn-primary" href="#pricing">Start for ₦5,000/month →</a>
+        <a class="btn-ghost" href="/choose">See all tracks</a>
+      </div>
+    </div>
+    <div>
+      <div class="wa-mockup">
+        <div class="wa-hdr">
+          <div class="wa-av">SN</div>
+          <div>
+            <div class="wa-nm">SkillStack NG</div>
+            <div class="wa-st">● online</div>
+          </div>
+        </div>
+        <div class="wa-body">
+          <div class="wa-bubble">
+            <div class="wa-tag">DAY 1 OF 90</div><br/>
+            <strong>What is content writing?</strong><br/><br/>
+            Content writing is not about sounding smart. It is about keeping a reader's attention long enough for them to do something — subscribe, buy, share, or trust you.
+            <div class="wa-time">7:01 AM</div>
+          </div>
+          <div class="wa-bubble sent">
+            "5 things every Lagos entrepreneur needs to know before hiring their first staff" — that is my article angle.
+            <div class="wa-time">7:22 AM ✓✓</div>
+          </div>
+          <div class="wa-bubble">
+            ✅ Strong angle — specific audience, real pain point<br/>
+            ⚠️ "Things to know" is overused — try "mistakes" or "lessons"<br/>
+            💡 "5 mistakes Lagos entrepreneurs make when hiring their first staff" — curiosity gap, fear trigger, same audience
+            <div class="wa-time">7:23 AM</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- INCOME PROOF -->
+<div class="income-section">
+  <div class="container section-center">
+    <span class="eyebrow">What content writers earn in Nigeria</span>
+    <h2>This skill pays. These are real Nigerian market rates.</h2>
+    <p class="section-lead">Content writing is one of the most in-demand remote skills in Nigeria. Brands, media companies, agencies, and startups all need it — and most cannot find writers who are good enough.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:40px;">
+      <div style="background:var(--off-white);border:1px solid var(--border);border-radius:14px;padding:20px 16px;text-align:center;">
+        <div style="font-size:0.78rem;color:var(--muted);margin-bottom:8px;">Blog article (1,000 words)</div>
+        <div style="font-size:1rem;font-weight:800;color:var(--green);">₦15k–₦50k</div>
+      </div>
+      <div style="background:var(--off-white);border:1px solid var(--border);border-radius:14px;padding:20px 16px;text-align:center;">
+        <div style="font-size:0.78rem;color:var(--muted);margin-bottom:8px;">Web copy (5 pages)</div>
+        <div style="font-size:1rem;font-weight:800;color:var(--green);">₦80k–₦200k</div>
+      </div>
+      <div style="background:var(--off-white);border:1px solid var(--border);border-radius:14px;padding:20px 16px;text-align:center;">
+        <div style="font-size:0.78rem;color:var(--muted);margin-bottom:8px;">Monthly retainer (4 articles)</div>
+        <div style="font-size:1rem;font-weight:800;color:var(--green);">₦60k–₦150k</div>
+      </div>
+      <div style="background:var(--off-white);border:1px solid var(--border);border-radius:14px;padding:20px 16px;text-align:center;">
+        <div style="font-size:0.78rem;color:var(--muted);margin-bottom:8px;">3 clients (full month)</div>
+        <div style="font-size:1rem;font-weight:800;color:var(--green);">₦180k–₦450k</div>
+      </div>
+      <div style="background:var(--off-white);border:1px solid var(--border);border-radius:14px;padding:20px 16px;text-align:center;">
+        <div style="font-size:0.78rem;color:var(--muted);margin-bottom:8px;">SEO content package</div>
+        <div style="font-size:1rem;font-weight:800;color:var(--green);">₦100k–₦300k</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROBLEM -->
+<div class="problem-section">
+  <div class="container section-center">
+    <span class="eyebrow">The problem</span>
+    <h2>Most people who try to learn content writing never finish — or never get paid.</h2>
+    <p class="section-lead">It is not because they cannot write. It is because the training they get does not translate to Nigerian clients, Nigerian platforms, or Nigerian briefs.</p>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="icon">📚</div>
+        <h3>Courses teach theory, not briefs</h3>
+        <p>Most courses end at "write engaging content." They never teach you how to handle a real client brief, hit a deadline, or charge what you are worth.</p>
+      </div>
+      <div class="problem-card">
+        <div class="icon">🌍</div>
+        <h3>Foreign examples don't work here</h3>
+        <p>Writing for BuzzFeed or HubSpot is not the same as writing for Zikoko, TechCabal, or a Lagos fintech. Nigerian readers are different. Nigerian brands are different.</p>
+      </div>
+      <div class="problem-card">
+        <div class="icon">🔇</div>
+        <h3>No feedback on actual writing</h3>
+        <p>You can watch 10 hours of "how to write great articles" and still not know if your writing is actually good. You need someone to read it and tell you what is wrong.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SOLUTION -->
+<div class="solution-section">
+  <div class="container section-center">
+    <span class="eyebrow">The SkillStack NG difference</span>
+    <h2>This is not a course. It is a 90-day writing practice with daily coaching.</h2>
+    <p class="section-lead">Every lesson is a real-world writing task. Every task gets real feedback. Every day you get better.</p>
+    <div class="solution-grid">
+      <div class="solution-card">
+        <div class="icon">📱</div>
+        <h3>Delivered to WhatsApp</h3>
+        <p>No platform to log into. No video to find. Your lesson arrives at the time you choose, Monday to Friday, every week for 90 days.</p>
+      </div>
+      <div class="solution-card">
+        <div class="icon">🇳🇬</div>
+        <h3>Built for Nigerian writers</h3>
+        <p>Every example uses Nigerian brands, Nigerian media, and Nigerian audiences. Zikoko not BuzzFeed. Flutterwave not Stripe. Lagos not London.</p>
+      </div>
+      <div class="solution-card">
+        <div class="icon">🤖</div>
+        <h3>AI feedback every day</h3>
+        <p>Submit your task and get specific feedback on your actual writing — what worked, what did not, and one improvement to apply immediately.</p>
+      </div>
+      <div class="solution-card">
+        <div class="icon">💼</div>
+        <h3>Portfolio ready by Day 90</h3>
+        <p>Every task you complete becomes a portfolio piece. By the end you have 65 writing samples and a client pitch package that works.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOR WHO -->
+<div class="forwho-section">
+  <div class="container section-center">
+    <span class="eyebrow">Who this is for</span>
+    <h2>This track was built for four types of people.</h2>
+    <p class="section-lead">If you see yourself in any of these, this track will work for you.</p>
+    <div class="persona-grid">
+      <div class="persona-card">
+        <span class="persona-tag">Freelancer</span>
+        <h3>You want to earn from writing</h3>
+        <p>You have always known you can write. This track gives you the structure, the portfolio, and the client pitch skills to turn that ability into income.</p>
+      </div>
+      <div class="persona-card">
+        <span class="persona-tag">Employee</span>
+        <h3>You write at work and want to do it better</h3>
+        <p>Reports, proposals, internal newsletters, website copy — this track makes your professional writing cleaner, sharper, and more persuasive.</p>
+      </div>
+      <div class="persona-card">
+        <span class="persona-tag">Business owner</span>
+        <h3>You need content for your brand</h3>
+        <p>Blog posts, website pages, newsletters — this track teaches you to write content that actually brings in customers, not just fills a page.</p>
+      </div>
+      <div class="persona-card">
+        <span class="persona-tag">Career changer</span>
+        <h3>You want a remote-friendly skill</h3>
+        <p>Content writing is one of the few high-income skills you can do entirely from your phone. This track is your 90-day runway into that career.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CURRICULUM -->
+<div class="curriculum-section">
+  <div class="container section-center">
+    <span class="eyebrow">The curriculum</span>
+    <h2>90 days. 65 lessons. One complete content writer.</h2>
+    <p class="section-lead">The curriculum moves from foundations to advanced formats to full client-readiness — in the exact order a real writer needs to learn them.</p>
+    <div class="week-grid">
+      <div class="week-card">
+        <div class="week-label">Week 1–2 · Days 1–10</div>
+        <h3>Content Writing Foundations</h3>
+        <ul>
+          <li>What content writing actually is</li>
+          <li>How readers read online</li>
+          <li>Writing clear, scannable structure</li>
+          <li>Headlines that earn the click</li>
+          <li>Intros that keep people reading</li>
+        </ul>
+      </div>
+      <div class="week-card">
+        <div class="week-label">Week 3–4 · Days 11–20</div>
+        <h3>Article & Blog Writing</h3>
+        <ul>
+          <li>How to structure a long-form article</li>
+          <li>Listicles, how-tos, and explainers</li>
+          <li>Research and fact-checking</li>
+          <li>Nigerian media formats (Zikoko, TechCabal)</li>
+          <li>Writing for different tones and voices</li>
+        </ul>
+      </div>
+      <div class="week-card">
+        <div class="week-label">Week 5–6 · Days 21–30</div>
+        <h3>Web Copy & Brand Content</h3>
+        <ul>
+          <li>Homepage and About page copy</li>
+          <li>Product descriptions that convert</li>
+          <li>Writing for Nigerian brand voices</li>
+          <li>Content for fintech, fashion, and FMCG</li>
+          <li>Editing your own work</li>
+        </ul>
+      </div>
+      <div class="week-card">
+        <div class="week-label">Week 7–8 · Days 31–40</div>
+        <h3>SEO Content Basics</h3>
+        <ul>
+          <li>What SEO content actually means</li>
+          <li>Keyword research without tools</li>
+          <li>Writing for search and for humans</li>
+          <li>Meta descriptions and title tags</li>
+          <li>Internal linking and structure</li>
+        </ul>
+      </div>
+      <div class="week-card">
+        <div class="week-label">Week 9–10 · Days 41–50</div>
+        <h3>Newsletters & Email Content</h3>
+        <ul>
+          <li>How newsletters differ from articles</li>
+          <li>Subject lines that get opened</li>
+          <li>Writing the weekly brand newsletter</li>
+          <li>Tone, frequency, and audience trust</li>
+          <li>Nigerian newsletter case studies</li>
+        </ul>
+      </div>
+      <div class="week-card">
+        <div class="week-label">Week 11–13 · Days 51–65</div>
+        <h3>Client Work & Income</h3>
+        <ul>
+          <li>How to handle a real content brief</li>
+          <li>Setting your rate and pitching clients</li>
+          <li>Building a portfolio from your tasks</li>
+          <li>Finding clients on Nigerian platforms</li>
+          <li>Your Day 90 client pitch package</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RATES -->
+<div class="rates-section">
+  <div class="container section-center">
+    <span class="eyebrow">Income potential</span>
+    <h2>What Nigerian content writers charge in 2026.</h2>
+    <p class="section-lead">These are real rates from the Nigerian freelance market. One retainer client at these rates covers months of SkillStack NG.</p>
+    <div class="rates-grid">
+      <div class="rate-card"><div class="label">Blog article (1,000 words)</div><div class="amount">₦15k–₦50k</div></div>
+      <div class="rate-card"><div class="label">Long-form article (2,500 words)</div><div class="amount">₦40k–₦100k</div></div>
+      <div class="rate-card"><div class="label">Website copy (5 pages)</div><div class="amount">₦80k–₦200k</div></div>
+      <div class="rate-card"><div class="label">Monthly blog retainer</div><div class="amount">₦60k–₦150k</div></div>
+      <div class="rate-card"><div class="label">SEO content package</div><div class="amount">₦100k–₦300k</div></div>
+      <div class="rate-card"><div class="label">Newsletter writing (monthly)</div><div class="amount">₦40k–₦100k</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SAMPLE LESSON -->
+<div class="sample-section">
+  <div class="container section-center">
+    <span class="eyebrow">Sample lesson</span>
+    <h2>This is what Day 1 looks like on your WhatsApp.</h2>
+    <p class="section-lead">Every lesson follows the same format: concept, Nigerian example, practical task, AI feedback. 15 minutes.</p>
+    <div class="wa-mockup">
+      <div class="wa-hdr">
+        <div class="wa-av">SN</div>
+        <div>
+          <div class="wa-nm">SkillStack NG</div>
+          <div class="wa-st">● online</div>
+        </div>
+      </div>
+      <div class="wa-body">
+        <div class="wa-bubble">
+          <div class="wa-tag">DAY 8 OF 90 — CONTENT WRITING</div><br/>
+          <strong>The headline is the article.</strong><br/><br/>
+          80% of people read the headline. 20% read the article. Your headline is not a label — it is a promise. Break the promise and they leave. Keep it and they read everything.
+          <div class="wa-time">7:01 AM</div>
+        </div>
+        <div class="wa-bubble sent">
+          Before: "Tips for saving money in Nigeria"<br/>
+          After: "How I saved ₦200,000 in 6 months on a ₦150,000 salary — without a side hustle"
+          <div class="wa-time">7:19 AM ✓✓</div>
+        </div>
+        <div class="wa-bubble">
+          ✅ "After" headline is specific — real numbers, real timeframe<br/>
+          ⚠️ "Tips" in the original is the weakest word in content writing<br/>
+          💡 The twist ("without a side hustle") is what creates curiosity — use that structure again
+          <div class="wa-time">7:19 AM</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TESTIMONIALS -->
+<div class="testi-section">
+  <div class="container section-center">
+    <span class="eyebrow">Beta tester feedback</span>
+    <h2>What early students are saying.</h2>
+    <div class="testi-grid">
+      <div class="testi-card">
+        <div class="stars">★★★★★</div>
+        <blockquote>"I have been writing for brands for two years but nobody ever told me what was wrong with my work. The AI feedback on SkillStack NG told me more in one week than two years of client feedback ever did."</blockquote>
+        <div class="testi-author">
+          <div class="testi-av">AT</div>
+          <div>
+            <div class="testi-name">Adaeze T.</div>
+            <div class="testi-role">Freelance writer, Lagos</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="stars">★★★★★</div>
+        <blockquote>"The Nigerian examples are what make it. Every lesson uses a brand I know, a platform I use, an audience I write for. It does not feel like a course — it feels like training."</blockquote>
+        <div class="testi-author">
+          <div class="testi-av">EO</div>
+          <div>
+            <div class="testi-name">Emeka O.</div>
+            <div class="testi-role">Content creator, Abuja</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="stars">★★★★★</div>
+        <blockquote>"15 minutes on my commute, every day. By week 3 I had already rewritten my portfolio page and a client told me it was the best pitch they had received. That paid for months of SkillStack NG."</blockquote>
+        <div class="testi-author">
+          <div class="testi-av">FS</div>
+          <div>
+            <div class="testi-name">Fatima S.</div>
+            <div class="testi-role">Brand consultant, Kano</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PRICING -->
+<div class="pricing-section" id="pricing">
+  <div class="container section-center">
+    <span class="eyebrow">Pricing</span>
+    <h2>Two ways to join. One destination.</h2>
+    <p class="section-lead">Both plans give you full access to all 65 lessons, daily AI feedback, and your completion certificate.</p>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <h3>Monthly</h3>
+        <p class="sub">Pay month by month · Cancel anytime</p>
+        <div class="price-main">₦5,000 <span class="price-period">/month</span></div>
+        <div class="price-note">Billed monthly via card</div>
+        <div class="price-urgency">⚡ Price increasing to ₦8,500 soon</div>
+        <ul class="features-list">
+          <li>All 65 content writing lessons</li>
+          <li>AI feedback on every task</li>
+          <li>WhatsApp delivery daily</li>
+          <li>Nigerian context throughout</li>
+          <li>Streak and progress tracking</li>
+          <li>Completion certificate Day 90</li>
+        </ul>
+        <a class="pricing-cta secondary" href="https://paystack.shop/pay/01d0empofc">Start monthly →</a>
+        <p class="pricing-small">Card payment · Renews automatically</p>
+      </div>
+      <div class="pricing-card featured">
+        <div class="best-badge">⭐ Best Value</div>
+        <h3>Full 90 Days</h3>
+        <p class="sub">One payment · No renewals · Bank transfer accepted</p>
+        <div class="price-main">₦13,000 <span class="price-period">once</span></div>
+        <div class="price-note">₦144 per day for the full journey</div>
+        <span class="price-saving">You save ₦2,000 vs monthly</span>
+        <ul class="features-list">
+          <li>All 65 content writing lessons</li>
+          <li>AI feedback on every task</li>
+          <li>WhatsApp delivery daily</li>
+          <li>Nigerian context throughout</li>
+          <li>Streak and progress tracking</li>
+          <li>Completion certificate Day 90</li>
+          <li>No monthly card charges ever</li>
+        </ul>
+        <a class="pricing-cta" href="https://paystack.shop/pay/6gz2f87ft4">Pay once, start today →</a>
+        <p class="pricing-small">First lesson arrives immediately after payment</p>
+        <div class="transfer-note">🏦 Bank transfer accepted</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GUARANTEE -->
+<div class="guarantee-section">
+  <div class="guarantee-card">
+    <div class="guarantee-icon">🛡️</div>
+    <div class="guarantee-text">
+      <h3>Our commitment to you</h3>
+      <p>If our platform fails to deliver your lessons for more than 5 consecutive weekdays due to a technical issue on our end, we will extend your subscription by the number of days missed at no extra charge. We are building something we are proud of — and we stand behind it. Questions? Email hello@skillstackng.com anytime.</p>
+    </div>
+  </div>
+</div>
+
+<!-- FAQ -->
+<div class="faq-section">
+  <div class="container section-center">
+    <span class="eyebrow">Questions</span>
+    <h2>Answered honestly.</h2>
+    <div class="faq-list">
+      <details>
+        <summary>Do I need writing experience to join?</summary>
+        <p>No. Day 1 starts with what content writing actually is and why it works. The only requirement is that you show up for 15 minutes every weekday and do the tasks.</p>
+      </details>
+      <details>
+        <summary>How is content writing different from copywriting?</summary>
+        <p>Copywriting is written to sell — ads, landing pages, sales emails. Content writing is written to inform, educate, or build trust — articles, blogs, newsletters, web pages. Both skills complement each other and both pay well in Nigeria.</p>
+      </details>
+      <details>
+        <summary>How quickly can I start earning?</summary>
+        <p>Students who complete the programme and apply the client pitch framework from Week 11 typically land their first client within 30 to 60 days of finishing. Some land clients before finishing. Results depend on how seriously you apply the work.</p>
+      </details>
+      <details>
+        <summary>What if I miss a day?</summary>
+        <p>Your lesson waits for you. Reply CONTINUE any time and your current lesson is sent immediately. The bot also sends a reminder if you miss a day. Life happens — the programme is designed for that.</p>
+      </details>
+      <details>
+        <summary>Can I do this track and copywriting?</summary>
+        <p>Yes. Many students do both — one after the other. Content writing and copywriting are different skills that pay from different clients. Together they make you the most versatile writer in any Nigerian market.</p>
+      </details>
+      <details>
+        <summary>Can I cancel?</summary>
+        <p>Monthly subscribers can cancel anytime by emailing hello@skillstackng.com. You will not be charged for the next month. Full 90-day subscribers have paid once and have no subscription to cancel.</p>
+      </details>
+    </div>
+  </div>
+</div>
+
+<!-- FINAL CTA -->
+<div class="final-section">
+  <div class="container">
+    <h2>90 days from now you will either have this skill or you won't.</h2>
+    <p>The lessons take 15 minutes. The decision takes 30 seconds. Everything else is just showing up.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <a class="btn-primary" href="https://paystack.shop/pay/6gz2f87ft4" style="font-size:1.05rem;padding:16px 32px;">Pay once — ₦13,000 for full 90 days →</a>
+      <a href="https://paystack.shop/pay/01d0empofc" style="border:1px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.8);padding:16px 28px;border-radius:10px;font-weight:600;font-size:0.95rem;text-decoration:none;">₦5,000/month</a>
+    </div>
+    <p style="font-size:0.78rem;color:rgba(255,255,255,0.4);margin-top:16px;">First lesson arrives on WhatsApp immediately after payment · Cancel anytime · Price increasing to ₦8,500 soon</p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>SkillStack NG is operated by Amaris Synergy Limited, Lagos, Nigeria.</p>
+  <p style="margin-top:8px;">
+    <a href="/">Home</a> ·
+    <a href="/choose">All tracks</a> ·
+    <a href="/privacy">Privacy Policy</a> ·
+    <a href="/terms">Terms of Service</a> ·
+    <a href="mailto:hello@skillstackng.com">hello@skillstackng.com</a>
+  </p>
+</footer>
+
+</body>
+</html>
