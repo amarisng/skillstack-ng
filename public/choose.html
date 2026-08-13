@@ -4,7 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Choose Your Track — SkillStack NG</title>
-  <meta name="description" content="Choose your high-income skill track. Copywriting or Social Media Management. Delivered to your WhatsApp every weekday."/>
+  <meta name="description" content="Choose your high-income skill track. Copywriting, Social Media Management, or Content Writing. Delivered to your WhatsApp every weekday."/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -66,7 +66,7 @@
     }
 
     /* MAIN */
-    .main { max-width: 1000px; margin: 0 auto; padding: 48px 24px 80px; }
+    .main { max-width: 1100px; margin: 0 auto; padding: 48px 24px 80px; }
 
     /* SECTION LABEL */
     .section-label {
@@ -84,7 +84,7 @@
     @media (max-width: 900px) {
       .tracks-grid { grid-template-columns: repeat(2, 1fr); }
     }
-    @media (max-width: 620px) {
+    @media (max-width: 580px) {
       .tracks-grid { grid-template-columns: 1fr; }
     }
 
@@ -110,18 +110,12 @@
       border-radius: 4px; padding: 3px 8px; margin-bottom: 12px;
     }
     .badge-live { background: var(--green); color: var(--dark); }
-    .badge-new { background: rgba(0,196,140,0.2); color: var(--green); border: 1px solid var(--green); }
     .badge-soon { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.5); }
 
     .track-header h2 { font-size: 1.2rem; font-weight: 800; color: #fff; margin-bottom: 6px; }
     .track-header p { font-size: 0.82rem; color: rgba(255,255,255,0.6); line-height: 1.5; }
-    .track-meta {
-      display: flex; gap: 16px; margin-top: 14px;
-    }
-    .track-meta span {
-      font-size: 0.72rem; font-weight: 600;
-      color: rgba(255,255,255,0.5);
-    }
+    .track-meta { display: flex; gap: 16px; margin-top: 14px; flex-wrap: wrap; }
+    .track-meta span { font-size: 0.72rem; font-weight: 600; color: rgba(255,255,255,0.5); }
     .track-meta span strong { color: var(--green); }
 
     .track-body { padding: 24px; }
@@ -138,10 +132,7 @@
       gap: 12px;
     }
     .price-option:hover { border-color: var(--green); background: rgba(0,196,140,0.04); }
-    .price-option.featured {
-      background: rgba(0,196,140,0.06);
-      border-color: var(--green);
-    }
+    .price-option.featured { background: rgba(0,196,140,0.06); border-color: var(--green); }
 
     .price-option-left { flex: 1; }
     .price-option-label {
@@ -149,9 +140,7 @@
       margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.06em;
     }
     .price-option-label.featured-label { color: var(--green); }
-    .price-option-amount {
-      font-size: 1.1rem; font-weight: 800; color: var(--text);
-    }
+    .price-option-amount { font-size: 1.1rem; font-weight: 800; color: var(--text); }
     .price-option-note { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
 
     .price-option-right {
@@ -160,37 +149,30 @@
       font-weight: 700; font-size: 0.8rem;
       white-space: nowrap; flex-shrink: 0;
     }
-    .price-option.featured .price-option-right {
-      background: var(--green);
-    }
 
     .saving-badge {
       display: inline-block;
       background: rgba(0,196,140,0.1); color: var(--green);
       border-radius: 4px; padding: 2px 8px;
-      font-size: 0.68rem; font-weight: 700;
-      margin-left: 8px;
+      font-size: 0.68rem; font-weight: 700; margin-left: 8px;
     }
 
     .transfer-note {
       font-size: 0.72rem; color: var(--green); font-weight: 600;
-      display: flex; align-items: center; gap: 4px;
-      margin-top: 4px;
+      display: flex; align-items: center; gap: 4px; margin-top: 4px;
     }
 
     .urgency-note {
       background: rgba(245,166,35,0.08);
       border: 1px solid rgba(245,166,35,0.2);
       border-radius: 8px; padding: 8px 12px;
-      font-size: 0.75rem; color: #C27A00; font-weight: 600;
-      margin-top: 12px;
+      font-size: 0.75rem; color: #C27A00; font-weight: 600; margin-top: 12px;
     }
 
     .learn-more {
       display: block; text-align: center;
       color: var(--green); font-size: 0.8rem; font-weight: 600;
-      text-decoration: none; margin-top: 14px;
-      padding: 8px;
+      text-decoration: none; margin-top: 14px; padding: 8px;
     }
     .learn-more:hover { text-decoration: underline; }
 
@@ -201,8 +183,7 @@
     }
     .coming-card {
       background: #fff; border: 1px solid var(--border);
-      border-radius: 16px; padding: 24px;
-      opacity: 0.85;
+      border-radius: 16px; padding: 24px; opacity: 0.85;
     }
     .coming-card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 6px; }
     .coming-card p { font-size: 0.8rem; color: var(--muted); line-height: 1.55; margin-bottom: 16px; }
@@ -210,40 +191,26 @@
       display: block; width: 100%; text-align: center;
       border: 1px solid var(--border); color: var(--muted);
       padding: 10px; border-radius: 8px;
-      font-size: 0.8rem; font-weight: 600; text-decoration: none;
-      transition: border-color 0.15s, color 0.15s;
+      font-size: 0.8rem; font-weight: 600;
       background: none; cursor: pointer; font-family: inherit;
+      transition: border-color 0.15s, color 0.15s;
     }
     .waitlist-btn:hover { border-color: var(--green); color: var(--green); }
-    .demand-badge {
-      display: inline-block; font-size: 0.68rem; font-weight: 700;
-      color: var(--gold); margin-bottom: 10px;
-    }
+    .demand-badge { display: inline-block; font-size: 0.68rem; font-weight: 700; color: var(--gold); margin-bottom: 10px; }
 
     /* HOW IT WORKS STRIP */
     .how-strip {
-      background: var(--dark);
-      border-radius: 16px; padding: 28px 32px;
-      display: flex; gap: 32px; flex-wrap: wrap;
-      align-items: center; margin-bottom: 48px;
+      background: var(--dark); border-radius: 16px; padding: 28px 32px;
+      display: flex; gap: 32px; flex-wrap: wrap; align-items: center; margin-bottom: 48px;
     }
-    .how-strip-title {
-      font-size: 0.9rem; font-weight: 700; color: #fff;
-      flex-shrink: 0;
-    }
-    .how-steps {
-      display: flex; gap: 24px; flex-wrap: wrap; flex: 1;
-    }
-    .how-step {
-      display: flex; align-items: center; gap: 8px;
-      font-size: 0.8rem; color: rgba(255,255,255,0.65);
-    }
+    .how-strip-title { font-size: 0.9rem; font-weight: 700; color: #fff; flex-shrink: 0; }
+    .how-steps { display: flex; gap: 24px; flex-wrap: wrap; flex: 1; }
+    .how-step { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: rgba(255,255,255,0.65); }
     .how-step-num {
       width: 22px; height: 22px; border-radius: 50%;
       background: rgba(0,196,140,0.2); color: var(--green);
       font-weight: 800; font-size: 0.7rem;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
 
     /* FOOTER */
@@ -260,29 +227,21 @@
       align-items: center; justify-content: center; padding: 24px;
     }
     .modal-overlay.active { display: flex; }
-    .modal {
-      background: #fff; border-radius: 20px; padding: 36px;
-      max-width: 440px; width: 100%;
-    }
+    .modal { background: #fff; border-radius: 20px; padding: 36px; max-width: 440px; width: 100%; }
     .modal h3 { font-size: 1.1rem; font-weight: 800; margin-bottom: 6px; }
     .modal p { font-size: 0.85rem; color: var(--muted); margin-bottom: 20px; }
     .modal input {
-      width: 100%; padding: 12px 14px;
-      border: 1px solid var(--border); border-radius: 10px;
-      font-family: inherit; font-size: 0.9rem; color: var(--text);
-      margin-bottom: 12px; outline: none;
+      width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px;
+      font-family: inherit; font-size: 0.9rem; color: var(--text); margin-bottom: 12px; outline: none;
     }
     .modal input:focus { border-color: var(--green); }
     .modal-submit {
-      width: 100%; background: var(--green); color: var(--dark);
-      border: none; padding: 13px; border-radius: 10px;
-      font-family: inherit; font-size: 0.95rem; font-weight: 800;
-      cursor: pointer;
+      width: 100%; background: var(--green); color: var(--dark); border: none;
+      padding: 13px; border-radius: 10px; font-family: inherit; font-size: 0.95rem; font-weight: 800; cursor: pointer;
     }
     .modal-close {
       display: block; text-align: center; margin-top: 12px;
-      color: var(--muted); font-size: 0.8rem; cursor: pointer;
-      background: none; border: none; font-family: inherit;
+      color: var(--muted); font-size: 0.8rem; cursor: pointer; background: none; border: none; font-family: inherit;
     }
     .modal-success { display: none; text-align: center; }
     .modal-success .check { font-size: 2rem; margin-bottom: 8px; }
@@ -342,7 +301,7 @@
       </div>
       <div class="track-body">
         <div class="pricing-options">
-          <a class="price-option" href="https://paystack.shop/pay/2-h3igsfd2" onclick="event.preventDefault();payWithPaystack(5000,'copywriting-monthly','copywriting')">
+          <a class="price-option" href="https://paystack.shop/pay/2-h3igsfd2">
             <div class="price-option-left">
               <div class="price-option-label">Monthly</div>
               <div class="price-option-amount">₦5,000<span style="font-size:0.8rem;font-weight:400;color:var(--muted)">/month</span></div>
@@ -350,7 +309,7 @@
             </div>
             <div class="price-option-right">Start →</div>
           </a>
-          <a class="price-option featured" href="https://paystack.shop/pay/m0m9ofipj4" onclick="event.preventDefault();payWithPaystack(13000,'copywriting-full','copywriting')">
+          <a class="price-option featured" href="https://paystack.shop/pay/m0m9ofipj4">
             <div class="price-option-left">
               <div class="price-option-label featured-label">⭐ Best value — Full 90 days</div>
               <div class="price-option-amount">₦13,000 <span class="saving-badge">Save ₦2,000</span></div>
@@ -379,7 +338,7 @@
       </div>
       <div class="track-body">
         <div class="pricing-options">
-          <a class="price-option" href="https://paystack.shop/pay/ec2kdwv0ku" onclick="event.preventDefault();payWithPaystack(5000,'smm-monthly','social_media_management')">
+          <a class="price-option" href="https://paystack.shop/pay/ec2kdwv0ku">
             <div class="price-option-left">
               <div class="price-option-label">Monthly</div>
               <div class="price-option-amount">₦5,000<span style="font-size:0.8rem;font-weight:400;color:var(--muted)">/month</span></div>
@@ -387,7 +346,7 @@
             </div>
             <div class="price-option-right">Start →</div>
           </a>
-          <a class="price-option featured" href="https://paystack.shop/pay/ok8zxwq28f" onclick="event.preventDefault();payWithPaystack(9000,'smm-full','social_media_management')">
+          <a class="price-option featured" href="https://paystack.shop/pay/ok8zxwq28f">
             <div class="price-option-left">
               <div class="price-option-label featured-label">⭐ Best value — Full 60 days</div>
               <div class="price-option-amount">₦9,000 <span class="saving-badge">Save ₦1,000</span></div>
@@ -416,7 +375,7 @@
       </div>
       <div class="track-body">
         <div class="pricing-options">
-          <a class="price-option" href="https://paystack.shop/pay/01d0empofc" onclick="event.preventDefault();payWithPaystack(5000,'cw-monthly','content_writing')">
+          <a class="price-option" href="https://paystack.shop/pay/01d0empofc">
             <div class="price-option-left">
               <div class="price-option-label">Monthly</div>
               <div class="price-option-amount">₦5,000<span style="font-size:0.8rem;font-weight:400;color:var(--muted)">/month</span></div>
@@ -424,7 +383,7 @@
             </div>
             <div class="price-option-right">Start →</div>
           </a>
-          <a class="price-option featured" href="https://paystack.shop/pay/6gz2f87ft4" onclick="event.preventDefault();payWithPaystack(13000,'cw-full','content_writing')">
+          <a class="price-option featured" href="https://paystack.shop/pay/6gz2f87ft4">
             <div class="price-option-left">
               <div class="price-option-label featured-label">⭐ Best value — Full 90 days</div>
               <div class="price-option-amount">₦13,000 <span class="saving-badge">Save ₦2,000</span></div>
@@ -444,28 +403,24 @@
   <!-- COMING SOON TRACKS -->
   <p class="section-label">Coming soon — join the waitlist</p>
   <div class="coming-grid">
-
     <div class="coming-card">
       <div class="demand-badge">★★★ HIGH DEMAND</div>
       <h3>Digital Marketing Fundamentals</h3>
       <p>Paid ads, SEO basics, email marketing and funnels — the full picture every Nigerian marketer needs.</p>
       <button class="waitlist-btn" onclick="openWaitlist('Digital Marketing Fundamentals')">Join waitlist →</button>
     </div>
-
     <div class="coming-card">
       <div class="demand-badge">★★ MEDIUM DEMAND</div>
       <h3>Excel for Business</h3>
       <p>From basic formulas to dashboards. Used by every Nigerian office, bank, and SME that pays well.</p>
       <button class="waitlist-btn" onclick="openWaitlist('Excel for Business')">Join waitlist →</button>
     </div>
-
     <div class="coming-card">
       <div class="demand-badge">★★ MEDIUM DEMAND</div>
       <h3>Data Analysis (Entry Level)</h3>
       <p>Google Sheets and Python basics. For those targeting tech-adjacent roles and remote work opportunities.</p>
       <button class="waitlist-btn" onclick="openWaitlist('Data Analysis')">Join waitlist →</button>
     </div>
-
   </div>
 
   <!-- REASSURANCE -->
@@ -547,59 +502,9 @@
         body: JSON.stringify({ name, phone, track: currentTrack })
       });
     } catch (e) { /* fail silently */ }
-
     document.getElementById('modalForm').style.display = 'none';
     document.getElementById('modalSuccess').style.display = 'block';
   }
-</script>
-<script>
-  (function() {
-    var params = new URLSearchParams(window.location.search);
-    var ref = params.get("ref");
-    if (ref) localStorage.setItem("ssng_ref", ref);
-  })();
-</script>
-<script src="https://js.paystack.co/v1/inline.js"></script>
-<script>
-function payWithPaystack(amount, planKey, track) {
-  var ref = localStorage.getItem("ssng_ref") || "";
-  var links = {
-    "copywriting-monthly": "https://paystack.shop/pay/2-h3igsfd2",
-    "copywriting-full": "https://paystack.shop/pay/m0m9ofipj4",
-    "smm-monthly": "https://paystack.shop/pay/ec2kdwv0ku",
-    "smm-full": "https://paystack.shop/pay/ok8zxwq28f",
-    "cw-monthly": "https://paystack.shop/pay/01d0empofc",
-    "cw-full": "https://paystack.shop/pay/6gz2f87ft4",
-    "beta": "https://paystack.shop/pay/tfv3ii1iq0"
-  };
-
-  var isMonthly = planKey.indexOf("monthly") !== -1 || planKey === "beta";
-
-  if (isMonthly) {
-    window.location.href = links[planKey] + (ref ? "?ref=" + ref : "");
-    return;
-  }
-
-  var handler = PaystackPop.setup({
-    key: "pk_live_840844c2b25d6ed006362384bf987d6514c8f20d",
-    email: "customer@skillstackng.com",
-    amount: amount * 100,
-    currency: "NGN",
-    metadata: {
-      custom_fields: [
-        { display_name: "Track", variable_name: "track", value: track },
-        { display_name: "Affiliate Ref", variable_name: "affiliate_ref", value: ref }
-      ]
-    },
-    callback: function(response) {
-      if (ref) localStorage.removeItem("ssng_ref");
-      window.location.href = "/thankyou";
-    },
-    onClose: function() {}
-  });
-  try { handler.openIframe(); }
-  catch(e) { window.location.href = links[planKey] + (ref ? "?ref=" + ref : ""); }
-}
 </script>
 </body>
 </html>
