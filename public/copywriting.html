@@ -845,21 +845,6 @@
   </p>
 </footer>
 <script>
-  // AFFILIATE REF TRACKING
-  (function() {
-    const params = new URLSearchParams(window.location.search);
-    const ref = params.get('ref');
-    if (ref) localStorage.setItem('ssng_ref', ref);
 
-    const storedRef = localStorage.getItem('ssng_ref');
-    if (!storedRef) return;
-
-    document.querySelectorAll('a[href*="paystack.shop"]').forEach(function(link) {
-      const url = new URL(link.href);
-      url.searchParams.set('ref', storedRef);
-      link.href = url.toString();
-    });
-  })();
-</script>
 </body>
 </html>
