@@ -190,9 +190,10 @@ const trackName = message === '1' ? 'Copywriting & Persuasion (90 days)' : messa
 
     // Send correct payment links based on selected track
     const isSMM = sub.track === 'social_media_management';
-    const monthlyLink = isSMM ? 'https://paystack.shop/pay/ec2kdwv0ku' : PAYSTACK_LINK;
-    const fullLink = isSMM ? 'https://paystack.shop/pay/ok8zxwq28f' : 'https://paystack.shop/pay/m0m9ofipj4';
-    const fullPrice = isSMM ? '9,000 for 60 days (save 1,000)' : '13,000 for 90 days (save 2,000)';
+const isCW = sub.track === 'content_writing';
+const monthlyLink = isSMM ? 'https://paystack.shop/pay/ec2kdwv0ku' : isCW ? 'https://paystack.shop/pay/01d0empofc' : PAYSTACK_LINK;
+const fullLink = isSMM ? 'https://paystack.shop/pay/ok8zxwq28f' : isCW ? 'https://paystack.shop/pay/6gz2f87ft4' : 'https://paystack.shop/pay/m0m9ofipj4';
+const fullPrice = isSMM ? '9,000 for 60 days (save 1,000)' : isCW ? '13,000 for 90 days (save 2,000)' : '13,000 for 90 days (save 2,000)';
 
     await sendMessage(cleanPhone, 'Perfect ' + sub.name + '! Your lesson will arrive Monday to Friday at ' + message.toUpperCase() + '.\n\nTo activate your subscription pay here:\n\nMonthly — ₦5,000/month:\n' + monthlyLink + '\n\nFull plan — ₦' + fullPrice + ':\n' + fullLink + '\n\nMake sure to enter this WhatsApp number in the payment form.');
     return;
