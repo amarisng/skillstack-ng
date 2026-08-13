@@ -767,7 +767,32 @@ app.post('/affiliate-signup', async (req, res) => {
     res.status(500).json({ success: false });
   }
 });
+app.post('/track-referral', async (req, res) => {
+  try {
+    const { ref } = req.body;
+    if (!ref) return res.status(400).json({ success: false });
 
+    const { data: affiliate } = await supabase
+      .from('affiliates')
+      .select('*')
+      .eq('affiliate_code', ref)
+      .eq('status', 'approved')
+      .single();
+
+    if (!affiliate) return res.status(200).json({ success: false, reason: 'not found' });
+
+    await supabase
+      .from('affiliates')
+      .update({ referral_count: (affiliate.referral_count || 0) + 1 })
+      .eq('affiliate_code', ref);
+
+    console.log('Referral tracked for: ' + ref);
+    res.status(200).json({ success: true });
+  } catch (err) {
+    console.error('Track referral error:', err.message);
+    res.status(200).json({ success: false });
+  }
+});
 app.get('/approve-affiliate', async (req, res) => {
   try {
     const phone = (req.query.phone || '').replace(/\D/g, '');
