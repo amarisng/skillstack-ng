@@ -367,9 +367,10 @@ cron.schedule('0 * * * *', async () => {
       console.log('No lesson found for day ' + sub.day_number);
       continue;
     }
-    await sendMessage(sub.phone, formatLesson(lesson, sub.day_number));
+   await sendMessage(sub.phone, formatLesson(lesson, sub.day_number));
     await supabase.from('subscribers').update({
-      last_active: today
+      last_active: today,
+      awaiting_task: true
     }).eq('phone', sub.phone);
     console.log('Sent Day ' + sub.day_number + ' lesson to ' + sub.phone);
   }
