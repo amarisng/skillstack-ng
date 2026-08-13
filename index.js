@@ -825,7 +825,9 @@ app.get('/approve-affiliate', async (req, res) => {
     res.status(500).send('Error: ' + err.message);
   }
 });
-
+app.get('/beta', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'beta.html'));
+});
 app.get('/demo', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'demo.html'));
 });
