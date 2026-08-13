@@ -164,7 +164,7 @@ if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
   return;
 }
   // Handle track selection
-  if (sub.active === 'false' && sub.name === '' && (message === '1' || message === '2')) {
+  if (sub.active === 'false' && sub.name === '' && (message === '1' || message === '2' || message === '3')) {
     const selectedTrack = message === '1' ? 'copywriting' : 'social_media_management';
     const trackName = message === '1' ? 'Copywriting & Persuasion (90 days)' : 'Social Media Management (60 days)';
     await supabase.from('subscribers').update({ track: selectedTrack, name: 'AWAITING' }).eq('phone', cleanPhone);
