@@ -229,8 +229,12 @@ const fullPrice = isSMM ? '9,000 for 60 days (save 1,000)' : isCW ? '13,000 for 
     }
     const wordCount = message.trim().split(/\s+/).length;
     if (wordCount < 5) {
-      await sendMessage(cleanPhone, 'Welcome back! Here is your Day ' + sub.day_number + ' lesson:');
-      await sendMessage(cleanPhone, formatLesson(lesson, sub.day_number));
+      if (sub.awaiting_task) {
+        await sendMessage(cleanPhone, 'Welcome back! Here is your Day ' + sub.day_number + ' lesson:');
+        await sendMessage(cleanPhone, formatLesson(lesson, sub.day_number));
+      } else {
+        await sendMessage(cleanPhone, 'Your next lesson will arrive at your scheduled time. Keep going! 💪');
+      }
       return;
     }
     const feedback = await getFeedback(lesson.task, message, lesson.feedback_prompt);
