@@ -239,7 +239,8 @@ const fullPrice = isSMM ? '9,000 for 60 days (save 1,000)' : isCW ? '13,000 for 
     await supabase.from('subscribers').update({
       day_number: nextDay,
       streak: sub.streak + 1,
-      last_active: new Date().toISOString().split('T')[0]
+      last_active: new Date().toISOString().split('T')[0],
+      awaiting_task: false
     }).eq('phone', cleanPhone);
     return;
   }
