@@ -335,7 +335,7 @@
       </div>
       <div class="track-body">
         <div class="pricing-options">
-          <a class="price-option" href="https://paystack.shop/pay/2-h3igsfd2">
+          <a class="price-option" href="https://paystack.shop/pay/2-h3igsfd2" onclick="event.preventDefault();payWithPaystack(5000,'copywriting-monthly','copywriting')">
             <div class="price-option-left">
               <div class="price-option-label">Monthly</div>
               <div class="price-option-amount">₦5,000<span style="font-size:0.8rem;font-weight:400;color:var(--muted)">/month</span></div>
@@ -343,7 +343,7 @@
             </div>
             <div class="price-option-right">Start →</div>
           </a>
-          <a class="price-option featured" href="https://paystack.shop/pay/m0m9ofipj4">
+          <a class="price-option featured" href="https://paystack.shop/pay/m0m9ofipj4" onclick="event.preventDefault();payWithPaystack(13000,'copywriting-full','copywriting')">
             <div class="price-option-left">
               <div class="price-option-label featured-label">⭐ Best value — Full 90 days</div>
               <div class="price-option-amount">₦13,000 <span class="saving-badge">Save ₦2,000</span></div>
@@ -372,7 +372,7 @@
       </div>
       <div class="track-body">
         <div class="pricing-options">
-          <a class="price-option" href="https://paystack.shop/pay/ec2kdwv0ku">
+          <a class="price-option" href="https://paystack.shop/pay/ec2kdwv0ku" onclick="event.preventDefault();payWithPaystack(5000,'smm-monthly','social_media_management')">
             <div class="price-option-left">
               <div class="price-option-label">Monthly</div>
               <div class="price-option-amount">₦5,000<span style="font-size:0.8rem;font-weight:400;color:var(--muted)">/month</span></div>
@@ -380,7 +380,7 @@
             </div>
             <div class="price-option-right">Start →</div>
           </a>
-          <a class="price-option featured" href="https://paystack.shop/pay/ok8zxwq28f">
+          <a class="price-option featured" href="https://paystack.shop/pay/ok8zxwq28f" onclick="event.preventDefault();payWithPaystack(9000,'smm-full','social_media_management')">
             <div class="price-option-left">
               <div class="price-option-label featured-label">⭐ Best value — Full 60 days</div>
               <div class="price-option-amount">₦9,000 <span class="saving-badge">Save ₦1,000</span></div>
@@ -396,42 +396,7 @@
     </div>
 
   </div>
-<!-- CONTENT WRITING -->
-    <div class="track-card live">
-      <div class="track-header">
-        <span class="track-badge badge-new">✦ New track</span>
-        <h2>Content Writing</h2>
-        <p>Write articles, blogs, web copy, and newsletters. One of the most in-demand remote writing skills in Nigeria.</p>
-        <div class="track-meta">
-          <span><strong>90 days</strong></span>
-          <span><strong>65 lessons</strong></span>
-          <span><strong>₦60k–₦450k/month</strong></span>
-        </div>
-      </div>
-      <div class="track-body">
-        <div class="pricing-options">
-          <a class="price-option" href="https://paystack.shop/pay/01d0empofc">
-            <div class="price-option-left">
-              <div class="price-option-label">Monthly</div>
-              <div class="price-option-amount">₦5,000<span style="font-size:0.8rem;font-weight:400;color:var(--muted)">/month</span></div>
-              <div class="price-option-note">Card payment · Cancel anytime</div>
-            </div>
-            <div class="price-option-right">Start →</div>
-          </a>
-          <a class="price-option featured" href="https://paystack.shop/pay/6gz2f87ft4">
-            <div class="price-option-left">
-              <div class="price-option-label featured-label">⭐ Best value — Full 90 days</div>
-              <div class="price-option-amount">₦13,000 <span class="saving-badge">Save ₦2,000</span></div>
-              <div class="price-option-note">One payment · No renewals</div>
-              <div class="transfer-note">🏦 Bank transfer accepted</div>
-            </div>
-            <div class="price-option-right">Pay once →</div>
-          </a>
-        </div>
-        <div class="urgency-note">⚡ Founding member rate — price increasing to ₦8,500 soon</div>
-        <a class="learn-more" href="/content-writing">See full curriculum & details →</a>
-      </div>
-    </div>
+
   <!-- COMING SOON TRACKS -->
   <p class="section-label">Coming soon — join the waitlist</p>
   <div class="coming-grid">
@@ -462,7 +427,7 @@
   <!-- REASSURANCE -->
   <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:28px 32px;text-align:center;">
     <p style="font-size:0.9rem;color:var(--muted);max-width:560px;margin:0 auto;line-height:1.7;">
-Not sure which track to start with? <strong style="color:var(--text);">Copywriting</strong> is for anyone who wants to write sales copy and ads. <strong style="color:var(--text);">Social Media Management</strong> is for anyone who wants to manage brand accounts. <strong style="color:var(--text);">Content Writing</strong> is for anyone who wants to write articles, blogs, and web copy for brands. All three are delivered the same way — WhatsApp, 15 minutes a day, AI feedback on every task.
+      Not sure which track to start with? <strong style="color:var(--text);">Copywriting</strong> is for anyone who wants to write for brands and earn from words. <strong style="color:var(--text);">Social Media Management</strong> is for anyone who wants to manage brand accounts and build a retainer business. Both are delivered the same way — WhatsApp, 15 minutes a day, AI feedback on every task. You can do both — one after the other.
     </p>
     <p style="margin-top:16px;font-size:0.82rem;color:var(--muted);">
       Questions? Email <a href="mailto:hello@skillstackng.com" style="color:var(--green);">hello@skillstackng.com</a>
@@ -502,6 +467,47 @@ Not sure which track to start with? <strong style="color:var(--text);">Copywriti
   </p>
 </footer>
 
+<script>
+  (function() {
+    var params = new URLSearchParams(window.location.search);
+    var ref = params.get("ref");
+    if (ref) localStorage.setItem("ssng_ref", ref);
+  })();
+</script>
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<script>
+function payWithPaystack(amount, planKey, track) {
+  var ref = localStorage.getItem("ssng_ref") || "";
+  var links = {
+    "copywriting-monthly": "https://paystack.shop/pay/2-h3igsfd2",
+    "copywriting-full": "https://paystack.shop/pay/m0m9ofipj4",
+    "smm-monthly": "https://paystack.shop/pay/ec2kdwv0ku",
+    "smm-full": "https://paystack.shop/pay/ok8zxwq28f",
+    "cw-monthly": "https://paystack.shop/pay/01d0empofc",
+    "cw-full": "https://paystack.shop/pay/6gz2f87ft4",
+    "beta": "https://paystack.shop/pay/tfv3ii1iq0"
+  };
+  var handler = PaystackPop.setup({
+    key: "pk_live_840844c2b25d6ed006362384bf987d6514c8f20d",
+    email: "customer@skillstackng.com",
+    amount: amount * 100,
+    currency: "NGN",
+    metadata: {
+      custom_fields: [
+        { display_name: "Track", variable_name: "track", value: track },
+        { display_name: "Affiliate Ref", variable_name: "affiliate_ref", value: ref }
+      ]
+    },
+    callback: function(response) {
+      if (ref) localStorage.removeItem("ssng_ref");
+      window.location.href = "/thankyou";
+    },
+    onClose: function() {}
+  });
+  try { handler.openIframe(); }
+  catch(e) { window.location.href = (links[planKey] || links["copywriting-monthly"]) + (ref ? "?ref=" + ref : ""); }
+}
+</script>
 <script>
   let currentTrack = '';
 
@@ -543,23 +549,6 @@ Not sure which track to start with? <strong style="color:var(--text);">Copywriti
     document.getElementById('modalForm').style.display = 'none';
     document.getElementById('modalSuccess').style.display = 'block';
   }
-</script>
-  <script>
-  // AFFILIATE REF TRACKING
-  (function() {
-    const params = new URLSearchParams(window.location.search);
-    const ref = params.get('ref');
-    if (ref) localStorage.setItem('ssng_ref', ref);
-
-    const storedRef = localStorage.getItem('ssng_ref');
-    if (!storedRef) return;
-
-    document.querySelectorAll('a[href*="paystack.shop"]').forEach(function(link) {
-      const url = new URL(link.href);
-      url.searchParams.set('ref', storedRef);
-      link.href = url.toString();
-    });
-  })();
 </script>
 </body>
 </html>
