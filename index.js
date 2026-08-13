@@ -165,8 +165,8 @@ if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
 }
   // Handle track selection
   if (sub.active === 'false' && sub.name === '' && (message === '1' || message === '2' || message === '3')) {
-    const selectedTrack = message === '1' ? 'copywriting' : 'social_media_management';
-    const trackName = message === '1' ? 'Copywriting & Persuasion (90 days)' : 'Social Media Management (60 days)';
+    const selectedTrack = message === '1' ? 'copywriting' : message === '2' ? 'social_media_management' : 'content_writing';
+const trackName = message === '1' ? 'Copywriting & Persuasion (90 days)' : message === '2' ? 'Social Media Management (60 days)' : 'Content Writing (90 days)';
     await supabase.from('subscribers').update({ track: selectedTrack, name: 'AWAITING' }).eq('phone', cleanPhone);
     await sendMessage(cleanPhone, 'Great choice! ' + trackName + ' it is.\n\nFirst — what is your first name?');
     return;
