@@ -253,7 +253,7 @@ const fullPrice = isSMM ? '9,000 for 60 days (save 1,000)' : isCW ? '13,000 for 
     return;
   }
 
-  await sendMessage(cleanPhone, 'Welcome back! Reply 1 for Copywriting or 2 for Social Media Management to get started.');
+  await sendMessage(cleanPhone, 'Welcome back! Reply 1 for Copywriting, 2 for Social Media Management or 3 for Content Writing to get started.');
 }
 
 app.post('/paystack-webhook', async (req, res) => {
