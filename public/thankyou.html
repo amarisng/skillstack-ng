@@ -378,6 +378,18 @@
 </footer>
 
 <script>
+  // AFFILIATE REFERRAL FIRE
+  (function() {
+    const ref = localStorage.getItem('ssng_ref');
+    if (!ref) return;
+    fetch('/track-referral', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ref: ref })
+    }).then(function() {
+      localStorage.removeItem('ssng_ref');
+    }).catch(function() {});
+  })();
   function copyNumber() {
     navigator.clipboard.writeText('+15554075935').then(() => {
       const btn = document.getElementById('copyBtn');
