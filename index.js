@@ -14,7 +14,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // ─────────────────────────────────────────────
 const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY
+  process.env.SUPABASE_SERVICE_KEY
 );
 
 const anthropic = new Anthropic({
