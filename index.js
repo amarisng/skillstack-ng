@@ -251,7 +251,8 @@ const fullPrice = isSMM ? '9,000 for 60 days (save 1,000)' : isCW ? '13,000 for 
 
   if (sub.active === 'false') {
     const isSMM = sub.track === 'social_media_management';
-    const monthlyLink = isSMM ? 'https://paystack.shop/pay/ec2kdwv0ku' : PAYSTACK_LINK;
+    const isCW2 = sub.track === 'content_writing';
+    const monthlyLink = isSMM ? 'https://paystack.shop/pay/p1kkgoo91-' : isCW2 ? 'https://paystack.shop/pay/yn75oepjbw' : 'https://paystack.shop/pay/2-h3igsfd2';
     const fullLink = isSMM ? 'https://paystack.shop/pay/ok8zxwq28f' : 'https://paystack.shop/pay/m0m9ofipj4';
     const fullPrice = isSMM ? '9,000 for 60 days' : '13,000 for 90 days';
     await sendMessage(cleanPhone, 'To activate your subscription pay here:\n\nMonthly — ₦5,000/month:\n' + monthlyLink + '\n\nFull plan — ₦' + fullPrice + ':\n' + fullLink);
