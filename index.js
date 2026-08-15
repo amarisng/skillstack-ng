@@ -731,7 +731,47 @@ app.get('/social-media-management', (req, res) => {
 app.get('/copywriting', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'copywriting.html'));
 });
+app.get('/ambassador', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'ambassador.html'));
+});
 
+app.post('/ambassador-apply', async (req, res) => {
+  try {
+    const { name, phone, email, school, department, state, plan, track } = req.body;
+    let cleanPhone = (phone || '').replace(/\D/g, '');
+    if (cleanPhone.startsWith('0')) cleanPhone = '234' + cleanPhone.substring(1);
+
+    await supabase.from('ambassadors').insert({
+      name,
+      phone: cleanPhone,
+      email,
+      school,
+      department,
+      state,
+      plan,
+      track,
+      status: 'pending',
+      created_at: new Date().toISOString()
+    });
+
+    await sendMessage('2347063667303',
+      'New Ambassador Application!\n\n' +
+      'Name: ' + name + '\n' +
+      'Phone: ' + cleanPhone + '\n' +
+      'Email: ' + email + '\n' +
+      'School: ' + school + '\n' +
+      'Department: ' + department + '\n' +
+      'State: ' + state + '\n' +
+      'Track: ' + track + '\n\n' +
+      'Plan: ' + plan
+    );
+
+    res.status(200).json({ success: true });
+  } catch (err) {
+    console.error('Ambassador apply error:', err.message);
+    res.status(200).json({ success: true });
+  }
+});
 app.get('/affiliate', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'affiliate.html'));
 });
