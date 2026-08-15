@@ -718,6 +718,9 @@ app.post('/waitlist', async (req, res) => {
 app.get('/content-writing', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'content-writing.html'));
 });
+app.get('/digital-marketing', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'digital-marketing.html'));
+});
 app.get('/social-media-management', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'social-media-management.html'));
 });
