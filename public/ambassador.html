@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-4WPE8R55VQ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-4WPE8R55VQ');
+  </script>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Campus Ambassador — SkillStack NG</title>
+  <meta name="description" content="Become a SkillStack NG Campus Ambassador. Introduce practical skills to your campus and earn 30% commission on every student you refer."/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green: #00C48C;
+      --green-dark: #009e72;
+      --dark: #0D1F17;
+      --white: #FFFFFF;
+      --off-white: #F7FAF8;
+      --text: #1A2E1F;
+      --muted: #5A7A65;
+      --border: #D8EAE0;
+      --gold: #F5A623;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--white);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* NAV */
+    nav {
+      background: var(--dark);
+      padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 60px; position: sticky; top: 0; z-index: 100;
+    }
+    .nav-logo { font-weight: 800; font-size: 1.1rem; color: #fff; text-decoration: none; }
+    .nav-logo span { color: var(--green); }
+    .nav-cta {
+      background: var(--green); color: var(--dark);
+      padding: 8px 18px; border-radius: 8px;
+      font-weight: 700; font-size: 0.85rem; text-decoration: none;
+    }
+
+    /* HERO */
+    .hero {
+      background: linear-gradient(135deg, #0D1F17 0%, #112B1C 100%);
+      color: #fff; padding: 72px 24px 80px; text-align: center;
+    }
+    .eyebrow {
+      display: inline-block;
+      background: rgba(0,196,140,0.15);
+      border: 1px solid rgba(0,196,140,0.3);
+      color: var(--green);
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      border-radius: 20px; padding: 4px 14px; margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800; line-height: 1.15; margin-bottom: 18px;
+    }
+    .hero h1 em { color: var(--green); font-style: normal; }
+    .hero p {
+      font-size: 1.05rem; color: rgba(255,255,255,0.7);
+      max-width: 520px; margin: 0 auto 32px; line-height: 1.7;
+    }
+    .hero-pills {
+      display: flex; gap: 10px; flex-wrap: wrap;
+      justify-content: center; margin-top: 8px;
+    }
+    .pill {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 20px; padding: 5px 14px;
+      font-size: 0.78rem; font-weight: 600;
+      color: rgba(255,255,255,0.7);
+    }
+    .btn-primary {
+      display: inline-block;
+      background: var(--green); color: var(--dark);
+      padding: 14px 32px; border-radius: 10px;
+      font-weight: 800; font-size: 1rem;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .btn-primary:hover { background: var(--green-dark); }
+
+    /* SECTIONS */
+    section { padding: 72px 24px; }
+    .container { max-width: 900px; margin: 0 auto; }
+    .section-center { text-align: center; }
+    .section-label {
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--green); margin-bottom: 12px;
+      display: block;
+    }
+    h2 {
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      font-weight: 800; line-height: 1.2;
+      color: var(--text); margin-bottom: 14px;
+    }
+    .section-lead {
+      font-size: 1rem; color: var(--muted);
+      max-width: 560px; margin: 0 auto 48px;
+      line-height: 1.7;
+    }
+
+    /* HOW IT WORKS */
+    .steps {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 24px; margin-top: 48px;
+    }
+    .step {
+      background: var(--off-white);
+      border: 1px solid var(--border);
+      border-radius: 16px; padding: 28px 24px; text-align: center;
+    }
+    .step-num {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--green); color: var(--dark);
+      font-weight: 900; font-size: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+    }
+    .step h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+    .step p { font-size: 0.83rem; color: var(--muted); line-height: 1.6; }
+
+    /* EARNINGS */
+    .earnings-section {
+      background: linear-gradient(135deg, #0D1F17 0%, #112B1C 100%);
+      color: #fff;
+    }
+    .earnings-section h2 { color: #fff; }
+    .earnings-section .section-label { color: var(--green); }
+    .earnings-section .section-lead { color: rgba(255,255,255,0.65); }
+    .earnings-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 20px; margin-top: 48px;
+    }
+    .earning-card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px; padding: 28px 20px; text-align: center;
+    }
+    .earning-card .scenario { font-size: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; }
+    .earning-card .referrals { font-size: 2rem; font-weight: 900; color: var(--green); line-height: 1; margin-bottom: 4px; }
+    .earning-card .referrals-label { font-size: 0.78rem; color: rgba(255,255,255,0.5); margin-bottom: 16px; }
+    .earning-card .income { font-size: 1.4rem; font-weight: 800; color: #fff; margin-bottom: 4px; }
+    .earning-card .income-label { font-size: 0.75rem; color: rgba(255,255,255,0.5); }
+    .earning-note {
+      text-align: center; margin-top: 32px;
+      font-size: 0.82rem; color: rgba(255,255,255,0.45);
+    }
+
+    /* WHAT YOU DO */
+    .duties-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px; margin-top: 48px;
+    }
+    .duty-card {
+      background: var(--off-white);
+      border: 1px solid var(--border);
+      border-radius: 16px; padding: 24px;
+    }
+    .duty-icon { font-size: 1.8rem; margin-bottom: 12px; }
+    .duty-card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+    .duty-card p { font-size: 0.83rem; color: var(--muted); line-height: 1.6; }
+
+    /* WHO SHOULD APPLY */
+    .qualify-list {
+      list-style: none; margin-top: 48px;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+    }
+    .qualify-list li {
+      display: flex; align-items: flex-start; gap: 12px;
+      background: var(--off-white);
+      border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px 20px;
+      font-size: 0.88rem; color: var(--text); line-height: 1.5;
+    }
+    .qualify-list li::before {
+      content: "✓"; color: var(--green); font-weight: 900;
+      flex-shrink: 0; margin-top: 1px;
+    }
+
+    /* FORM */
+    .form-section { background: var(--off-white); }
+    .form-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 20px; padding: 40px;
+      max-width: 620px; margin: 0 auto;
+    }
+    .form-card h3 { font-size: 1.3rem; font-weight: 800; margin-bottom: 8px; color: var(--text); }
+    .form-card .form-lead { font-size: 0.88rem; color: var(--muted); margin-bottom: 28px; line-height: 1.6; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label {
+      display: block; font-size: 0.82rem; font-weight: 700;
+      color: var(--text); margin-bottom: 6px;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%; padding: 12px 14px;
+      border: 1px solid var(--border); border-radius: 10px;
+      font-family: inherit; font-size: 0.9rem; color: var(--text);
+      outline: none; background: var(--white);
+      transition: border-color 0.15s;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { border-color: var(--green); }
+    .form-group textarea { min-height: 90px; resize: vertical; }
+    .form-submit {
+      width: 100%; background: var(--green); color: var(--dark);
+      border: none; padding: 14px; border-radius: 10px;
+      font-family: inherit; font-size: 1rem; font-weight: 800;
+      cursor: pointer; margin-top: 8px;
+      transition: background 0.15s;
+    }
+    .form-submit:hover { background: var(--green-dark); }
+    .form-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+    .form-note { font-size: 0.75rem; color: var(--muted); text-align: center; margin-top: 12px; }
+    .form-success {
+      display: none; text-align: center; padding: 32px 0;
+    }
+    .form-success .check { font-size: 3rem; margin-bottom: 12px; }
+    .form-success h3 { font-size: 1.1rem; font-weight: 800; margin-bottom: 8px; color: var(--text); }
+    .form-success p { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+
+    /* FAQ */
+    .faq-list { max-width: 680px; margin: 40px auto 0; }
+    details {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 12px; margin-bottom: 10px; overflow: hidden;
+    }
+    summary {
+      padding: 18px 20px; font-weight: 600; font-size: 0.92rem;
+      color: var(--text); cursor: pointer; list-style: none;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: "+"; color: var(--green); font-size: 1.2rem; }
+    details[open] summary::after { content: "−"; }
+    details p { padding: 0 20px 18px; font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+
+    /* FOOTER */
+    footer {
+      background: var(--dark); padding: 24px; text-align: center;
+      font-size: 0.78rem; color: rgba(255,255,255,0.35);
+    }
+    footer a { color: var(--green); text-decoration: none; }
+
+    @media (max-width: 680px) {
+      .earnings-grid { grid-template-columns: 1fr; }
+      .form-card { padding: 28px 20px; }
+      section { padding: 56px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="/">Skill<span>Stack</span> NG</a>
+  <a class="nav-cta" href="#apply">Apply now →</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <span class="eyebrow">Campus Ambassador Programme</span>
+  <h1>Bring practical skills to your campus.<br><em>Earn as you grow.</em></h1>
+  <p>Become a SkillStack NG Campus Ambassador. Introduce your fellow students to skills that pay — and earn 30% commission on every student you refer.</p>
+  <div style="margin-bottom: 32px;">
+    <a class="btn-primary" href="#apply">Apply to become an ambassador →</a>
+  </div>
+  <div class="hero-pills">
+    <span class="pill">30% commission per referral</span>
+    <span class="pill">Open to all Nigerian campuses</span>
+    <span class="pill">No experience needed</span>
+    <span class="pill">Earn from your phone</span>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section>
+  <div class="container section-center">
+    <span class="section-label">How it works</span>
+    <h2>Simple. Rewarding. Flexible.</h2>
+    <p class="section-lead">No targets. No pressure. Just share SkillStack with students on your campus and earn every time someone enrols through your link.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Apply below</h3>
+        <p>Fill in the short application form. We review every submission and respond within 48 hours.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Get your referral link</h3>
+        <p>Once approved, you receive a unique referral link. Every student who signs up through it is tracked to you.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Share on campus</h3>
+        <p>Post in WhatsApp groups, tell your coursemates, share on your social media. There is no script — just be yourself.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <h3>Earn 30% commission</h3>
+        <p>For every student who pays and enrols through your link, you earn 30% of their subscription. Paid directly to you.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EARNINGS -->
+<section class="earnings-section">
+  <div class="container section-center">
+    <span class="section-label">Your earning potential</span>
+    <h2>Real income. From your campus.</h2>
+    <p class="section-lead" style="color:rgba(255,255,255,0.65);">SkillStack NG costs ₦5,000 per month. You earn ₦1,500 for every student who enrols through your link. Here is what that looks like.</p>
+    <div class="earnings-grid">
+      <div class="earning-card">
+        <div class="scenario">Starter</div>
+        <div class="referrals">5</div>
+        <div class="referrals-label">students referred per month</div>
+        <div class="income">₦7,500</div>
+        <div class="income-label">earned per month</div>
+      </div>
+      <div class="earning-card">
+        <div class="scenario">Active</div>
+        <div class="referrals">20</div>
+        <div class="referrals-label">students referred per month</div>
+        <div class="income">₦30,000</div>
+        <div class="income-label">earned per month</div>
+      </div>
+      <div class="earning-card">
+        <div class="scenario">Top Ambassador</div>
+        <div class="referrals">50</div>
+        <div class="referrals-label">students referred per month</div>
+        <div class="income">₦75,000</div>
+        <div class="income-label">earned per month</div>
+      </div>
+    </div>
+    <p class="earning-note">Commissions are paid monthly. No cap on how much you can earn.</p>
+  </div>
+</section>
+
+<!-- WHAT YOU DO -->
+<section>
+  <div class="container section-center">
+    <span class="section-label">Your role</span>
+    <h2>What campus ambassadors actually do</h2>
+    <p class="section-lead">There is no rigid job description. Your role is to make SkillStack visible on your campus — in a way that feels natural to you.</p>
+    <div class="duties-grid">
+      <div class="duty-card">
+        <div class="duty-icon">📱</div>
+        <h3>Share in student communities</h3>
+        <p>Post your referral link in WhatsApp groups, departmental chats, and student forums. Share when it feels relevant — not as spam.</p>
+      </div>
+      <div class="duty-card">
+        <div class="duty-icon">🗣️</div>
+        <h3>Tell your coursemates</h3>
+        <p>Word of mouth is the most powerful form of marketing. If you believe in what SkillStack teaches, just tell people about it.</p>
+      </div>
+      <div class="duty-card">
+        <div class="duty-icon">📣</div>
+        <h3>Post on your own platforms</h3>
+        <p>Share on your personal Instagram, Twitter, TikTok, or status. Your followers trust you — that trust converts.</p>
+      </div>
+      <div class="duty-card">
+        <div class="duty-icon">🎯</div>
+        <h3>Identify interested students</h3>
+        <p>Talk to students who are asking about side income, digital skills, or freelancing. SkillStack is a direct answer to those questions.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO SHOULD APPLY -->
+<section style="background: var(--off-white);">
+  <div class="container section-center">
+    <span class="section-label">Who should apply</span>
+    <h2>You are a good fit if...</h2>
+    <p class="section-lead">We are not looking for marketing experience. We are looking for students who are connected, trusted, and genuinely interested in helping their peers build skills.</p>
+    <ul class="qualify-list">
+      <li>You are a current student at any Nigerian university, polytechnic, or college</li>
+      <li>You are active in at least one WhatsApp group, department group, or student community</li>
+      <li>You are interested in earning income from your phone without a 9-to-5</li>
+      <li>You believe practical skills matter more than just a degree</li>
+      <li>You are a class rep, course rep, student leader, or community organiser</li>
+      <li>You are already learning a digital skill or want to start</li>
+    </ul>
+  </div>
+</section>
+
+<!-- APPLICATION FORM -->
+<section class="form-section" id="apply">
+  <div class="container section-center">
+    <span class="section-label">Apply now</span>
+    <h2>Become a Campus Ambassador</h2>
+    <p class="section-lead">Applications take less than 3 minutes. We review every submission and respond within 48 hours.</p>
+    <div class="form-card">
+      <div id="ambassadorForm">
+        <h3>Ambassador Application</h3>
+        <p class="form-lead">Fill in your details below. Once approved, we will send your referral link and onboarding information directly to your WhatsApp.</p>
+
+        <div class="form-group">
+          <label>Full name *</label>
+          <input type="text" id="fieldName" placeholder="Your full name"/>
+        </div>
+        <div class="form-group">
+          <label>WhatsApp number *</label>
+          <input type="tel" id="fieldPhone" placeholder="e.g. 08012345678"/>
+        </div>
+        <div class="form-group">
+          <label>Email address *</label>
+          <input type="email" id="fieldEmail" placeholder="your@email.com"/>
+        </div>
+        <div class="form-group">
+          <label>University / Institution *</label>
+          <input type="text" id="fieldSchool" placeholder="e.g. University of Lagos"/>
+        </div>
+        <div class="form-group">
+          <label>Department / Course of study *</label>
+          <input type="text" id="fieldDepartment" placeholder="e.g. Mass Communication, 300 level"/>
+        </div>
+        <div class="form-group">
+          <label>State *</label>
+          <select id="fieldState">
+            <option value="">Select your state</option>
+            <option>Abia</option><option>Adamawa</option><option>Akwa Ibom</option>
+            <option>Anambra</option><option>Bauchi</option><option>Bayelsa</option>
+            <option>Benue</option><option>Borno</option><option>Cross River</option>
+            <option>Delta</option><option>Ebonyi</option><option>Edo</option>
+            <option>Ekiti</option><option>Enugu</option><option>FCT — Abuja</option>
+            <option>Gombe</option><option>Imo</option><option>Jigawa</option>
+            <option>Kaduna</option><option>Kano</option><option>Katsina</option>
+            <option>Kebbi</option><option>Kogi</option><option>Kwara</option>
+            <option>Lagos</option><option>Nasarawa</option><option>Niger</option>
+            <option>Ogun</option><option>Ondo</option><option>Osun</option>
+            <option>Oyo</option><option>Plateau</option><option>Rivers</option>
+            <option>Sokoto</option><option>Taraba</option><option>Yobe</option>
+            <option>Zamfara</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>How do you plan to share SkillStack on your campus? *</label>
+          <textarea id="fieldPlan" placeholder="e.g. I run the departmental WhatsApp group for 200 students and also post on my Instagram (4,000 followers)..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Which SkillStack track interests you most? *</label>
+          <select id="fieldTrack">
+            <option value="">Select a track</option>
+            <option>Copywriting & Persuasion</option>
+            <option>Social Media Management</option>
+            <option>Content Writing</option>
+            <option>Digital Marketing Fundamentals</option>
+          </select>
+        </div>
+
+        <button class="form-submit" onclick="submitAmbassador()" id="submitBtn">Submit application →</button>
+        <p class="form-note">We respond to every application within 48 hours on WhatsApp.</p>
+      </div>
+
+      <div class="form-success" id="formSuccess">
+        <div class="check">✅</div>
+        <h3>Application received!</h3>
+        <p>Thank you for applying. We will review your application and get back to you within 48 hours on WhatsApp. Keep an eye on your messages.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section>
+  <div class="container section-center">
+    <span class="section-label">Questions</span>
+    <h2>Frequently asked questions</h2>
+    <div class="faq-list">
+      <details>
+        <summary>How much do I earn per referral?</summary>
+        <p>You earn 30% of every subscription paid by a student you refer. SkillStack NG costs ₦5,000 per month — so you earn ₦1,500 for every monthly subscription. If a student pays the full 90-day plan (₦13,000), you earn ₦3,900 from that one referral.</p>
+      </details>
+      <details>
+        <summary>When and how do I get paid?</summary>
+        <p>Commissions are calculated monthly and paid directly to your bank account or via transfer. You will receive a payment summary showing exactly how many referrals converted and your total earnings for the month.</p>
+      </details>
+      <details>
+        <summary>Do I need to be a SkillStack subscriber myself?</summary>
+        <p>No — but we strongly recommend it. Ambassadors who are learning on the platform themselves are far more convincing when they talk about it. If you enrol, you can speak from experience, which converts far better than just sharing a link.</p>
+      </details>
+      <details>
+        <summary>Is there a minimum number of referrals required?</summary>
+        <p>No minimum. Whether you refer 2 students or 200, you earn on every single one. There is no pressure and no target you need to hit to stay in the programme.</p>
+      </details>
+      <details>
+        <summary>Can students from any Nigerian institution apply?</summary>
+        <p>Yes. We welcome ambassadors from universities, polytechnics, colleges of education, and any other accredited Nigerian institution. All campuses, all states.</p>
+      </details>
+      <details>
+        <summary>What happens after I apply?</summary>
+        <p>We review your application within 48 hours and send you a WhatsApp message with your approval, your unique referral link, and a short onboarding guide on how to start sharing effectively.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>SkillStack NG is operated by Amaris Synergy Limited, Lagos, Nigeria.</p>
+  <p style="margin-top:8px;">
+    <a href="/">Home</a> ·
+    <a href="/privacy">Privacy Policy</a> ·
+    <a href="/terms">Terms of Service</a> ·
+    <a href="mailto:hello@skillstackng.com">hello@skillstackng.com</a>
+  </p>
+</footer>
+
+<script>
+  async function submitAmbassador() {
+    const name     = document.getElementById('fieldName').value.trim();
+    const phone    = document.getElementById('fieldPhone').value.trim();
+    const email    = document.getElementById('fieldEmail').value.trim();
+    const school   = document.getElementById('fieldSchool').value.trim();
+    const dept     = document.getElementById('fieldDepartment').value.trim();
+    const state    = document.getElementById('fieldState').value;
+    const plan     = document.getElementById('fieldPlan').value.trim();
+    const track    = document.getElementById('fieldTrack').value;
+
+    if (!name || !phone || !email || !school || !dept || !state || !plan || !track) {
+      alert('Please fill in all fields before submitting.');
+      return;
+    }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
+
+    try {
+      await fetch('/ambassador-apply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, phone, email, school, department: dept, state, plan, track })
+      });
+    } catch(e) { /* fail silently */ }
+
+    document.getElementById('ambassadorForm').style.display = 'none';
+    document.getElementById('formSuccess').style.display = 'block';
+  }
+</script>
+
+</body>
+</html>
