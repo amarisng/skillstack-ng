@@ -721,6 +721,9 @@ app.get('/content-writing', (req, res) => {
 app.get('/ambassador', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'ambassador.html'));
 });
+app.get('/demo-video', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'demo-video.html'));
+});
 app.get('/ambassador-kit', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'ambassador-kit.html'));
 });
