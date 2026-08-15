@@ -190,10 +190,11 @@ if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
 
     // Send correct payment links based on selected track
     const isSMM = sub.track === 'social_media_management';
-const isCW = sub.track === 'content_writing';
-const monthlyLink = isSMM ? 'https://paystack.shop/pay/p1kkgoo91-' : isCW ? 'https://paystack.shop/pay/yn75oepjbw' : 'https://paystack.shop/pay/2-h3igsfd2';
-const fullLink = isSMM ? 'https://paystack.shop/pay/ok8zxwq28f' : isCW ? 'https://paystack.shop/pay/6gz2f87ft4' : 'https://paystack.shop/pay/m0m9ofipj4';
-const fullPrice = isSMM ? '9,000 for 60 days (save 1,000)' : isCW ? '13,000 for 90 days (save 2,000)' : '13,000 for 90 days (save 2,000)';
+    const isCW = sub.track === 'content_writing';
+    const isDM = sub.track === 'digital_marketing';
+    const monthlyLink = isSMM ? 'https://paystack.shop/pay/p1kkgoo91-' : isCW ? 'https://paystack.shop/pay/yn75oepjbw' : isDM ? 'PAYSTACK_DM_MONTHLY' : 'https://paystack.shop/pay/2-h3igsfd2';
+    const fullLink = isSMM ? 'https://paystack.shop/pay/ok8zxwq28f' : isCW ? 'https://paystack.shop/pay/6gz2f87ft4' : isDM ? 'PAYSTACK_DM_FULL' : 'https://paystack.shop/pay/m0m9ofipj4';
+    const fullPrice = isSMM ? '9,000 for 60 days (save 1,000)' : isCW ? '13,000 for 90 days (save 2,000)' : isDM ? '13,000 for 90 days (save 2,000)' : '13,000 for 90 days (save 2,000)';
 
     await sendMessage(cleanPhone, 'Perfect ' + sub.name + '! Your lesson will arrive Monday to Friday at ' + message.toUpperCase() + '.\n\nTo activate your subscription pay here:\n\nMonthly — ₦5,000/month:\n' + monthlyLink + '\n\nFull plan — ₦' + fullPrice + ':\n' + fullLink + '\n\nMake sure to enter this WhatsApp number in the payment form.');
     return;
