@@ -261,7 +261,7 @@ if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
     return;
   }
 
-  await sendMessage(cleanPhone, 'Welcome back! Reply 1 for Copywriting, 2 for Social Media Management or 3 for Content Writing to get started.');
+  await sendMessage(cleanPhone, 'Welcome back! Reply 1 for Copywriting, 2 for Social Media Management, 3 for Content Writing or 4 for Digital Marketing to get started.');
 }
 
 app.post('/paystack-webhook', async (req, res) => {
