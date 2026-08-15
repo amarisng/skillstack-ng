@@ -184,26 +184,16 @@
     }
     .learn-more:hover { text-decoration: underline; }
 
-    /* COMING SOON CARDS */
-    .coming-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px; margin-bottom: 48px;
-    }
-    .coming-card {
-      background: #fff; border: 1px solid var(--border);
-      border-radius: 16px; padding: 24px; opacity: 0.85;
-    }
-    .coming-card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 6px; }
-    .coming-card p { font-size: 0.8rem; color: var(--muted); line-height: 1.55; margin-bottom: 16px; }
     .waitlist-btn {
       display: block; width: 100%; text-align: center;
-      border: 1px solid var(--border); color: var(--muted);
-      padding: 10px; border-radius: 8px;
-      font-size: 0.8rem; font-weight: 600;
+      border: 2px solid var(--green); color: var(--green);
+      padding: 12px; border-radius: 10px;
+      font-size: 0.85rem; font-weight: 700;
       background: none; cursor: pointer; font-family: inherit;
-      transition: border-color 0.15s, color 0.15s;
+      margin-top: 16px;
+      transition: background 0.15s;
     }
-    .waitlist-btn:hover { border-color: var(--green); color: var(--green); }
+    .waitlist-btn:hover { background: rgba(0,196,140,0.08); }
     .demand-badge { display: inline-block; font-size: 0.68rem; font-weight: 700; color: var(--gold); margin-bottom: 10px; }
 
     /* HOW IT WORKS STRIP */
@@ -406,7 +396,8 @@
       </div>
     </div>
 
-  <div class="track-card live">
+    <!-- DIGITAL MARKETING -->
+    <div class="track-card live">
       <div class="track-header">
         <span class="track-badge badge-live">✦ Live now</span>
         <h2>Digital Marketing Fundamentals</h2>
@@ -433,11 +424,39 @@
       </div>
     </div>
 
-  </div>
+    <!-- SALES & LEAD GENERATION -->
+    <div class="track-card">
+      <div class="track-header">
+        <span class="track-badge badge-soon">Coming soon</span>
+        <h2>Sales & Lead Generation</h2>
+        <p>Build pipelines, close deals, and generate consistent leads for Nigerian businesses.</p>
+        <div class="track-meta">
+          <span><strong>90 days</strong></span>
+          <span><strong>★★★ HIGH DEMAND</strong></span>
+        </div>
+      </div>
+      <div class="track-body">
+        <button class="waitlist-btn" onclick="openWaitlist('Sales & Lead Generation')">Join waitlist →</button>
+      </div>
+    </div>
+
+    <!-- FREELANCING -->
+    <div class="track-card">
+      <div class="track-header">
+        <span class="track-badge badge-soon">Coming soon</span>
+        <h2>Freelancing & Getting Online Clients</h2>
+        <p>Find clients, set your rates, pitch confidently, and build a sustainable freelance income from Nigeria.</p>
+        <div class="track-meta">
+          <span><strong>90 days</strong></span>
+          <span><strong>★★★ HIGH DEMAND</strong></span>
+        </div>
+      </div>
+      <div class="track-body">
+        <button class="waitlist-btn" onclick="openWaitlist('Freelancing & Getting Online Clients')">Join waitlist →</button>
+      </div>
+    </div>
 
   </div>
-
-  
 
   <!-- REASSURANCE -->
   <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:28px 32px;text-align:center;">
@@ -450,34 +469,6 @@
   </div>
 
 </div>
-
-    <div class="track-card">
-      <span class="track-badge badge-soon">Coming soon</span>
-      <h2>Sales & Lead Generation</h2>
-      <p>Build pipelines, close deals, and generate consistent leads for Nigerian businesses.</p>
-      <div class="track-meta">
-        <span><strong>90 days</strong></span>
-        <span><strong>★★★ HIGH DEMAND</strong></span>
-      </div>
-      <div class="track-body" style="margin-top:16px;">
-        <button class="waitlist-btn" onclick="openWaitlist('Sales & Lead Generation')" style="width:100%;padding:12px;background:transparent;border:2px solid var(--green);color:var(--green);border-radius:10px;font-weight:700;cursor:pointer;">Join waitlist →</button>
-      </div>
-    </div>
-
-    <div class="track-card">
-      <span class="track-badge badge-soon">Coming soon</span>
-      <h2>Freelancing & Getting Online Clients</h2>
-      <p>Find clients, set your rates, pitch confidently, and build a sustainable freelance income from Nigeria.</p>
-      <div class="track-meta">
-        <span><strong>90 days</strong></span>
-        <span><strong>★★★ HIGH DEMAND</strong></span>
-      </div>
-      <div class="track-body" style="margin-top:16px;">
-        <button class="waitlist-btn" onclick="openWaitlist('Freelancing & Getting Online Clients')" style="width:100%;padding:12px;background:transparent;border:2px solid var(--green);color:var(--green);border-radius:10px;font-weight:700;cursor:pointer;">Join waitlist →</button>
-      </div>
-    </div>
-
-  </div>
 
 <!-- WAITLIST MODAL -->
 <div class="modal-overlay" id="modalOverlay" onclick="closeWaitlistOnOverlay(event)">
