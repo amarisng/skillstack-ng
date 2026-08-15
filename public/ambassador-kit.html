@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ambassador Resource Kit — SkillStack NG</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green: #00C48C;
+      --green-dark: #009e72;
+      --dark: #0D1F17;
+      --white: #FFFFFF;
+      --off-white: #F7FAF8;
+      --text: #1A2E1F;
+      --muted: #5A7A65;
+      --border: #D8EAE0;
+      --gold: #F5A623;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--off-white); color: var(--text);
+    }
+    .kit { max-width: 900px; margin: 0 auto; padding: 48px 24px 80px; }
+    h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; color: var(--dark); }
+    .subtitle { font-size: 0.95rem; color: var(--muted); margin-bottom: 48px; line-height: 1.6; }
+    .kit-section { margin-bottom: 52px; }
+    .kit-section h2 {
+      font-size: 1rem; font-weight: 800; color: var(--dark);
+      margin-bottom: 16px; padding-bottom: 10px;
+      border-bottom: 2px solid var(--green);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .copy-block {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px;
+      margin-bottom: 12px; position: relative;
+    }
+    .copy-block-label {
+      font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--green); margin-bottom: 10px;
+    }
+    .copy-block p, .copy-block pre {
+      font-size: 0.88rem; color: var(--text); line-height: 1.7;
+      white-space: pre-wrap; font-family: inherit;
+    }
+    .copy-btn {
+      position: absolute; top: 14px; right: 14px;
+      background: var(--green); color: var(--dark);
+      border: none; border-radius: 6px; padding: 5px 12px;
+      font-size: 0.72rem; font-weight: 700; cursor: pointer;
+      font-family: inherit; transition: background 0.15s;
+    }
+    .copy-btn:hover { background: var(--green-dark); }
+    .copy-btn.copied { background: var(--dark); color: #fff; }
+
+    /* BANNERS */
+    .banners-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+    .banner-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+    }
+    .banner-preview { width: 100%; display: block; }
+    .banner-footer {
+      padding: 14px 16px; display: flex;
+      align-items: center; justify-content: space-between;
+    }
+    .banner-name { font-size: 0.8rem; font-weight: 700; color: var(--text); }
+    .banner-size { font-size: 0.7rem; color: var(--muted); }
+    .download-btn {
+      background: var(--green); color: var(--dark);
+      border: none; border-radius: 6px; padding: 6px 14px;
+      font-size: 0.75rem; font-weight: 700; cursor: pointer;
+      text-decoration: none; display: inline-block;
+      font-family: inherit;
+    }
+    .download-btn:hover { background: var(--green-dark); }
+  </style>
+</head>
+<body>
+<div class="kit">
+  <h1>🎒 Your Ambassador Resource Kit</h1>
+  <p class="subtitle">Everything you need to start promoting SkillStack NG on your campus. Copy the messages, download the banners, and start sharing today. All links go to skillstackng.com — your referral code is automatically tracked.</p>
+
+  <!-- WHATSAPP MESSAGES -->
+  <div class="kit-section">
+    <h2>📱 WhatsApp Messages</h2>
+
+    <div class="copy-block">
+      <div class="copy-block-label">Message 1 — Simple and direct</div>
+      <pre>Guys, I just found something worth sharing.
+
+SkillStack NG teaches practical skills — copywriting, social media management, content writing, digital marketing — directly on WhatsApp. 15 minutes a day. Nigerian examples. AI feedback on every task.
+
+₦5,000/month. Cancel anytime.
+
+Check it out: skillstackng.com</pre>
+      <button class="copy-btn" onclick="copyText(this)">Copy</button>
+    </div>
+
+    <div class="copy-block">
+      <div class="copy-block-label">Message 2 — Income focused</div>
+      <pre>If you've been looking for a way to earn while still in school, this might be it.
+
+SkillStack NG teaches you the exact skills Nigerian businesses are paying for right now — copywriting, social media management, content writing, digital marketing.
+
+You learn on WhatsApp. 15 minutes a day. AI coach gives you feedback daily.
+
+Most students who finish the 90-day track are earning from their skill within 60 days.
+
+Start at ₦5,000/month: skillstackng.com</pre>
+      <button class="copy-btn" onclick="copyText(this)">Copy</button>
+    </div>
+
+    <div class="copy-block">
+      <div class="copy-block-label">Message 3 — Casual / personal</div>
+      <pre>Bro/sis I have to tell you about this thing I found.
+
+It's called SkillStack NG. You pick a skill — copywriting, social media, content writing, digital marketing — and they send you lessons on WhatsApp every morning. 15 minutes. You reply with your task and get AI feedback immediately.
+
+₦5,000 a month. Worth it.
+
+skillstackng.com — check it out</pre>
+      <button class="copy-btn" onclick="copyText(this)">Copy</button>
+    </div>
+
+    <div class="copy-block">
+      <div class="copy-block-label">Message 4 — For department/class group</div>
+      <pre>Good morning everyone 🌅
+
+Quick one — a lot of us are trying to build income or skills before graduation. I came across SkillStack NG and wanted to share it with the group.
+
+It's a WhatsApp-based learning platform. You pick one skill track (copywriting, social media, content writing, or digital marketing), and you get one lesson every weekday — 15 minutes. You practice, you get AI feedback, you build the skill.
+
+₦5,000/month. No app, no laptop needed.
+
+Link: skillstackng.com</pre>
+      <button class="copy-btn" onclick="copyText(this)">Copy</button>
+    </div>
+  </div>
+
+  <!-- INSTAGRAM / STATUS CAPTIONS -->
+  <div class="kit-section">
+    <h2>📸 Instagram & WhatsApp Status Captions</h2>
+
+    <div class="copy-block">
+      <div class="copy-block-label">Caption 1 — Story/status</div>
+      <pre>15 minutes a day.
+One skill.
+One lesson on WhatsApp every morning.
+AI feedback on every task you submit.
+
+This is how Nigerian students are building copywriting, social media, content writing and digital marketing skills before graduation.
+
+skillstackng.com ✅</pre>
+      <button class="copy-btn" onclick="copyText(this)">Copy</button>
+    </div>
+
+    <div class="copy-block">
+      <div class="copy-block-label">Caption 2 — Feed post</div>
+      <pre>Your degree teaches you what to know.
+SkillStack NG teaches you what to earn with.
+
+Copywriting. Social media management. Content writing. Digital marketing.
+
+All delivered to your WhatsApp. 15 minutes a day. Nigerian examples. AI feedback daily.
+
+₦5,000/month. Start at skillstackng.com 🔗
+
+#SkillStackNG #NigerianStudents #DigitalSkills #FreelancingNigeria #LearnOnWhatsApp</pre>
+      <button class="copy-btn" onclick="copyText(this)">Copy</button>
+    </div>
+
+    <div class="copy-block">
+      <div class="copy-block-label">Caption 3 — Short and punchy</div>
+      <pre>Skills that pay.
+Delivered to your WhatsApp.
+15 minutes a day.
+
+skillstackng.com
+
+#SkillStackNG #NigerianYouth #LearnAndEarn</pre>
+      <button class="copy-btn" onclick="copyText(this)">Copy</button>
+    </div>
+
+    <div class="copy-block">
+      <div class="copy-block-label">Caption 4 — Problem/solution</div>
+      <pre>The problem isn't that Nigerian graduates can't find jobs.
+
+The problem is that most graduates finish school with zero skill that a business is willing to pay for immediately.
+
+SkillStack NG fixes that.
+
+Practical skills — copywriting, social media, content writing, digital marketing — delivered to your WhatsApp. 15 minutes a day. AI feedback on every task.
+
+Start before you graduate: skillstackng.com
+
+#SkillStackNG #NigerianGraduates #DigitalSkillsNigeria</pre>
+      <button class="copy-btn" onclick="copyText(this)">Copy</button>
+    </div>
+  </div>
+
+  <!-- TWITTER/X POSTS -->
+  <div class="kit-section">
+    <h2>🐦 Twitter / X Posts</h2>
+
+    <div class="copy-block">
+      <div class="copy-block-label">Tweet 1</div>
+      <pre>Nigerian students — SkillStack NG sends you one skill lesson on WhatsApp every weekday. 15 minutes. AI feedback daily.
+
+Copywriting. Social media. Content writing. Digital marketing.
+
+₦5,000/month. skillstackng.com</pre>
+      <button class="copy-btn" onclick="copyText(this)">Copy</button>
+    </div>
+
+    <div class="copy-block">
+      <div class="copy-block-label">Tweet 2</div>
+      <pre>Your degree won't teach you how to write copy, manage social media or run digital campaigns.
+
+SkillStack NG will. On WhatsApp. 15 minutes a day.
+
+skillstackng.com</pre>
+      <button class="copy-btn" onclick="copyText(this)">Copy</button>
+    </div>
+
+    <div class="copy-block">
+      <div class="copy-block-label">Tweet 3 — Thread opener</div>
+      <pre>Nigerian students who are building income before graduation are doing one thing most people ignore:
+
+They are learning a skill that businesses will pay for immediately.
+
+Here is what that looks like in 2026 👇</pre>
+      <button class="copy-btn" onclick="copyText(this)">Copy</button>
+    </div>
+  </div>
+
+  <!-- VERBAL PITCH -->
+  <div class="kit-section">
+    <h2>🗣️ Verbal Pitch (say this out loud)</h2>
+
+    <div class="copy-block">
+      <div class="copy-block-label">30-second version</div>
+      <pre>Have you heard of SkillStack NG? It's a WhatsApp-based learning platform that teaches practical skills — things like copywriting, social media management, content writing and digital marketing. Every morning you get a lesson on WhatsApp, you do a short task, and an AI coach gives you personal feedback. It's 15 minutes a day and costs ₦5,000 a month. The whole point is that by the end of 90 days, you have a real skill you can earn with. Check it out at skillstackng.com.</pre>
+      <button class="copy-btn" onclick="copyText(this)">Copy</button>
+    </div>
+
+    <div class="copy-block">
+      <div class="copy-block-label">One-liner (for quick mentions)</div>
+      <pre>SkillStack NG teaches you practical digital skills on WhatsApp — 15 minutes a day, AI feedback, ₦5,000 a month. skillstackng.com.</pre>
+      <button class="copy-btn" onclick="copyText(this)">Copy</button>
+    </div>
+  </div>
+
+  <!-- DOWNLOADABLE BANNERS -->
+  <div class="kit-section">
+    <h2>🖼️ Downloadable Banners</h2>
+    <p style="font-size:0.85rem;color:var(--muted);margin-bottom:24px;line-height:1.6;">Save these banners and share them on WhatsApp status, Instagram stories, or any platform. Each one links to skillstackng.com.</p>
+    <div class="banners-grid" id="bannersGrid"></div>
+  </div>
+
+</div>
+
+<script>
+function copyText(btn) {
+  const block = btn.closest('.copy-block');
+  const text = block.querySelector('pre, p').innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+// Generate banners as SVG data URIs and render download cards
+const banners = [
+  { name: 'WhatsApp Status', size: '1080 × 1920', id: 'story' },
+  { name: 'Square Post', size: '1080 × 1080', id: 'square' },
+  { name: 'Landscape Banner', size: '1200 × 628', id: 'landscape' },
+  { name: 'WhatsApp Flyer', size: '800 × 800', id: 'flyer' },
+];
+
+function makeSVG(type) {
+  const green = '#00C48C';
+  const dark = '#0D1F17';
+  const white = '#FFFFFF';
+  const gold = '#F5A623';
+
+  if (type === 'story') {
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="1080" height="1920">
+      <rect width="1080" height="1920" fill="${dark}"/>
+      <rect width="1080" height="8" y="0" fill="${green}"/>
+      <rect width="1080" height="8" y="1912" fill="${green}"/>
+      <circle cx="540" cy="340" r="260" fill="${green}" opacity="0.08"/>
+      <circle cx="540" cy="340" r="180" fill="${green}" opacity="0.12"/>
+      <text x="540" y="260" font-family="Arial Black, Arial" font-weight="900" font-size="120" fill="${green}" text-anchor="middle">S</text>
+      <text x="540" y="380" font-family="Arial Black, Arial" font-weight="900" font-size="52" fill="${white}" text-anchor="middle">SkillStack NG</text>
+      <rect x="340" y="480" width="400" height="3" fill="${green}" opacity="0.4"/>
+      <text x="540" y="620" font-family="Arial, sans-serif" font-weight="700" font-size="72" fill="${white}" text-anchor="middle">Learn a skill</text>
+      <text x="540" y="710" font-family="Arial, sans-serif" font-weight="700" font-size="72" fill="${white}" text-anchor="middle">that pays.</text>
+      <text x="540" y="830" font-family="Arial, sans-serif" font-size="44" fill="rgba(255,255,255,0.6)" text-anchor="middle">On WhatsApp. 15 minutes a day.</text>
+      <text x="540" y="900" font-family="Arial, sans-serif" font-size="44" fill="rgba(255,255,255,0.6)" text-anchor="middle">AI feedback on every task.</text>
+      <rect x="190" y="1000" width="700" height="180" rx="24" fill="${green}"/>
+      <text x="540" y="1085" font-family="Arial Black, Arial" font-weight="900" font-size="52" fill="${dark}" text-anchor="middle">Copywriting</text>
+      <text x="540" y="1150" font-family="Arial, sans-serif" font-size="38" fill="${dark}" text-anchor="middle">Social Media · Content Writing · Digital Marketing</text>
+      <rect x="190" y="1240" width="700" height="140" rx="20" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
+      <text x="540" y="1305" font-family="Arial, sans-serif" font-weight="700" font-size="40" fill="${white}" text-anchor="middle">₦5,000 / month</text>
+      <text x="540" y="1355" font-family="Arial, sans-serif" font-size="32" fill="rgba(255,255,255,0.5)" text-anchor="middle">Cancel anytime · No app needed</text>
+      <text x="540" y="1560" font-family="Arial Black, Arial" font-weight="900" font-size="64" fill="${green}" text-anchor="middle">skillstackng.com</text>
+      <text x="540" y="1640" font-family="Arial, sans-serif" font-size="36" fill="rgba(255,255,255,0.4)" text-anchor="middle">Start today. Learn on WhatsApp.</text>
+      <rect x="390" y="1720" width="300" height="60" rx="30" fill="${green}" opacity="0.15"/>
+      <text x="540" y="1760" font-family="Arial, sans-serif" font-weight="700" font-size="32" fill="${green}" text-anchor="middle">🇳🇬 Built for Nigerians</text>
+    </svg>`;
+  }
+
+  if (type === 'square') {
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080">
+      <rect width="1080" height="1080" fill="${dark}"/>
+      <rect width="1080" height="6" fill="${green}"/>
+      <rect width="6" height="1080" fill="${green}"/>
+      <rect x="1074" width="6" height="1080" fill="${green}"/>
+      <rect y="1074" width="1080" height="6" fill="${green}"/>
+      <circle cx="900" cy="180" r="200" fill="${green}" opacity="0.06"/>
+      <circle cx="180" cy="900" r="150" fill="${green}" opacity="0.06"/>
+      <text x="80" y="160" font-family="Arial Black, Arial" font-weight="900" font-size="48" fill="${green}">SkillStack NG</text>
+      <rect x="80" y="185" width="240" height="4" fill="${green}"/>
+      <text x="80" y="320" font-family="Arial Black, Arial" font-weight="900" font-size="96" fill="${white}">Learn a</text>
+      <text x="80" y="430" font-family="Arial Black, Arial" font-weight="900" font-size="96" fill="${white}">skill that</text>
+      <text x="80" y="540" font-family="Arial Black, Arial" font-weight="900" font-size="96" fill="${green}">pays.</text>
+      <text x="80" y="630" font-family="Arial, sans-serif" font-size="38" fill="rgba(255,255,255,0.6)">On WhatsApp. 15 minutes a day.</text>
+      <text x="80" y="680" font-family="Arial, sans-serif" font-size="38" fill="rgba(255,255,255,0.6)">AI feedback on every task you submit.</text>
+      <rect x="80" y="740" width="920" height="2" fill="rgba(255,255,255,0.1)"/>
+      <text x="80" y="820" font-family="Arial, sans-serif" font-weight="700" font-size="36" fill="rgba(255,255,255,0.7)">Copywriting · Social Media · Content Writing · Digital Marketing</text>
+      <rect x="80" y="870" width="440" height="110" rx="16" fill="${green}"/>
+      <text x="300" y="930" font-family="Arial Black, Arial" font-weight="900" font-size="42" fill="${dark}" text-anchor="middle">₦5,000/month</text>
+      <text x="300" y="965" font-family="Arial, sans-serif" font-size="28" fill="${dark}" text-anchor="middle">Cancel anytime</text>
+      <text x="880" y="940" font-family="Arial Black, Arial" font-weight="900" font-size="40" fill="${green}" text-anchor="middle">skillstackng.com</text>
+    </svg>`;
+  }
+
+  if (type === 'landscape') {
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 628" width="1200" height="628">
+      <rect width="1200" height="628" fill="${dark}"/>
+      <rect width="1200" height="5" fill="${green}"/>
+      <rect width="1200" height="5" y="623" fill="${green}"/>
+      <rect width="400" height="628" x="800" fill="${green}" opacity="0.06"/>
+      <circle cx="1000" cy="314" r="220" fill="${green}" opacity="0.1"/>
+      <text x="900" y="290" font-family="Arial Black, Arial" font-weight="900" font-size="110" fill="${green}" text-anchor="middle" opacity="0.3">S</text>
+      <text x="60" y="100" font-family="Arial Black, Arial" font-weight="900" font-size="36" fill="${green}">SkillStack NG</text>
+      <text x="60" y="210" font-family="Arial Black, Arial" font-weight="900" font-size="80" fill="${white}">Learn a skill</text>
+      <text x="60" y="300" font-family="Arial Black, Arial" font-weight="900" font-size="80" fill="${green}">that pays.</text>
+      <text x="60" y="375" font-family="Arial, sans-serif" font-size="30" fill="rgba(255,255,255,0.6)">On WhatsApp · 15 minutes a day · AI feedback on every task</text>
+      <text x="60" y="435" font-family="Arial, sans-serif" font-size="28" fill="rgba(255,255,255,0.5)">Copywriting · Social Media Management · Content Writing · Digital Marketing</text>
+      <rect x="60" y="480" width="280" height="80" rx="12" fill="${green}"/>
+      <text x="200" y="527" font-family="Arial Black, Arial" font-weight="900" font-size="32" fill="${dark}" text-anchor="middle">₦5,000/month</text>
+      <text x="200" y="553" font-family="Arial, sans-serif" font-size="22" fill="${dark}" text-anchor="middle">Cancel anytime</text>
+      <text x="400" y="527" font-family="Arial Black, Arial" font-weight="900" font-size="30" fill="${white}">skillstackng.com</text>
+    </svg>`;
+  }
+
+  if (type === 'flyer') {
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="800" height="800">
+      <rect width="800" height="800" fill="${dark}"/>
+      <rect width="800" height="800" fill="none" stroke="${green}" stroke-width="8"/>
+      <rect y="0" width="800" height="120" fill="${green}"/>
+      <text x="400" y="58" font-family="Arial Black, Arial" font-weight="900" font-size="40" fill="${dark}" text-anchor="middle">SkillStack NG</text>
+      <text x="400" y="100" font-family="Arial, sans-serif" font-size="24" fill="${dark}" text-anchor="middle">Practical Skills · Delivered on WhatsApp</text>
+      <text x="400" y="230" font-family="Arial Black, Arial" font-weight="900" font-size="66" fill="${white}" text-anchor="middle">Learn a skill.</text>
+      <text x="400" y="306" font-family="Arial Black, Arial" font-weight="900" font-size="66" fill="${green}" text-anchor="middle">Earn from it.</text>
+      <rect x="60" y="350" width="680" height="2" fill="rgba(255,255,255,0.1)"/>
+      <text x="400" y="410" font-family="Arial, sans-serif" font-size="28" fill="rgba(255,255,255,0.7)" text-anchor="middle">✦ Copywriting &amp; Persuasion</text>
+      <text x="400" y="455" font-family="Arial, sans-serif" font-size="28" fill="rgba(255,255,255,0.7)" text-anchor="middle">✦ Social Media Management</text>
+      <text x="400" y="500" font-family="Arial, sans-serif" font-size="28" fill="rgba(255,255,255,0.7)" text-anchor="middle">✦ Content Writing</text>
+      <text x="400" y="545" font-family="Arial, sans-serif" font-size="28" fill="rgba(255,255,255,0.7)" text-anchor="middle">✦ Digital Marketing Fundamentals</text>
+      <rect x="60" y="580" width="680" height="2" fill="rgba(255,255,255,0.1)"/>
+      <text x="400" y="640" font-family="Arial, sans-serif" font-size="26" fill="rgba(255,255,255,0.5)" text-anchor="middle">15 minutes a day · AI feedback daily · No app needed</text>
+      <rect x="200" y="670" width="400" height="80" rx="16" fill="${green}"/>
+      <text x="400" y="716" font-family="Arial Black, Arial" font-weight="900" font-size="34" fill="${dark}" text-anchor="middle">Start at ₦5,000/month</text>
+      <text x="400" y="748" font-family="Arial, sans-serif" font-size="24" fill="${dark}" text-anchor="middle">skillstackng.com</text>
+    </svg>`;
+  }
+}
+
+const grid = document.getElementById('bannersGrid');
+banners.forEach(b => {
+  const svgContent = makeSVG(b.id);
+  const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+  const url = URL.createObjectURL(blob);
+
+  // Preview as inline SVG scaled down
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(svgContent, 'image/svg+xml');
+  const svgEl = doc.documentElement;
+  svgEl.setAttribute('width', '100%');
+  svgEl.setAttribute('height', 'auto');
+  svgEl.style.display = 'block';
+
+  const card = document.createElement('div');
+  card.className = 'banner-card';
+
+  const preview = document.createElement('div');
+  preview.style.background = '#0D1F17';
+  preview.style.padding = '8px';
+  preview.appendChild(svgEl);
+
+  const footer = document.createElement('div');
+  footer.className = 'banner-footer';
+  footer.innerHTML = `
+    <div>
+      <div class="banner-name">${b.name}</div>
+      <div class="banner-size">${b.size} · SVG</div>
+    </div>
+    <a href="${url}" download="SkillStack-${b.id}.svg" class="download-btn">Download</a>
+  `;
+
+  card.appendChild(preview);
+  card.appendChild(footer);
+  grid.appendChild(card);
+});
+</script>
+</body>
+</html>
