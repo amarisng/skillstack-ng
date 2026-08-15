@@ -160,7 +160,7 @@ async function handleOnboarding(phone, message) {
 // Allow inactive subscribers to correct their track before payment
 if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
   await supabase.from('subscribers').update({ track: 'copywriting', name: '' }).eq('phone', cleanPhone);
-  await sendMessage(cleanPhone, 'No problem! Let\'s start over.\n\nChoose your track:\n\n1️⃣ Copywriting & Persuasion — 90 days\n2️⃣ Social Media Management — 60 days\n\nReply 1 or 2.');
+ await sendMessage(cleanPhone, 'No problem! Let\'s start over.\n\nChoose your track:\n\n1️⃣ Copywriting & Persuasion — 90 days\n2️⃣ Social Media Management — 60 days\n3️⃣ Content Writing — 90 days\n4️⃣ Digital Marketing Fundamentals — 90 days\n\nReply 1, 2, 3 or 4.');
   return;
 }
   // Handle track selection
