@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SkillStack NG — Full Journey Demo</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green: #00C48C;
+      --dark: #0D1F17;
+      --white: #FFFFFF;
+      --wa-bg: #E5DDD5;
+      --wa-header: #075E54;
+      --wa-received: #ffffff;
+      --wa-sent: #DCF8C6;
+    }
+    html, body {
+      width: 100%; height: 100%;
+      background: #111;
+      display: flex; align-items: center; justify-content: center;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      overflow: hidden;
+    }
+
+    /* ── SCENE WRAPPER ── */
+    .scene {
+      width: 360px;
+      position: relative;
+    }
+
+    /* ── PHONE SHELL ── */
+    .phone {
+      width: 360px;
+      background: #1A1A2E;
+      border-radius: 40px;
+      border: 7px solid #2A2A40;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* status bar */
+    .status-bar {
+      background: var(--wa-header);
+      padding: 8px 16px 0;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .status-bar .time { font-size: 0.68rem; font-weight: 700; color: #fff; }
+    .status-bar .icons { font-size: 0.65rem; color: #fff; display: flex; gap: 5px; align-items: center; }
+
+    /* wa header */
+    .wa-header {
+      background: var(--wa-header);
+      padding: 8px 14px 12px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .back-arrow { color: #fff; font-size: 1rem; opacity: 0.9; }
+    .wa-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--green);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 0.72rem; color: var(--dark);
+      flex-shrink: 0;
+    }
+    .wa-name { font-size: 0.88rem; font-weight: 700; color: #fff; }
+    .wa-status { font-size: 0.65rem; color: rgba(255,255,255,0.75); }
+
+    /* ── SCREENS ── */
+    .screen { display: none; flex-direction: column; }
+    .screen.active { display: flex; }
+
+    /* LANDING SCREEN */
+    .landing-screen {
+      background: var(--dark);
+      min-height: 520px;
+      padding: 0;
+      overflow: hidden;
+    }
+    .landing-nav {
+      background: rgba(13,31,23,0.97);
+      padding: 12px 16px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .landing-logo { font-weight: 900; font-size: 0.9rem; color: #fff; }
+    .landing-logo span { color: var(--green); }
+    .landing-btn {
+      background: var(--green); color: var(--dark);
+      padding: 5px 12px; border-radius: 6px;
+      font-weight: 800; font-size: 0.68rem;
+    }
+    .landing-hero {
+      padding: 24px 16px;
+      text-align: center;
+    }
+    .landing-eyebrow {
+      display: inline-block;
+      background: rgba(0,196,140,0.15);
+      border: 1px solid rgba(0,196,140,0.3);
+      color: var(--green);
+      font-size: 0.58rem; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      border-radius: 20px; padding: 3px 10px; margin-bottom: 12px;
+    }
+    .landing-h1 {
+      font-size: 1.3rem; font-weight: 900; color: #fff;
+      line-height: 1.2; margin-bottom: 10px;
+    }
+    .landing-h1 em { color: var(--green); font-style: normal; }
+    .landing-lead {
+      font-size: 0.72rem; color: rgba(255,255,255,0.65);
+      line-height: 1.6; margin-bottom: 20px;
+    }
+    .landing-cta {
+      display: inline-block;
+      background: var(--green); color: var(--dark);
+      padding: 10px 24px; border-radius: 8px;
+      font-weight: 900; font-size: 0.82rem;
+      margin-bottom: 16px;
+    }
+    .landing-tracks {
+      display: flex; flex-direction: column; gap: 6px; margin-top: 16px;
+    }
+    .track-pill {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px; padding: 8px 12px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .track-pill .track-name { font-size: 0.72rem; font-weight: 700; color: #fff; }
+    .track-pill .track-badge {
+      background: var(--green); color: var(--dark);
+      font-size: 0.58rem; font-weight: 700;
+      border-radius: 4px; padding: 2px 6px;
+    }
+
+    /* PAYSTACK SCREEN */
+    .pay-screen {
+      background: #f5f5f5;
+      min-height: 520px;
+    }
+    .pay-header {
+      background: #00457C;
+      padding: 12px 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .pay-header span { color: #fff; font-size: 0.78rem; font-weight: 700; }
+    .pay-body { padding: 16px; }
+    .pay-amount-card {
+      background: #fff; border-radius: 10px;
+      padding: 14px; margin-bottom: 12px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .pay-to { font-size: 0.68rem; color: #666; margin-bottom: 4px; }
+    .pay-amount { font-size: 1.6rem; font-weight: 900; color: #222; }
+    .pay-desc { font-size: 0.65rem; color: #888; margin-top: 2px; }
+    .pay-form { background: #fff; border-radius: 10px; padding: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .pay-field { margin-bottom: 10px; }
+    .pay-field label { font-size: 0.62rem; color: #666; font-weight: 600; display: block; margin-bottom: 3px; }
+    .pay-field .field-val {
+      border: 1px solid #ddd; border-radius: 6px;
+      padding: 8px 10px; font-size: 0.72rem; color: #222;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .pay-submit {
+      width: 100%; background: #00457C; color: #fff;
+      border: none; border-radius: 8px; padding: 12px;
+      font-size: 0.82rem; font-weight: 800; margin-top: 8px;
+      text-align: center;
+    }
+    .pay-secure { font-size: 0.6rem; color: #999; text-align: center; margin-top: 6px; }
+
+    /* SUCCESS SCREEN */
+    .success-screen {
+      background: #fff;
+      min-height: 520px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 32px 20px; text-align: center;
+    }
+    .success-icon { font-size: 4rem; margin-bottom: 16px; }
+    .success-title { font-size: 1.1rem; font-weight: 900; color: #222; margin-bottom: 8px; }
+    .success-sub { font-size: 0.78rem; color: #666; line-height: 1.6; margin-bottom: 20px; }
+    .success-wa-btn {
+      background: #25D366; color: #fff;
+      padding: 12px 24px; border-radius: 10px;
+      font-weight: 800; font-size: 0.82rem;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    /* WHATSAPP CHAT SCREEN */
+    .chat-screen { flex-direction: column; }
+    .chat-body {
+      background: var(--wa-bg);
+      min-height: 440px; max-height: 440px;
+      padding: 10px 9px;
+      display: flex; flex-direction: column; gap: 6px;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+    }
+    .chat-body::-webkit-scrollbar { display: none; }
+
+    .day-divider {
+      text-align: center; margin: 6px 0;
+    }
+    .day-divider span {
+      background: rgba(0,0,0,0.18);
+      color: #fff; font-size: 0.6rem;
+      border-radius: 10px; padding: 3px 10px;
+    }
+
+    .bubble {
+      max-width: 84%;
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 0.73rem;
+      line-height: 1.5;
+      color: #111;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+    .bubble.show { opacity: 1; transform: translateY(0); }
+    .bubble.received {
+      background: var(--wa-received);
+      border-radius: 10px 10px 10px 2px;
+      align-self: flex-start;
+    }
+    .bubble.sent {
+      background: var(--wa-sent);
+      border-radius: 10px 10px 2px 10px;
+      align-self: flex-end;
+    }
+    .bubble-tag {
+      display: inline-block;
+      background: rgba(7,94,84,0.1);
+      color: #075E54;
+      font-size: 0.58rem; font-weight: 700;
+      border-radius: 3px; padding: 1px 5px;
+      margin-bottom: 4px;
+    }
+    .btime {
+      font-size: 0.58rem; color: #999;
+      text-align: right; margin-top: 3px;
+      display: flex; justify-content: flex-end; align-items: center; gap: 3px;
+    }
+    .ticks { color: #53BDEB; }
+
+    .typing {
+      background: var(--wa-received);
+      border-radius: 10px 10px 10px 2px;
+      padding: 9px 12px;
+      align-self: flex-start;
+      display: none; gap: 4px; align-items: center;
+      width: fit-content;
+    }
+    .typing.show { display: flex; }
+    .typing span {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #999;
+      animation: dot 1.2s infinite;
+    }
+    .typing span:nth-child(2) { animation-delay: 0.2s; }
+    .typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes dot {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-4px); }
+    }
+
+    /* typing in input bar simulation */
+    .chat-input {
+      background: #F0F0F0;
+      padding: 7px 9px;
+      display: flex; align-items: center; gap: 7px;
+    }
+    .input-field {
+      flex: 1; background: #fff;
+      border-radius: 20px; padding: 7px 12px;
+      font-size: 0.72rem; color: #555;
+      min-height: 32px;
+      display: flex; align-items: center;
+    }
+    .send-btn {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--wa-header);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 0.82rem; flex-shrink: 0;
+    }
+
+    /* restart button */
+    .restart-btn {
+      position: absolute; bottom: -48px; left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff; border-radius: 20px; padding: 7px 20px;
+      font-size: 0.72rem; font-weight: 600; cursor: pointer;
+      white-space: nowrap;
+    }
+    .restart-btn:hover { background: rgba(255,255,255,0.2); }
+
+    /* cursor blink for typing sim */
+    .cursor { display: inline-block; width: 1px; height: 12px; background: #333; animation: blink 0.7s infinite; vertical-align: middle; margin-left: 1px; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+  </style>
+</head>
+<body>
+
+<div class="scene">
+  <div class="phone" id="phone">
+
+    <!-- ══ SCREEN 1: LANDING PAGE ══ -->
+    <div class="screen active" id="screenLanding">
+      <div class="status-bar">
+        <span class="time">8:47 AM</span>
+        <div class="icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
+      </div>
+      <div class="landing-screen">
+        <div class="landing-nav">
+          <div class="landing-logo">Skill<span>Stack</span> NG</div>
+          <div class="landing-btn">Start →</div>
+        </div>
+        <div class="landing-hero">
+          <div class="landing-eyebrow">Now open · 4 tracks live</div>
+          <div class="landing-h1">Learn a high-income skill<br>in 90 days. <em>On WhatsApp.</em></div>
+          <div class="landing-lead">One lesson every weekday. 15 minutes. AI feedback on every task. No app. Just your phone.</div>
+          <div class="landing-cta">Start for ₦5,000/month →</div>
+          <div class="landing-tracks">
+            <div class="track-pill"><span class="track-name">✦ Copywriting & Persuasion</span><span class="track-badge">Live now</span></div>
+            <div class="track-pill"><span class="track-name">✦ Social Media Management</span><span class="track-badge">Live now</span></div>
+            <div class="track-pill"><span class="track-name">✦ Content Writing</span><span class="track-badge">Live now</span></div>
+            <div class="track-pill"><span class="track-name">✦ Digital Marketing</span><span class="track-badge">Live now</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN 2: PAYSTACK ══ -->
+    <div class="screen" id="screenPay">
+      <div class="status-bar" style="background:#00457C;">
+        <span class="time">8:49 AM</span>
+        <div class="icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
+      </div>
+      <div class="pay-screen">
+        <div class="pay-header">
+          <span>🔒 paystack.shop</span>
+        </div>
+        <div class="pay-body">
+          <div class="pay-amount-card">
+            <div class="pay-to">Pay SkillStack NG</div>
+            <div class="pay-amount">₦5,000</div>
+            <div class="pay-desc">Copywriting & Persuasion — Monthly Plan</div>
+          </div>
+          <div class="pay-form">
+            <div class="pay-field">
+              <label>EMAIL ADDRESS</label>
+              <div class="field-val">amaka@gmail.com</div>
+            </div>
+            <div class="pay-field">
+              <label>WHATSAPP NUMBER</label>
+              <div class="field-val">08031234567</div>
+            </div>
+            <div class="pay-field">
+              <label>CARD NUMBER</label>
+              <div class="field-val">4084 0840 8408 4084 <span style="color:#999;font-size:0.65rem;">✓</span></div>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <div class="pay-field" style="flex:1">
+                <label>EXPIRY</label>
+                <div class="field-val">12/26</div>
+              </div>
+              <div class="pay-field" style="flex:1">
+                <label>CVV</label>
+                <div class="field-val">•••</div>
+              </div>
+            </div>
+            <div class="pay-submit" id="payBtn">Pay ₦5,000</div>
+            <div class="pay-secure">🔒 Secured by Paystack</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN 3: PAYMENT SUCCESS ══ -->
+    <div class="screen" id="screenSuccess">
+      <div class="status-bar" style="background:#00457C;">
+        <span class="time">8:50 AM</span>
+        <div class="icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
+      </div>
+      <div class="success-screen">
+        <div class="success-icon">✅</div>
+        <div class="success-title">Payment Successful!</div>
+        <div class="success-sub">Your SkillStack NG subscription is now active. Send a WhatsApp message to start your first lesson.</div>
+        <div class="success-wa-btn">📲 Open WhatsApp to activate</div>
+      </div>
+    </div>
+
+    <!-- ══ SCREEN 4: WHATSAPP CHAT ══ -->
+    <div class="screen" id="screenChat">
+      <div class="status-bar">
+        <span class="time" id="chatTime">8:51 AM</span>
+        <div class="icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
+      </div>
+      <div class="wa-header">
+        <span class="back-arrow">←</span>
+        <div class="wa-avatar">SN</div>
+        <div>
+          <div class="wa-name">SkillStack NG</div>
+          <div class="wa-status">online</div>
+        </div>
+      </div>
+
+      <div class="chat-body" id="chatBody">
+        <!-- messages injected by JS -->
+      </div>
+
+      <div class="chat-input">
+        <div class="input-field" id="inputField">Type a message...</div>
+        <div class="send-btn">➤</div>
+      </div>
+    </div>
+
+  </div><!-- /phone -->
+
+  <button class="restart-btn" onclick="restartDemo()">↺ Replay</button>
+</div>
+
+<script>
+// ─── TIMING CONFIG ───────────────────────────────────────────
+const SCREEN_DURATION = 3500;   // how long each non-chat screen shows (ms)
+const MSG_INTERVAL    = 4500;   // gap between messages in chat (ms)
+const TYPING_DURATION = 1800;   // how long typing indicator shows (ms)
+
+// ─── MESSAGE SEQUENCE ────────────────────────────────────────
+// type: 'divider' | 'received' | 'sent' | 'typing'
+const messages = [
+
+  // ONBOARDING
+  { type: 'divider', text: 'TODAY' },
+  { type: 'received', time: '8:51 AM', tag: null,
+    text: `Welcome to SkillStack NG! 🎓\n\nWe deliver high-income skill lessons to your WhatsApp every weekday — 15 minutes a day, AI feedback on every task.\n\nChoose your track:\n\n1️⃣ Copywriting & Persuasion — 90 days\n2️⃣ Social Media Management — 60 days\n3️⃣ Content Writing — 90 days\n4️⃣ Digital Marketing Fundamentals — 90 days\n\nReply 1, 2, 3 or 4 to get started.` },
+  { type: 'sent', time: '8:51 AM', text: '1' },
+  { type: 'received', time: '8:51 AM', text: `Great choice! 🎯 Copywriting & Persuasion — 90 days.\n\nWhat's your first name?` },
+  { type: 'sent', time: '8:52 AM', text: 'Amaka' },
+  { type: 'received', time: '8:52 AM', text: `Nice to meet you, Amaka! 👋\n\nWhat time would you like your daily lesson?\n\n1️⃣ 7:00 AM\n2️⃣ 8:00 AM\n3️⃣ 12:00 PM\n4️⃣ 6:00 PM` },
+  { type: 'sent', time: '8:52 AM', text: '1' },
+  { type: 'received', time: '8:52 AM', text: `Perfect! Your lessons will arrive at 7:00 AM every weekday. 🌅\n\nYour payment is confirmed. Your first lesson arrives tomorrow morning.\n\nGet ready, Amaka — 90 days from now, you will be earning from this skill. 💪` },
+
+  // DAY 1
+  { type: 'divider', text: 'DAY 1 — MONDAY' },
+  { type: 'received', time: '7:01 AM', tag: '📚 DAY 1 OF 90 — COPYWRITING TRACK',
+    text: `What Is Copywriting?\n\n[CONTEXT]\nCopywriting is everywhere in Nigeria — every SMS from your bank, every billboard on the Lagos-Ibadan expressway, every ad on Instagram. Someone wrote all of it. That person is a copywriter.\n\n[CONCEPT]\nCopy has one job: to make someone take action. Buy. Click. Call. Sign up. Every word either moves the reader toward that action or pulls them away. Nothing is neutral.\n\nCopywriting is different from content writing. Content builds trust over time. Copy makes something happen right now.\n\n[NIGERIAN EXAMPLE]\nWhen GTBank sends you "Your account has been credited with ₦50,000" — that is not copywriting. When they send "Earn 15% interest on your savings this December — only 48 hours left" — that is copywriting. One informs. One moves.\n\n[TASK]\nWrite two versions of the same offer for a Lagos hair salon. Version A: content (builds trust). Version B: copy (drives immediate action). Send both here.` },
+  { type: 'sent', time: '7:18 AM', text: `Version A (content): "At GlowUp Salon in Lekki, we specialise in natural hair care using products that protect your hair's health. Our stylists have 10+ years of experience with all hair types.\"\n\nVersion B (copy): "Your natural hair deserves better. Book at GlowUp Salon today and get 20% off — only 5 slots left this weekend. DM now before they're gone."` },
+  { type: 'received', time: '7:18 AM', tag: '🤖 AI COACH FEEDBACK',
+    text: `✅ Strong: Your copy version nails the core principle — scarcity ("5 slots left") + urgency ("this weekend") + a clear action ("DM now"). That combination works every time.\n\n⚠️ Improve: Version A reads like a CV, not content. Real content marketing tells a story or teaches something. Try: "Here is why most Lagos hair salons damage natural hair without knowing it — and what we do differently."\n\n💡 Pro tip: In copy, specificity is everything. "5 slots" beats "limited slots". "20% off your first silk press" beats "20% off". The more specific, the more believable.` },
+
+  // DAY 2
+  { type: 'divider', text: 'DAY 2 — TUESDAY' },
+  { type: 'received', time: '7:00 AM', tag: '📚 DAY 2 OF 90 — COPYWRITING TRACK',
+    text: `The One Reader Rule\n\n[CONCEPT]\nMost Nigerian brands write copy for "everyone." That is why most Nigerian copy sounds lifeless — it is trying not to exclude anyone, so it connects with no one.\n\nThe One Reader Rule: before writing a single word, describe one specific person. Not "young Nigerians." Not "women aged 25–35." One person with a name, a job, a frustration, and a goal.\n\n[NIGERIAN EXAMPLE]\n"Tola, 29, works in a bank in VI. Spends ₦8,000 on lunch every month because she has no time to cook. Worried about her savings. Wants to feel in control of her money but doesn't know where to start."\n\nEvery word of your copy should feel like it was written for Tola specifically. When Tola reads it, she should think: "This was written for me."\n\n[TASK]\nPick any Nigerian product or service you use. Write a One Reader profile for their ideal customer — name, job, city, one fear, one desire. Then write one opening line of copy that speaks directly to that person.` },
+  { type: 'sent', time: '7:22 AM', text: `Product: Piggyvest\n\nReader: Chidi, 26, software developer in Abuja. Earns ₦280k/month but always broke by the 20th. Afraid he'll never save enough to move out of his parents' house. Wants to feel like an adult who has his finances together.\n\nOpening line: "You earn well. So why does your account always look like this by the 20th? Piggyvest locks your savings before you can spend them — automatically."` },
+  { type: 'received', time: '7:23 AM', tag: '🤖 AI COACH FEEDBACK',
+    text: `✅ Strong: "Always broke by the 20th" — that is a felt truth for thousands of Nigerian earners. You named the embarrassment without being preachy. That is advanced copy instinct for Day 2.\n\n⚠️ Improve: "Feel like an adult" is close but slightly vague. Push it: "Finally feel in control of money you actually worked for." More specific, more powerful.\n\n💡 Pro tip: The best copy reads like the brand has been watching you. "Your account by the 20th" is surveillance-level specificity. That uncomfortable recognition is exactly what makes people stop scrolling.` },
+
+  // DAY 3
+  { type: 'divider', text: 'DAY 3 — WEDNESDAY' },
+  { type: 'received', time: '7:00 AM', tag: '📚 DAY 3 OF 90 — COPYWRITING TRACK',
+    text: `Headlines That Stop Scrolls\n\n[CONCEPT]\nYour headline is the first and most important line of any copy. If it fails, nothing else gets read — not your price, not your offer, not your beautiful design. The headline's only job is to make them read the next line.\n\nFour headline formulas that work for Nigerian audiences:\n\n1. The Bold Claim: "This is why your Instagram ads are wasting money"\n2. The Curiosity Gap: "What most Lagos entrepreneurs get completely wrong about pricing"\n3. The Direct Benefit: "Write copy that converts — in 15 minutes a day"\n4. The Fear Trigger: "The one mistake killing your Nigerian e-commerce store"\n\n[TASK]\nWrite 3 headlines for a Nigerian business of your choice — one using each of the first three formulas. Label each clearly.` },
+  { type: 'sent', time: '7:19 AM', text: `Business: A Lagos-based online food delivery startup\n\nBold Claim: "Why your food delivery business is losing repeat customers every week"\n\nCuriosity Gap: "What the fastest-growing food delivery brands in Lagos do differently before 9am"\n\nDirect Benefit: "Get more repeat food orders without spending more on ads — starting this week"` },
+  { type: 'received', time: '7:20 AM', tag: '🤖 AI COACH FEEDBACK',
+    text: `✅ Strong: All three use the formulas correctly. Your Bold Claim creates immediate relevance — any food delivery owner reads "losing repeat customers" and feels seen. The Direct Benefit is specific and promise-heavy without being vague.\n\n⚠️ Improve: The Curiosity Gap is good but "before 9am" feels forced. Try: "What successful Lagos food delivery brands do that their customers never notice — but always remember."\n\n💡 Pro tip: Test your headlines on yourself. If you would not stop scrolling for it, neither will your reader. "Losing customers every week" creates urgency. That is why it works.` },
+
+  // DAY 4
+  { type: 'divider', text: 'DAY 4 — THURSDAY' },
+  { type: 'received', time: '7:00 AM', tag: '📚 DAY 4 OF 90 — COPYWRITING TRACK',
+    text: `The Fear Flip\n\n[CONCEPT]\nMost Nigerian buyers don't buy because of what they want. They buy because of what they're afraid of losing.\n\nA mother doesn't buy a school supplies bundle because she wants her child to learn. She buys because she's afraid her child will fall behind.\n\nThe Fear Flip: Find the fear underneath the desire. Write to that fear first. Then show your product as the escape.\n\nDesire: "I want to earn more money"\nFear: "I'm afraid I'll still be in the same place 2 years from now"\n\nDesire copy: "Learn a skill that pays in Nigeria"\nFear copy: "In 12 months, you will either have this skill or still be wondering why you didn't start today"\n\n[TASK]\nPick a Nigerian product. Write a desire-based opening line and a fear-based opening line for the same product. Label both clearly.` },
+  { type: 'sent', time: '7:16 AM', text: `Product: SkillStack NG itself\n\nDesire: "Learn copywriting on WhatsApp — 15 minutes a day, 90 days, AI feedback daily."\n\nFear: "In 90 days, the people who started SkillStack NG today will be pitching clients. The people who didn't will still be scrolling job boards."` },
+  { type: 'received', time: '7:17 AM', tag: '🤖 AI COACH FEEDBACK',
+    text: `✅ Strong: The fear version is genuinely good. "Still scrolling job boards" is a painful, specific image. It creates comparison anxiety — one of the most powerful motivators in copy. Well done.\n\n⚠️ Improve: The desire version is accurate but flat. Try adding specificity: "Learn copywriting that earns you ₦50k–₦300k per month — on WhatsApp, 15 minutes a day." A number makes the desire real.\n\n💡 Pro tip: You are now writing copy for a copywriting course using copy techniques from that course. That meta-awareness — that your skills apply immediately to your own situation — is the mark of someone who is genuinely learning, not just completing tasks.` },
+
+  // DAY 5
+  { type: 'divider', text: 'DAY 5 — FRIDAY' },
+  { type: 'received', time: '7:00 AM', tag: '📚 DAY 5 OF 90 — COPYWRITING TRACK',
+    text: `Social Proof — The Most Powerful Copy Element\n\n[CONCEPT]\nIn Nigeria, trust is everything. Customers have been burned by too many fake products, delayed deliveries, and empty promises. That is why social proof is the most powerful element in Nigerian copywriting.\n\nSocial proof tells your customer: "Other people like you have already done this and it worked."\n\nTypes of social proof:\n• Testimonials: real customers, real results, real names\n• Numbers: "4,200 Nigerian freelancers trained"\n• Authority: "As featured in TechCabal and Nairametrics"\n• Specificity: "Adaeze from Enugu earned her first ₦80,000 client 3 weeks after completing the course"\n\nThe rule: specific social proof beats generic social proof every time. "Students love us!" means nothing. "Tunde from Ibadan landed a ₦200,000 social media retainer on Day 62" means everything.\n\n[TASK]\nWrite 2 pieces of social proof for a Nigerian brand of your choice — one generic (how most brands do it) and one specific (how it should actually be done). Label clearly.` },
+  { type: 'sent', time: '7:21 AM', text: `Brand: A Nigerian online real estate platform\n\nGeneric: "Thousands of Nigerians trust us to find their dream homes. Join our happy customers today!"\n\nSpecific: "Emeka from Lekki found and verified a 3-bedroom flat in Ajah in 4 days using our platform — after 3 months of searching offline with no results. He paid ₦1.8 million and moved in within the week."` },
+  { type: 'received', time: '7:22 AM', tag: '🤖 AI COACH FEEDBACK',
+    text: `✅ Excellent: The specific version is portfolio-quality work. You hit every element — a real name, a real location, a real timeline, a real amount, and a before/after contrast (3 months offline vs 4 days online). That is textbook social proof.\n\n⚠️ Minor: "Dream homes" in the generic version is a cliché that actually weakens trust. Real estate copy that uses that phrase signals to Nigerian buyers that nobody thought carefully about this message.\n\n💡 Week 1 complete! In 5 days you have learned: what copywriting is, the One Reader Rule, headline formulas, the Fear Flip, and social proof. You are already writing better than most Nigerian brand accounts. Week 2 starts Monday — we go deeper into persuasion psychology. Have a great weekend, Amaka. 🎉` },
+
+];
+
+// ─── STATE ───────────────────────────────────────────────────
+let step = 0;
+let chatStep = 0;
+let chatTimer = null;
+let typingEl = null;
+
+// ─── SCREEN TRANSITIONS ──────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ─── TYPING SIMULATION IN INPUT BAR ─────────────────────────
+function simulateTyping(text, callback) {
+  const field = document.getElementById('inputField');
+  field.textContent = '';
+  let i = 0;
+  // Only show first 40 chars to keep it snappy
+  const display = text.length > 40 ? text.substring(0, 40) + '...' : text;
+  const interval = setInterval(() => {
+    field.textContent = display.substring(0, i) + '|';
+    i++;
+    if (i > display.length) {
+      clearInterval(interval);
+      field.textContent = 'Type a message...';
+      if (callback) callback();
+    }
+  }, 30);
+}
+
+// ─── ADD MESSAGE TO CHAT ─────────────────────────────────────
+function addMessage(msg) {
+  const chat = document.getElementById('chatBody');
+
+  if (msg.type === 'divider') {
+    const d = document.createElement('div');
+    d.className = 'day-divider';
+    d.innerHTML = `<span>${msg.text}</span>`;
+    chat.appendChild(d);
+    chat.scrollTop = chat.scrollHeight;
+    return;
+  }
+
+  if (msg.type === 'received') {
+    // Show typing first
+    const t = document.createElement('div');
+    t.className = 'typing show';
+    t.innerHTML = '<span></span><span></span><span></span>';
+    chat.appendChild(t);
+    chat.scrollTop = chat.scrollHeight;
+
+    setTimeout(() => {
+      t.remove();
+      const b = document.createElement('div');
+      b.className = 'bubble received';
+      b.innerHTML = (msg.tag ? `<div class="bubble-tag">${msg.tag}</div><br/>` : '') +
+        msg.text.replace(/\n/g, '<br>') +
+        `<div class="btime">${msg.time}</div>`;
+      chat.appendChild(b);
+      requestAnimationFrame(() => b.classList.add('show'));
+      chat.scrollTop = chat.scrollHeight;
+    }, TYPING_DURATION);
+    return;
+  }
+
+  if (msg.type === 'sent') {
+    // Simulate typing in input bar
+    simulateTyping(msg.text, () => {
+      const b = document.createElement('div');
+      b.className = 'bubble sent';
+      b.innerHTML = msg.text.replace(/\n/g, '<br>') +
+        `<div class="btime">${msg.time} <span class="ticks">✓✓</span></div>`;
+      chat.appendChild(b);
+      requestAnimationFrame(() => b.classList.add('show'));
+      chat.scrollTop = chat.scrollHeight;
+    });
+  }
+}
+
+// ─── MAIN SEQUENCE ───────────────────────────────────────────
+function runSequence() {
+
+  // Phase 1 — Landing page (already shown)
+  setTimeout(() => {
+
+    // Phase 2 — Paystack
+    showScreen('screenPay');
+
+    setTimeout(() => {
+      // Animate pay button
+      const btn = document.getElementById('payBtn');
+      btn.textContent = 'Processing...';
+      btn.style.background = '#0069a3';
+
+      setTimeout(() => {
+
+        // Phase 3 — Success
+        showScreen('screenSuccess');
+
+        setTimeout(() => {
+
+          // Phase 4 — WhatsApp chat
+          showScreen('screenChat');
+          runChat();
+
+        }, SCREEN_DURATION);
+      }, 1500);
+    }, SCREEN_DURATION);
+
+  }, SCREEN_DURATION);
+}
+
+function runChat() {
+  chatStep = 0;
+  nextChatMessage();
+}
+
+function nextChatMessage() {
+  if (chatStep >= messages.length) return;
+
+  const msg = messages[chatStep];
+  chatStep++;
+
+  // For received messages add TYPING_DURATION to the wait
+  const wait = msg.type === 'received' ? TYPING_DURATION + 400 : 600;
+
+  addMessage(msg);
+
+  setTimeout(() => {
+    chatTimer = setTimeout(nextChatMessage, MSG_INTERVAL);
+  }, wait);
+}
+
+// ─── RESTART ─────────────────────────────────────────────────
+function restartDemo() {
+  if (chatTimer) clearTimeout(chatTimer);
+  document.getElementById('chatBody').innerHTML = '';
+  document.getElementById('inputField').textContent = 'Type a message...';
+  document.getElementById('payBtn').textContent = 'Pay ₦5,000';
+  document.getElementById('payBtn').style.background = '#00457C';
+  showScreen('screenLanding');
+  step = 0;
+  chatStep = 0;
+  setTimeout(runSequence, 1000);
+}
+
+// ─── START ───────────────────────────────────────────────────
+setTimeout(runSequence, SCREEN_DURATION);
+
+</script>
+</body>
+</html>
