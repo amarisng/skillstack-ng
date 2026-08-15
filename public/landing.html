@@ -277,6 +277,10 @@
       display: grid; grid-template-columns: repeat(2, 1fr);
       gap: 12px; margin-top: 40px;
     }
+    @media (max-width: 680px) {
+      .rates-grid { grid-template-columns: 1fr 1fr; }
+      div[style*="grid-template-columns:1fr 1fr"] { grid-template-columns: 1fr !important; }
+    }
     .rate-card {
       background: var(--off-white);
       border: 1px solid var(--border);
