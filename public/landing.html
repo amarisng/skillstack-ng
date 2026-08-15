@@ -644,6 +644,126 @@
   </div>
 </section>
 
+<!-- LIVE DEMO — dark -->
+<section style="background:linear-gradient(135deg,#0D1F17 0%,#0A2218 100%);padding:72px 24px;">
+  <div style="max-width:900px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;">
+    <div>
+      <span style="display:inline-block;background:rgba(0,196,140,0.15);border:1px solid rgba(0,196,140,0.3);color:#00C48C;font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;border-radius:20px;padding:4px 14px;margin-bottom:16px;">Live demo</span>
+      <h2 style="font-size:clamp(1.6rem,4vw,2.2rem);font-weight:800;color:#fff;line-height:1.2;margin-bottom:14px;">See exactly what lands on your WhatsApp.</h2>
+      <p style="font-size:1rem;color:rgba(255,255,255,0.65);line-height:1.7;margin-bottom:28px;">This is the real experience — from payment to Day 5. Watch a lesson arrive, see a task submitted, and get AI feedback. Playing automatically.</p>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;">
+        <li style="display:flex;align-items:center;gap:10px;font-size:0.88rem;color:rgba(255,255,255,0.75);"><span style="color:#00C48C;font-weight:900;">✓</span> Real lesson content from the Copywriting track</li>
+        <li style="display:flex;align-items:center;gap:10px;font-size:0.88rem;color:rgba(255,255,255,0.75);"><span style="color:#00C48C;font-weight:900;">✓</span> Real task submitted by a learner</li>
+        <li style="display:flex;align-items:center;gap:10px;font-size:0.88rem;color:rgba(255,255,255,0.75);"><span style="color:#00C48C;font-weight:900;">✓</span> Real AI coach feedback — specific, personal, actionable</li>
+        <li style="display:flex;align-items:center;gap:10px;font-size:0.88rem;color:rgba(255,255,255,0.75);"><span style="color:#00C48C;font-weight:900;">✓</span> This is what you get every weekday for 90 days</li>
+      </ul>
+    </div>
+    <div style="display:flex;justify-content:center;">
+      <div style="width:280px;background:#1A1A2E;border-radius:36px;border:6px solid #2A2A40;box-shadow:0 32px 80px rgba(0,0,0,0.6);overflow:hidden;">
+        <div style="background:#075E54;padding:7px 14px 0;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:0.62rem;font-weight:700;color:#fff;">9:01 AM</span>
+          <span style="font-size:0.6rem;color:#fff;">●●● 🔋</span>
+        </div>
+        <div style="background:#075E54;padding:7px 12px 10px;display:flex;align-items:center;gap:8px;">
+          <span style="color:#fff;font-size:0.9rem;">←</span>
+          <div style="width:28px;height:28px;border-radius:50%;background:#00C48C;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:0.62rem;color:#0D1F17;flex-shrink:0;">SN</div>
+          <div><div style="font-size:0.78rem;font-weight:700;color:#fff;">SkillStack NG</div><div style="font-size:0.58rem;color:rgba(255,255,255,0.75);">online</div></div>
+        </div>
+        <div style="background:#E5DDD5;min-height:380px;max-height:380px;padding:9px 8px;display:flex;flex-direction:column;gap:5px;overflow:hidden;" id="ldChatBody"></div>
+        <div style="background:#F0F0F0;padding:6px 8px;display:flex;align-items:center;gap:6px;">
+          <div style="flex:1;background:#fff;border-radius:20px;padding:6px 10px;font-size:0.65rem;color:#999;" id="ldInputField">Type a message...</div>
+          <div style="width:28px;height:28px;border-radius:50%;background:#075E54;display:flex;align-items:center;justify-content:center;color:#fff;font-size:0.75rem;">➤</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function(){
+  var msgs = [
+    {t:'r', time:'9:01 AM', tag:'📚 DAY 1 OF 90 — COPYWRITING', text:'<strong>What Is Copywriting?</strong><br><br>Copywriting is everywhere in Nigeria — every SMS from your bank, every Instagram ad, every billboard on the Lagos-Ibadan expressway.<br><br>Copy has one job: make someone take action. Buy. Click. Call. Sign up.<br><br><strong>Nigerian example:</strong> When GTBank sends "Your account has been credited" — that is not copy. When they send "Earn 15% interest this December — only 48 hours left" — that is copy.<br><br>📝 <strong>Task:</strong> Write two versions for a Lagos hair salon — Version A: content. Version B: copy. Send both here.'},
+    {t:'s', time:'9:18 AM', text:'Version A (content): "At GlowUp Salon in Lekki, we specialise in natural hair care with products that protect your hair\'s health."<br><br>Version B (copy): "Your natural hair deserves better. Book today — 20% off, only 5 slots left this weekend. DM now."'},
+    {t:'r', time:'9:18 AM', tag:'🤖 AI COACH FEEDBACK', text:'✅ <strong>Strong:</strong> Your copy nails it — scarcity + urgency + clear action. That combination works every time.<br><br>⚠️ <strong>Improve:</strong> Version A reads like a CV. Real content tells a story.<br><br>💡 <strong>Pro tip:</strong> Specificity is everything. "5 slots" beats "limited slots". "20% off your first silk press" beats "20% off".'},
+    {t:'div', text:'DAY 2'},
+    {t:'r', time:'7:00 AM', tag:'📚 DAY 2 OF 90 — COPYWRITING', text:'<strong>The One Reader Rule</strong><br><br>Most Nigerian brands write copy for "everyone." That is why most Nigerian copy sounds lifeless.<br><br>Before writing a single word, describe one specific person. Not "young Nigerians." One person with a name, a job, a frustration, and a goal.<br><br>📝 <strong>Task:</strong> Pick any Nigerian product. Write a one-reader profile then write one opening line of copy for that person.'},
+    {t:'s', time:'7:22 AM', text:'Product: Piggyvest<br><br>Reader: Chidi, 26, developer in Abuja. Earns ₦280k/month but always broke by the 20th.<br><br>Line: "You earn well. So why does your account always look like this by the 20th? Piggyvest locks your savings before you can spend them."'},
+    {t:'r', time:'7:23 AM', tag:'🤖 AI COACH FEEDBACK', text:'✅ <strong>Excellent:</strong> "Always broke by the 20th" is a felt truth for thousands of Nigerian earners. You named the embarrassment without being preachy. That is advanced copy instinct for Day 2.<br><br>💡 <strong>Pro tip:</strong> The best copy reads like the brand has been watching you.'},
+    {t:'div', text:'DAY 3'},
+    {t:'r', time:'7:00 AM', tag:'📚 DAY 3 OF 90 — COPYWRITING', text:'<strong>Headlines That Stop Scrolls</strong><br><br>Your headline is the most important line of any copy. If it fails, nothing else gets read.<br><br>Four formulas:<br>1. Bold Claim: "This is why your ads are wasting money"<br>2. Curiosity Gap: "What most Lagos entrepreneurs get wrong about pricing"<br>3. Direct Benefit: "Write copy that converts in 15 minutes a day"<br>4. Fear Trigger: "The one mistake killing your Nigerian business"<br><br>📝 <strong>Task:</strong> Write 3 headlines for any Nigerian business — one per formula.'},
+    {t:'s', time:'7:19 AM', text:'Business: Lagos food delivery startup<br><br>Bold Claim: "Why your food delivery business is losing repeat customers every week"<br><br>Curiosity Gap: "What the fastest-growing Lagos food brands do differently before 9am"<br><br>Direct Benefit: "Get more repeat orders without spending more on ads — starting this week"'},
+    {t:'r', time:'7:20 AM', tag:'🤖 AI COACH FEEDBACK', text:'✅ <strong>Strong:</strong> All three use the formulas correctly. "Losing repeat customers" creates immediate relevance — any food delivery owner reads that and feels seen.<br><br>💡 <strong>Pro tip:</strong> Test your headlines on yourself. If you would not stop scrolling, neither will your reader.'},
+  ];
+
+  var chatBody = document.getElementById('ldChatBody');
+  var inputField = document.getElementById('ldInputField');
+  var idx = 0;
+  var timer;
+
+  function addMsg(msg) {
+    if (msg.t === 'div') {
+      var d = document.createElement('div');
+      d.style.cssText = 'text-align:center;margin:4px 0;';
+      d.innerHTML = '<span style="background:rgba(0,0,0,0.18);color:#fff;font-size:0.55rem;border-radius:10px;padding:2px 8px;">' + msg.text + '</span>';
+      chatBody.appendChild(d);
+      chatBody.scrollTop = chatBody.scrollHeight;
+      return;
+    }
+    if (msg.t === 'r') {
+      var typing = document.createElement('div');
+      typing.style.cssText = 'background:#fff;border-radius:10px 10px 10px 2px;padding:7px 10px;align-self:flex-start;display:flex;gap:3px;align-items:center;width:fit-content;';
+      typing.innerHTML = '<span style="width:5px;height:5px;border-radius:50%;background:#999;animation:ldot 1.2s infinite;display:inline-block;"></span><span style="width:5px;height:5px;border-radius:50%;background:#999;animation:ldot 1.2s 0.2s infinite;display:inline-block;"></span><span style="width:5px;height:5px;border-radius:50%;background:#999;animation:ldot 1.2s 0.4s infinite;display:inline-block;"></span>';
+      chatBody.appendChild(typing);
+      chatBody.scrollTop = chatBody.scrollHeight;
+      setTimeout(function(){
+        typing.remove();
+        var b = document.createElement('div');
+        b.style.cssText = 'max-width:86%;background:#fff;border-radius:10px 10px 10px 2px;padding:7px 9px;font-size:0.65rem;line-height:1.5;color:#111;align-self:flex-start;opacity:0;transform:translateY(5px);transition:all 0.3s;';
+        b.innerHTML = (msg.tag ? '<div style="display:inline-block;background:rgba(7,94,84,0.1);color:#075E54;font-size:0.55rem;font-weight:700;border-radius:3px;padding:1px 4px;margin-bottom:3px;">' + msg.tag + '</div><br>' : '') + msg.text + '<div style="font-size:0.55rem;color:#999;text-align:right;margin-top:2px;">' + msg.time + '</div>';
+        chatBody.appendChild(b);
+        requestAnimationFrame(function(){ b.style.opacity='1'; b.style.transform='translateY(0)'; });
+        chatBody.scrollTop = chatBody.scrollHeight;
+      }, 1600);
+      return;
+    }
+    if (msg.t === 's') {
+      var short = msg.text.length > 50 ? msg.text.substring(0,50)+'...' : msg.text;
+      var i = 0;
+      var iv = setInterval(function(){
+        inputField.textContent = short.substring(0,i) + '|';
+        i++;
+        if(i > short.length){
+          clearInterval(iv);
+          inputField.textContent = 'Type a message...';
+          var b = document.createElement('div');
+          b.style.cssText = 'max-width:86%;background:#DCF8C6;border-radius:10px 10px 2px 10px;padding:7px 9px;font-size:0.65rem;line-height:1.5;color:#111;align-self:flex-end;opacity:0;transform:translateY(5px);transition:all 0.3s;';
+          b.innerHTML = msg.text + '<div style="font-size:0.55rem;color:#999;text-align:right;margin-top:2px;">' + msg.time + ' <span style="color:#53BDEB;">✓✓</span></div>';
+          chatBody.appendChild(b);
+          requestAnimationFrame(function(){ b.style.opacity='1'; b.style.transform='translateY(0)'; });
+          chatBody.scrollTop = chatBody.scrollHeight;
+        }
+      }, 28);
+      return;
+    }
+  }
+
+  function next() {
+    if(idx >= msgs.length){ idx=0; chatBody.innerHTML=''; }
+    var msg = msgs[idx++];
+    addMsg(msg);
+    var wait = msg.t==='r' ? 5500 : msg.t==='s' ? 4000 : 2000;
+    timer = setTimeout(next, wait);
+  }
+
+  // add keyframe for dots
+  var style = document.createElement('style');
+  style.textContent = '@keyframes ldot{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-4px)}}';
+  document.head.appendChild(style);
+
+  setTimeout(next, 800);
+})();
+</script>
+
 <!-- HOW IT WORKS — light -->
 <section class="curriculum-section">
   <div class="container section-center">
