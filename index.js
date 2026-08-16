@@ -292,7 +292,14 @@ if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
     }).eq('phone', cleanPhone);
     return;
   }
-
+// RESUME command — for paused subscribers
+  if (sub.active === 'paused' && message.toUpperCase() === 'RESUME') {
+    await supabase.from('subscribers').update({ active: 'true' }).eq('phone', cleanPhone);
+    const lesson = await getLesson(sub.day_number, sub.track || 'copywriting');
+    await sendMessage(cleanPhone, '▶️ Welcome back, ' + sub.name + '! Your lessons are now active again.\n\nYou are picking up from Day ' + sub.day_number + '. Here is your lesson:');
+    if (lesson) await sendMessage(cleanPhone, formatLesson(lesson, sub.day_number));
+    return;
+  }
   if (sub.active === 'false') {
     const isSMM = sub.track === 'social_media_management';
     const isCW2 = sub.track === 'content_writing';
