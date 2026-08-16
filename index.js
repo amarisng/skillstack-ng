@@ -129,9 +129,10 @@ async function activateSubscriber(whatsappNumber, name, planType = 'monthly') {
       });
     }
 
+    const trackLabel = (sub && sub.track === 'social_media_management') ? 'Social Media Management' : (sub && sub.track === 'content_writing') ? 'Content Writing' : (sub && sub.track === 'digital_marketing') ? 'Digital Marketing Fundamentals' : 'Copywriting';
     const planMsg = planType === 'full'
-      ? 'Payment confirmed! Welcome to SkillStack NG ' + (name || '') + '. Your full 90-day copywriting journey is unlocked - no monthly renewals needed.'
-      : 'Payment confirmed! Welcome to SkillStack NG ' + (name || '') + '. Your 90-day copywriting journey starts NOW.';
+      ? 'Payment confirmed! Welcome to SkillStack NG ' + (name || '') + '. Your ' + trackLabel + ' journey is fully unlocked — no monthly renewals needed. 🎉'
+      : 'Payment confirmed! Welcome to SkillStack NG ' + (name || '') + '. Your ' + trackLabel + ' journey starts NOW. 🎉';
     await sendMessage(finalPhone, planMsg);
     await sendMessage(finalPhone, 'One quick question — what time do you want your daily lesson delivered to this WhatsApp?\n\nReply with your preferred time:\n6AM\n7AM\n8AM\n12PM\n6PM\n9PM');
 
