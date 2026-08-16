@@ -271,6 +271,22 @@ if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
       return;
     }
     }
+  // Bot commands
+    if (message.toUpperCase() === 'STATUS') {
+      const trackLabel = sub.track === 'social_media_management' ? 'Social Media Management' : sub.track === 'content_writing' ? 'Content Writing' : sub.track === 'digital_marketing' ? 'Digital Marketing Fundamentals' : 'Copywriting & Persuasion';
+      await sendMessage(cleanPhone, '📊 Your SkillStack NG Progress\n\nName: ' + sub.name + '\nTrack: ' + trackLabel + '\nDay: ' + sub.day_number + ' of 90\nStreak: ' + sub.streak + ' days 🔥\nLesson time: ' + sub.time_preference + '\n\nKeep going — you are building a real skill. 💪');
+      return;
+    }
+    if (message.toUpperCase() === 'PAUSE') {
+      await supabase.from('subscribers').update({ active: 'paused' }).eq('phone', cleanPhone);
+      await sendMessage(cleanPhone, '⏸️ Your lessons have been paused, ' + sub.name + '.\n\nYou are on Day ' + sub.day_number + '. Reply RESUME when you are ready to continue — you will pick up exactly where you left off. 🙏');
+      return;
+    }
+    if (message.toUpperCase() === 'STOP' || message.toUpperCase() === 'CANCEL') {
+      await supabase.from('subscribers').update({ active: 'false' }).eq('phone', cleanPhone);
+      await sendMessage(cleanPhone, '🛑 Your SkillStack NG subscription has been cancelled, ' + sub.name + '.\n\nYou completed Day ' + sub.day_number + ' of your track. If you ever want to continue, email support@skillstackng.com and we will reactivate your account.\n\nThank you for learning with us. 🙏');
+      return;
+    }
     const wordCount = message.trim().split(/\s+/).length;
     if (wordCount < 5) {
       if (sub.awaiting_task) {
