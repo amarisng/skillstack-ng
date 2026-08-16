@@ -320,8 +320,31 @@ app.post('/paystack-webhook', async (req, res) => {
       if (whatsappNumber) {
         const amount = data.amount / 100;
         let planType = 'monthly';
-        if (amount >= 13000) planType = 'full'; // Copywriting full 90 days
-        else if (amount >= 9000) planType = 'full'; // SMM full 60 days
+        if (amount >= 13000) planType = 'full';
+        else if (amount >= 9000) planType = 'full';
+
+        // Beta payment — run full onboarding inside bot
+        if (amount <= 200) {
+          const betaPhone = whatsappNumber.replace(/\D/g, '');
+          const existingSub = await getSubscriber(betaPhone);
+          if (!existingSub) {
+            await supabase.from('subscribers').insert({
+              phone: betaPhone,
+              name: '',
+              day_number: 0,
+              track: 'copywriting',
+              time_preference: '07:00',
+              active: 'false',
+              streak: 0,
+              plan_type: 'monthly',
+              subscription_expires: new Date(Date.now() + 32 * 86400000).toISOString().split('T')[0],
+              last_active: new Date().toISOString().split('T')[0]
+            });
+          }
+          await sendMessage(betaPhone, 'Payment confirmed! Welcome to SkillStack NG Beta. 🎉\n\nChoose your track:\n\n1️⃣ Copywriting & Persuasion — 90 days\n2️⃣ Social Media Management — 60 days\n3️⃣ Content Writing — 90 days\n4️⃣ Digital Marketing Fundamentals — 90 days\n\nReply 1, 2, 3 or 4 to get started.');
+          return;
+        }
+
         await activateSubscriber(whatsappNumber, customerName, planType);
       } else {
         console.log('No WhatsApp number found. Metadata: ' + JSON.stringify(data.metadata));
