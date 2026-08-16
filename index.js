@@ -159,6 +159,10 @@ async function handleOnboarding(phone, message) {
     return;
   }
 // Allow inactive subscribers to correct their track before payment
+  if (message.toUpperCase() === 'HELP' || message.toUpperCase() === 'SUPPORT') {
+    await sendMessage(cleanPhone, 'SkillStack NG Support 🛠️\n\nFor any issue, email us at:\nsupport@skillstackng.com\n\nWe respond within 24 hours on weekdays.\n\nUseful commands:\nLESSON — resend today\'s lesson\nSTATUS — check your progress\nSTOP — cancel your subscription\nHELP — show this message\n\nFor general enquiries: hello@skillstackng.com');
+    return;
+  }
 if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
   await supabase.from('subscribers').update({ track: 'copywriting', name: '' }).eq('phone', cleanPhone);
  await sendMessage(cleanPhone, 'No problem! Let\'s start over.\n\nChoose your track:\n\n1️⃣ Copywriting & Persuasion — 90 days\n2️⃣ Social Media Management — 60 days\n3️⃣ Content Writing — 90 days\n4️⃣ Digital Marketing Fundamentals — 90 days\n\nReply 1, 2, 3 or 4.');
@@ -759,6 +763,9 @@ app.get('/content-writing', (req, res) => {
 });
 app.get('/ambassador', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'ambassador.html'));
+});
+app.get('/support', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'support.html'));
 });
 app.get('/ambassador-kit', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'ambassador-kit.html'));
