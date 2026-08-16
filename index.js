@@ -111,7 +111,8 @@ async function activateSubscriber(whatsappNumber, name, planType = 'monthly') {
         streak: 1,
         plan_type: planType,
         subscription_expires: subscriptionExpires,
-        last_active: new Date().toISOString().split('T')[0]
+        last_active: new Date().toISOString().split('T')[0],
+        track: sub.track || 'copywriting'
       }).eq('phone', finalPhone);
     } else {
       await supabase.from('subscribers').insert({
