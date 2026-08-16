@@ -249,8 +249,7 @@ if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
       return;
     }
 
-    // STATUS command
-    if (message.toUpperCase() === 'STATUS') {
+    
       const trackLabel = sub.track === 'social_media_management' ? 'Social Media Management' : sub.track === 'content_writing' ? 'Content Writing' : sub.track === 'digital_marketing' ? 'Digital Marketing Fundamentals' : 'Copywriting & Persuasion';
       const timeLabel = sub.time_preference || '07:00';
       await sendMessage(cleanPhone, '📊 Your SkillStack NG Progress\n\nName: ' + sub.name + '\nTrack: ' + trackLabel + '\nDay: ' + sub.day_number + ' of 90\nStreak: ' + sub.streak + ' days 🔥\nLesson time: ' + timeLabel + '\n\nKeep going — you are building a real skill. 💪');
