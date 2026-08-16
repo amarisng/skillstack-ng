@@ -134,8 +134,7 @@ async function activateSubscriber(whatsappNumber, name, planType = 'monthly') {
       ? 'Payment confirmed! Welcome to SkillStack NG ' + (name || '') + '. Your ' + trackLabel + ' journey is fully unlocked — no monthly renewals needed. 🎉'
       : 'Payment confirmed! Welcome to SkillStack NG ' + (name || '') + '. Your ' + trackLabel + ' journey starts NOW. 🎉';
     await sendMessage(finalPhone, planMsg);
-    await sendMessage(finalPhone, 'One quick question — what time do you want your daily lesson delivered to this WhatsApp?\n\nReply with your preferred time:\n6AM\n7AM\n8AM\n12PM\n6PM\n9PM');
-
+    await sendMessage(finalPhone, 'One quick question — what is your first name?');
     console.log('Subscriber activated successfully: ' + finalPhone);
   } catch (err) {
     console.error('Activation error:', err.message);
