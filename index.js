@@ -232,6 +232,14 @@ if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
       await sendMessage(cleanPhone, 'You have completed all available lessons. More coming soon!');
       return;
     }
+    if (sub.name === 'Subscriber') {
+      await sendMessage(cleanPhone, 'What is your first name?');
+      return;
+    }
+    if (sub.time_preference === '07:00' && (message.toUpperCase() === 'HI' || message.toUpperCase() === 'HELLO')) {
+      await sendMessage(cleanPhone, 'What time do you want your daily lesson?\n\nReply with:\n6AM\n7AM\n8AM\n12PM\n6PM\n9PM');
+      return;
+    }
     if (message.toUpperCase() === 'LESSON' || message.toUpperCase() === 'HI' || message.toUpperCase() === 'HELLO' || message.toUpperCase() === 'YES' || message.toUpperCase() === 'CONTINUE') {
       await sendMessage(cleanPhone, formatLesson(lesson, sub.day_number));
       return;
