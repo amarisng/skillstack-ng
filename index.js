@@ -201,6 +201,13 @@ if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
     return;
   }
 
+ // Collect name from newly activated subscribers
+  if (sub.active === 'true' && sub.day_number === 1 && sub.name === 'Subscriber') {
+    await supabase.from('subscribers').update({ name: message }).eq('phone', cleanPhone);
+    await sendMessage(cleanPhone, 'Nice to meet you, ' + message + '! 👋\n\nWhat time do you want your daily lesson delivered?\n\nReply with:\n6AM\n7AM\n8AM\n12PM\n6PM\n9PM');
+    return;
+  }
+
   // Handle time preference reply from newly activated subscribers
   const validTimes2 = ['6AM', '7AM', '8AM', '12PM', '6PM', '9PM'];
   if (sub.active === 'true' && sub.day_number === 1 && validTimes2.includes(message.toUpperCase())) {
