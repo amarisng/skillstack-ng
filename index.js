@@ -129,7 +129,7 @@ const TRACKS = {
     label: 'Copywriting & Persuasion',
     totalDays: 90,
     monthlyLink: 'https://paystack.shop/pay/2-h3igsfd2',
-    fullLink: 'https://paystack.shop/pay/m0m9ofipj4',
+    fullLink: 'https://paystack.shop/pay/bo96lsmt2c',
     fullPrice: '13,000 for 90 days (save 2,000)',
     fullExpiryDays: 95
   }
