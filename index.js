@@ -27,7 +27,7 @@ const twilioClient = twilio(
 );
 
 const TWILIO_NUMBER = process.env.TWILIO_WHATSAPP_NUMBER;
-const PAYSTACK_LINK = process.env.PAYSTACK_PAYMENT_LINK;
+const ADMIN_WHATSAPP_NUMBER = process.env.ADMIN_WHATSAPP_NUMBER || '2347063667303';
 const PAYSTACK_SECRET = process.env.PAYSTACK_SECRET_KEY;
 const PAYSTACK_TEST_SECRET = process.env.PAYSTACK_TEST_SECRET_KEY;
 const VERIFY_TOKEN = process.env.WEBHOOK_VERIFY_TOKEN || 'skillstack_verify_2024';
@@ -79,8 +79,48 @@ async function getFeedback(task, submission, feedbackPrompt) {
   return message.content[0].text;
 }
 
-function formatLesson(lesson, dayNumber) {
-  return 'Day ' + dayNumber + ' of 90 - SkillStack NG\n\n' + lesson.title + '\n\n' + lesson.content + '\n\n---\nTODAYS TASK\n' + lesson.task + '\n\nReply with your answer and I will give you personal feedback.';
+const TRACKS = {
+  social_media_management: {
+    label: 'Social Media Management',
+    totalDays: 60,
+    monthlyLink: 'https://paystack.shop/pay/p1kkgoo91-',
+    fullLink: 'https://paystack.shop/pay/6aanjfut9m',
+    fullPrice: '9,000 for 60 days (save 1,000)',
+    fullExpiryDays: 65
+  },
+  content_writing: {
+    label: 'Content Writing',
+    totalDays: 90,
+    monthlyLink: 'https://paystack.shop/pay/yn75oepjbw',
+    fullLink: 'https://paystack.shop/pay/vd5zt2ws9q',
+    fullPrice: '13,000 for 90 days (save 2,000)',
+    fullExpiryDays: 95
+  },
+  digital_marketing: {
+    label: 'Digital Marketing Fundamentals',
+    totalDays: 90,
+    monthlyLink: 'https://paystack.shop/pay/3ke4qasoo5',
+    fullLink: 'https://paystack.shop/pay/wbmr9cgdyn',
+    fullPrice: '13,000 for 90 days (save 2,000)',
+    fullExpiryDays: 95
+  },
+  copywriting: {
+    label: 'Copywriting & Persuasion',
+    totalDays: 90,
+    monthlyLink: 'https://paystack.shop/pay/2-h3igsfd2',
+    fullLink: 'https://paystack.shop/pay/m0m9ofipj4',
+    fullPrice: '13,000 for 90 days (save 2,000)',
+    fullExpiryDays: 95
+  }
+};
+
+function getTrackInfo(track) {
+  return TRACKS[track] || TRACKS.copywriting;
+}
+
+function formatLesson(lesson, dayNumber, track) {
+  const totalDays = getTrackInfo(track).totalDays;
+  return 'Day ' + dayNumber + ' of ' + totalDays + ' - SkillStack NG\n\n' + lesson.title + '\n\n' + lesson.content + '\n\n---\nTODAYS TASK\n' + lesson.task + '\n\nReply with your answer and I will give you personal feedback.';
 }
 
 async function activateSubscriber(whatsappNumber, name, planType = 'monthly') {
@@ -94,8 +134,9 @@ async function activateSubscriber(whatsappNumber, name, planType = 'monthly') {
     console.log('Activating subscriber: ' + finalPhone);
     let sub = await getSubscriber(finalPhone);
 
-    // Set subscription expiry — 95 days for copywriting full, 65 days for SMM full, 32 days for monthly
-    const expiryDays = planType === 'full' ? 95 : 32;
+    // Set subscription expiry — full plans get the track's programme length, monthly always renews in 32 days
+    const trackInfo = getTrackInfo(sub && sub.track);
+    const expiryDays = planType === 'full' ? trackInfo.fullExpiryDays : 32;
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + expiryDays);
     const subscriptionExpires = expiryDate.toISOString().split('T')[0];
@@ -120,7 +161,7 @@ async function activateSubscriber(whatsappNumber, name, planType = 'monthly') {
         name: name || 'Subscriber',
         day_number: 1,
         track: 'copywriting',
-        time_preference: '07:00',
+        time_preference: null,
         active: 'true',
         streak: 1,
         plan_type: planType,
@@ -129,7 +170,7 @@ async function activateSubscriber(whatsappNumber, name, planType = 'monthly') {
       });
     }
 
-    const trackLabel = (sub && sub.track === 'social_media_management') ? 'Social Media Management' : (sub && sub.track === 'content_writing') ? 'Content Writing' : (sub && sub.track === 'digital_marketing') ? 'Digital Marketing Fundamentals' : 'Copywriting';
+    const trackLabel = trackInfo.label;
     const planMsg = planType === 'full'
       ? 'Payment confirmed! Welcome to SkillStack NG ' + (name || '') + '. Your ' + trackLabel + ' journey is fully unlocked — no monthly renewals needed. 🎉'
       : 'Payment confirmed! Welcome to SkillStack NG ' + (name || '') + '. Your ' + trackLabel + ' journey starts NOW. 🎉';
@@ -194,12 +235,7 @@ if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
     await supabase.from('subscribers').update({ time_preference: timePreference }).eq('phone', cleanPhone);
 
     // Send correct payment links based on selected track
-    const isSMM = sub.track === 'social_media_management';
-    const isCW = sub.track === 'content_writing';
-    const isDM = sub.track === 'digital_marketing';
-    const monthlyLink = isSMM ? 'https://paystack.shop/pay/p1kkgoo91-' : isCW ? 'https://paystack.shop/pay/yn75oepjbw' : isDM ? 'https://paystack.shop/pay/3ke4qasoo5' : 'https://paystack.shop/pay/2-h3igsfd2';
-   const fullLink = isSMM ? 'https://paystack.shop/pay/6aanjfut9m' : isCW ? 'https://paystack.shop/pay/vd5zt2ws9q' : isDM ? 'https://paystack.shop/pay/wbmr9cgdyn' : 'https://paystack.shop/pay/m0m9ofipj4';
-    const fullPrice = isSMM ? '9,000 for 60 days (save 1,000)' : isCW ? '13,000 for 90 days (save 2,000)' : isDM ? '13,000 for 90 days (save 2,000)' : '13,000 for 90 days (save 2,000)';
+    const { monthlyLink, fullLink, fullPrice } = getTrackInfo(sub.track);
 
     await sendMessage(cleanPhone, 'Perfect ' + sub.name + '! Your lesson will arrive Monday to Friday at ' + message.toUpperCase() + '.\n\nTo activate your subscription pay here:\n\nMonthly — ₦5,000/month:\n' + monthlyLink + '\n\nFull plan — ₦' + fullPrice + ':\n' + fullLink + '\n\nMake sure to enter this WhatsApp number in the payment form.');
     return;
@@ -222,11 +258,18 @@ if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
     const timePreference = timeMap2[message.toUpperCase()];
     await supabase.from('subscribers').update({
       time_preference: timePreference,
-      last_active: new Date(Date.now() - 86400000).toISOString().split('T')[0]
+      last_active: new Date(Date.now() - 86400000).toISOString().split('T')[0],
+      awaiting_task: true
     }).eq('phone', cleanPhone);
     const lesson = await getLesson(1, sub.track || 'copywriting');
     await sendMessage(cleanPhone, 'Perfect! Your lesson will arrive Monday to Friday at ' + message.toUpperCase() + '. Here is your Day 1 lesson right now:');
-    if (lesson) await sendMessage(cleanPhone, formatLesson(lesson, 1));
+    if (lesson) {
+      await sendMessage(cleanPhone, formatLesson(lesson, 1, sub.track));
+    } else {
+      console.error('No Day 1 lesson found for track: ' + sub.track);
+      await sendMessage(cleanPhone, 'Your Day 1 lesson is being finalized — you will receive it within a few minutes. If you don\'t see it, reply LESSON.');
+      await sendMessage(ADMIN_WHATSAPP_NUMBER, 'ALERT: No Day 1 lesson found for track "' + sub.track + '" (subscriber ' + cleanPhone + ')');
+    }
     return;
   }
 
@@ -240,20 +283,20 @@ if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
       await sendMessage(cleanPhone, 'What is your first name?');
       return;
     }
-    if (sub.time_preference === '07:00' && (message.toUpperCase() === 'HI' || message.toUpperCase() === 'HELLO')) {
+    if (!sub.time_preference && (message.toUpperCase() === 'HI' || message.toUpperCase() === 'HELLO')) {
       await sendMessage(cleanPhone, 'What time do you want your daily lesson?\n\nReply with:\n6AM\n7AM\n8AM\n12PM\n6PM\n9PM');
       return;
     }
     if (message.toUpperCase() === 'LESSON' || message.toUpperCase() === 'HI' || message.toUpperCase() === 'HELLO' || message.toUpperCase() === 'YES' || message.toUpperCase() === 'CONTINUE') {
-      await sendMessage(cleanPhone, formatLesson(lesson, sub.day_number));
+      await sendMessage(cleanPhone, formatLesson(lesson, sub.day_number, sub.track));
       await supabase.from('subscribers').update({ awaiting_task: true, lesson_delivered_at: new Date().toISOString() }).eq('phone', cleanPhone);
       return;
     }
 
     // Bot commands — checked before word count
     if (message.toUpperCase() === 'STATUS') {
-      const trackLabel = sub.track === 'social_media_management' ? 'Social Media Management' : sub.track === 'content_writing' ? 'Content Writing' : sub.track === 'digital_marketing' ? 'Digital Marketing Fundamentals' : 'Copywriting & Persuasion';
-      await sendMessage(cleanPhone, '📊 Your SkillStack NG Progress\n\nName: ' + sub.name + '\nTrack: ' + trackLabel + '\nDay: ' + sub.day_number + ' of 90\nStreak: ' + sub.streak + ' days 🔥\nLesson time: ' + sub.time_preference + '\n\nKeep going — you are building a real skill. 💪');
+      const trackInfo = getTrackInfo(sub.track);
+      await sendMessage(cleanPhone, '📊 Your SkillStack NG Progress\n\nName: ' + sub.name + '\nTrack: ' + trackInfo.label + '\nDay: ' + sub.day_number + ' of ' + trackInfo.totalDays + '\nStreak: ' + sub.streak + ' days 🔥\nLesson time: ' + sub.time_preference + '\n\nKeep going — you are building a real skill. 💪');
       return;
     }
     if (message.toUpperCase() === 'PAUSE') {
@@ -264,6 +307,11 @@ if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
     if (message.toUpperCase() === 'STOP' || message.toUpperCase() === 'CANCEL') {
       await supabase.from('subscribers').update({ active: 'false' }).eq('phone', cleanPhone);
       await sendMessage(cleanPhone, '🛑 Your SkillStack NG subscription has been cancelled, ' + sub.name + '.\n\nYou completed Day ' + sub.day_number + ' of your track. If you ever want to continue, email support@skillstackng.com and we will reactivate your account.\n\nThank you for learning with us. 🙏');
+      return;
+    }
+
+    if (!sub.awaiting_task) {
+      await sendMessage(cleanPhone, 'You have already submitted today\'s task! Your next lesson will arrive at your scheduled time. Keep going! 💪');
       return;
     }
 
@@ -286,29 +334,34 @@ if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
 
   // RESUME command
   if (sub.active === 'paused' && message.toUpperCase() === 'RESUME') {
-    await supabase.from('subscribers').update({ active: 'true' }).eq('phone', cleanPhone);
+    await supabase.from('subscribers').update({ active: 'true', awaiting_task: true }).eq('phone', cleanPhone);
     const lesson = await getLesson(sub.day_number, sub.track || 'copywriting');
     await sendMessage(cleanPhone, '▶️ Welcome back, ' + sub.name + '! Your lessons are now active again.\n\nYou are picking up from Day ' + sub.day_number + '. Here is your lesson:');
-    if (lesson) await sendMessage(cleanPhone, formatLesson(lesson, sub.day_number));
+    if (lesson) await sendMessage(cleanPhone, formatLesson(lesson, sub.day_number, sub.track));
     return;
   }
   if (sub.active === 'false') {
-    const isSMM = sub.track === 'social_media_management';
-    const isCW2 = sub.track === 'content_writing';
-    const isDM2 = sub.track === 'digital_marketing';
-    const monthlyLink = isSMM ? 'https://paystack.shop/pay/p1kkgoo91-' : isDM2 ? 'https://paystack.shop/pay/3ke4qasoo5' : 'https://paystack.shop/pay/2-h3igsfd2';
-    const fullLink = isSMM ? 'https://paystack.shop/pay/6aanjfut9m' : isCW2 ? 'https://paystack.shop/pay/vd5zt2ws9q' : isDM2 ? 'https://paystack.shop/pay/wbmr9cgdyn' : 'https://paystack.shop/pay/m0m9ofipj4';
-    const fullPrice = isSMM ? '9,000 for 60 days' : isCW2 ? '13,000 for 90 days' : isDM2 ? '13,000 for 90 days' : '13,000 for 90 days';
+    const { monthlyLink, fullLink, fullPrice } = getTrackInfo(sub.track);
     await sendMessage(cleanPhone, 'To activate your subscription pay here:\n\nMonthly — ₦5,000/month:\n' + monthlyLink + '\n\nFull plan — ₦' + fullPrice + ':\n' + fullLink);
+    return;
+  }
+
+  if (sub.active === 'paused') {
+    await sendMessage(cleanPhone, 'Your lessons are paused, ' + sub.name + '. Reply RESUME to pick up from Day ' + sub.day_number + ', or STOP to cancel your subscription.');
     return;
   }
 
   await sendMessage(cleanPhone, 'Welcome back! Reply 1 for Copywriting, 2 for Social Media Management, 3 for Content Writing or 4 for Digital Marketing to get started.');
 }
 
+function safeEqual(a, b) {
+  if (!a || !b || a.length !== b.length) return false;
+  return crypto.timingSafeEqual(Buffer.from(a), Buffer.from(b));
+}
+
 app.post('/paystack-webhook', async (req, res) => {
   try {
-    const signature = req.headers['x-paystack-signature'];
+    const signature = req.headers['x-paystack-signature'] || '';
     const hashLive = crypto.createHmac('sha512', PAYSTACK_SECRET)
       .update(req.body).digest('hex');
     const hashTest = PAYSTACK_TEST_SECRET
@@ -316,7 +369,7 @@ app.post('/paystack-webhook', async (req, res) => {
           .update(req.body).digest('hex')
       : null;
 
-    if (hashLive !== signature && hashTest !== signature) {
+    if (!safeEqual(hashLive, signature) && !(hashTest && safeEqual(hashTest, signature))) {
       console.log('Invalid Paystack signature');
       return res.status(401).send('Unauthorized');
     }
@@ -346,8 +399,7 @@ app.post('/paystack-webhook', async (req, res) => {
       if (whatsappNumber) {
         const amount = data.amount / 100;
         let planType = 'monthly';
-        if (amount >= 13000) planType = 'full';
-        else if (amount >= 9000) planType = 'full';
+        if (amount >= 9000) planType = 'full';
 
         // Beta payment — run full onboarding inside bot
         if (amount <= 200) {
@@ -439,7 +491,7 @@ cron.schedule('0 * * * *', async () => {
       console.log('No lesson found for day ' + sub.day_number);
       continue;
     }
-   await sendMessage(sub.phone, formatLesson(lesson, sub.day_number));
+   await sendMessage(sub.phone, formatLesson(lesson, sub.day_number, sub.track));
     await supabase.from('subscribers').update({
       last_active: today,
       awaiting_task: true
@@ -503,12 +555,14 @@ cron.schedule('0 7 * * *', async () => {
       active: 'false'
     }).eq('phone', sub.phone);
 
+    const info = getTrackInfo(sub.track);
+
     // Send renewal message
     await sendMessage(sub.phone,
       'Hi ' + sub.name + ', your SkillStack NG subscription has expired and your lessons have been paused.\n\n' +
-      'To continue your copywriting journey from Day ' + sub.day_number + ', renew here:\n\n' +
-      'Monthly - 5,000/month: ' + PAYSTACK_LINK + '\n\n' +
-      'Full 90 days - 13,000 (save 2,000): https://paystack.shop/pay/m0m9ofipj4\n\n' +
+      'To continue your ' + info.label + ' journey from Day ' + sub.day_number + ', renew here:\n\n' +
+      'Monthly - ₦5,000/month: ' + info.monthlyLink + '\n\n' +
+      'Full plan - ₦' + info.fullPrice + ': ' + info.fullLink + '\n\n' +
       'Your progress is saved — you will pick up exactly where you left off.'
     );
     console.log('Deactivated expired subscriber: ' + sub.phone);
@@ -528,10 +582,11 @@ cron.schedule('0 7 * * *', async () => {
 
   if (!expiringSoon) return;
   for (const sub of expiringSoon) {
+    const info = getTrackInfo(sub.track);
     await sendMessage(sub.phone,
       'Hi ' + sub.name + '! Your SkillStack NG subscription renews in 3 days.\n\n' +
-      'If your card details have changed or you would like to switch to the full 90-day plan (save 2,000), update here:\n\n' +
-      'Full 90 days - 13,000: https://paystack.shop/pay/m0m9ofipj4\n\n' +
+      'If your card details have changed or you would like to switch to the full plan (₦' + info.fullPrice + '), update here:\n\n' +
+      info.fullLink + '\n\n' +
       'Otherwise your monthly renewal will happen automatically. Keep going!'
     );
   }
@@ -765,13 +820,14 @@ app.get('/choose', (req, res) => {
 app.post('/waitlist', async (req, res) => {
   try {
     const { name, phone, track } = req.body;
+    if (!name || !phone) return res.status(400).json({ success: false, error: 'Name and phone are required' });
     let cleanPhone = (phone || '').replace(/\D/g, '');
     if (cleanPhone.startsWith('0')) cleanPhone = '234' + cleanPhone.substring(1);
     await supabase.from('waitlist').insert({
       name, phone: cleanPhone, track,
       created_at: new Date().toISOString()
     });
-    await sendMessage('2347063667303',
+    await sendMessage(ADMIN_WHATSAPP_NUMBER,
       'New waitlist signup!\nName: ' + name + '\nPhone: ' + cleanPhone + '\nTrack: ' + track
     );
     res.status(200).json({ success: true });
@@ -827,7 +883,7 @@ app.post('/download-guide', async (req, res) => {
     });
 
     // Notify you on WhatsApp
-    await sendMessage('2347063667303',
+    await sendMessage(ADMIN_WHATSAPP_NUMBER,
       'New Guide Download!\n\nName: ' + name +
       '\nEmail: ' + email +
       '\nPhone: ' + (cleanPhone || 'not provided') +
@@ -865,6 +921,7 @@ app.get('/ambassador', (req, res) => {
 app.post('/ambassador-apply', async (req, res) => {
   try {
     const { name, phone, email, school, department, state, plan, track } = req.body;
+    if (!name || !phone || !email) return res.status(400).json({ success: false, error: 'Name, phone and email are required' });
     let cleanPhone = (phone || '').replace(/\D/g, '');
     if (cleanPhone.startsWith('0')) cleanPhone = '234' + cleanPhone.substring(1);
 
@@ -881,7 +938,7 @@ app.post('/ambassador-apply', async (req, res) => {
       created_at: new Date().toISOString()
     });
 
-    await sendMessage('2347063667303',
+    await sendMessage(ADMIN_WHATSAPP_NUMBER,
       'New Ambassador Application!\n\n' +
       'Name: ' + name + '\n' +
       'Phone: ' + cleanPhone + '\n' +
@@ -906,6 +963,9 @@ app.get('/affiliate', (req, res) => {
 app.post('/affiliate-signup', async (req, res) => {
   try {
     const { name, phone, email, channel, bank, account, accountName } = req.body;
+    if (!name || !phone || !email || !bank || !account || !accountName) {
+      return res.status(400).json({ success: false, error: 'Name, phone, email and bank details are required' });
+    }
 
     // Clean phone number
     let cleanPhone = phone.replace(/\D/g, '');
@@ -933,7 +993,7 @@ app.post('/affiliate-signup', async (req, res) => {
     });
 
     // Notify Amaris via WhatsApp
-    await sendMessage('2347063667303',
+    await sendMessage(ADMIN_WHATSAPP_NUMBER,
       'New affiliate application!\n\n' +
       'Name: ' + name + '\n' +
       'Phone: ' + cleanPhone + '\n' +
@@ -942,7 +1002,7 @@ app.post('/affiliate-signup', async (req, res) => {
       'Bank: ' + bank + ' — ' + account + ' (' + accountName + ')\n' +
       'Code: ' + code + '\n\n' +
       'Approve by updating their status in Supabase to "approved" and sending them their link:\n' +
-      'https://paystack.shop/pay/2-h3igsfd2?ref=' + code
+      'https://skillstackng.com/choose?ref=' + code
     );
 
     res.status(200).json({ success: true });
@@ -991,7 +1051,7 @@ app.get('/approve-affiliate', async (req, res) => {
     if (!affiliate) return res.status(404).send('Affiliate not found');
     if (affiliate.status !== 'approved') return res.status(400).send('Affiliate not approved yet — update status in Supabase first');
 
-    const link = 'https://paystack.shop/pay/2-h3igsfd2?ref=' + affiliate.affiliate_code;
+    const link = 'https://skillstackng.com/choose?ref=' + affiliate.affiliate_code;
 
     await sendMessage(phone,
       'Congratulations ' + affiliate.name + '! Your SkillStack NG affiliate application has been approved.\n\n' +
