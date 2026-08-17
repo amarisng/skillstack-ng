@@ -249,9 +249,6 @@ if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
       await supabase.from('subscribers').update({ awaiting_task: true, lesson_delivered_at: new Date().toISOString() }).eq('phone', cleanPhone);
       return;
     }
-      await sendMessage(cleanPhone, formatLesson(lesson, sub.day_number));
-      return;
-    }
 
     // Bot commands — checked before word count
     if (message.toUpperCase() === 'STATUS') {
