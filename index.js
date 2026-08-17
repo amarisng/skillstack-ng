@@ -789,6 +789,59 @@ app.get('/content-writing', (req, res) => {
 app.get('/ambassador', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'ambassador.html'));
 });
+app.get('/free-guide', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'free-guide.html'));
+});
+
+app.post('/download-guide', async (req, res) => {
+  try {
+    const { name, email, phone, track } = req.body;
+    if (!name || !email) return res.status(400).json({ error: 'Name and email required' });
+
+    const cleanPhone = phone ? phone.replace(/\D/g, '').replace(/^0/, '234') : '';
+
+    // Save to Supabase
+    await supabase.from('leads').insert({
+      name,
+      email,
+      phone: cleanPhone,
+      track_interest: track || 'not specified',
+      source: 'free-guide',
+      created_at: new Date().toISOString()
+    });
+
+    // Add to Brevo and trigger email sequence
+    await fetch('https://api.brevo.com/v3/contacts', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'api-key': process.env.BREVO_API_KEY
+      },
+      body: JSON.stringify({
+        email: email,
+        attributes: {
+          FIRSTNAME: name,
+          PHONE: cleanPhone,
+          TRACK_INTEREST: track || 'not specified'
+        },
+        listIds: [3],
+        updateEnabled: true
+      })
+    });
+
+    // Notify you on WhatsApp
+    await sendMessage('2347063667303',
+      'New Guide Download!\n\nName: ' + name +
+      '\nEmail: ' + email +
+      '\nPhone: ' + (cleanPhone || 'not provided') +
+      '\nTrack interest: ' + (track || 'not specified'));
+
+    res.status(200).json({ success: true });
+  } catch (err) {
+    console.error('Guide download error:', err.message);
+    res.status(200).json({ success: true });
+  }
+});
 app.get('/support', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'support.html'));
 });
