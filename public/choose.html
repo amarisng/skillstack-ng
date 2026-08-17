@@ -486,6 +486,7 @@
       <h3>Join the waitlist</h3>
       <p id="modalTrackName">We will notify you the moment this track opens — before anyone else.</p>
       <input type="text" id="waitlistName" placeholder="Your first name"/>
+      <input type="email" id="waitlistEmail" placeholder="Email address"/>
       <input type="tel" id="waitlistPhone" placeholder="WhatsApp number (e.g. 08012345678)"/>
       <button class="modal-submit" onclick="submitWaitlist()">Notify me when it opens →</button>
       <button class="modal-close" onclick="closeWaitlist()">Cancel</button>
@@ -534,6 +535,7 @@
   function closeWaitlist() {
     document.getElementById('modalOverlay').classList.remove('active');
     document.getElementById('waitlistName').value = '';
+    document.getElementById('waitlistEmail').value = '';
     document.getElementById('waitlistPhone').value = '';
   }
 
@@ -543,16 +545,21 @@
 
   async function submitWaitlist() {
     const name = document.getElementById('waitlistName').value.trim();
+    const email = document.getElementById('waitlistEmail').value.trim();
     const phone = document.getElementById('waitlistPhone').value.trim();
-    if (!name || !phone) {
-      alert('Please enter your name and WhatsApp number.');
+    if (!name || !email || !phone) {
+      alert('Please enter your name, email and WhatsApp number.');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      alert('Please enter a valid email address.');
       return;
     }
     try {
       await fetch('/waitlist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, phone, track: currentTrack })
+        body: JSON.stringify({ name, email, phone, track: currentTrack })
       });
     } catch (e) { /* fail silently */ }
     document.getElementById('modalForm').style.display = 'none';

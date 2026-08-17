@@ -840,16 +840,17 @@ app.get('/choose', (req, res) => {
 
 app.post('/waitlist', async (req, res) => {
   try {
-    const { name, phone, track } = req.body;
-    if (!name || !phone) return res.status(400).json({ success: false, error: 'Name and phone are required' });
+    const { name, email, phone, track } = req.body;
+    if (!name || !email || !phone) return res.status(400).json({ success: false, error: 'Name, email and phone are required' });
     let cleanPhone = (phone || '').replace(/\D/g, '');
     if (cleanPhone.startsWith('0')) cleanPhone = '234' + cleanPhone.substring(1);
-    await supabase.from('waitlist').insert({
-      name, phone: cleanPhone, track,
+    const { error } = await supabase.from('waitlist').insert({
+      name, email, phone: cleanPhone, track,
       created_at: new Date().toISOString()
     });
+    if (error) console.error('Waitlist insert error:', error.message);
     await sendMessage(ADMIN_WHATSAPP_NUMBER,
-      'New waitlist signup!\nName: ' + name + '\nPhone: ' + cleanPhone + '\nTrack: ' + track
+      'New waitlist signup!\nName: ' + name + '\nEmail: ' + email + '\nPhone: ' + cleanPhone + '\nTrack: ' + track
     );
     res.status(200).json({ success: true });
   } catch (err) {
