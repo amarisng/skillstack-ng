@@ -285,8 +285,8 @@ if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
       awaiting_task: false
     }).eq('phone', cleanPhone);
     return;
-  }
-// RESUME command — for paused subscribers
+
+  // RESUME command — for paused subscribers
   if (sub.active === 'paused' && message.toUpperCase() === 'RESUME') {
     await supabase.from('subscribers').update({ active: 'true' }).eq('phone', cleanPhone);
     const lesson = await getLesson(sub.day_number, sub.track || 'copywriting');
