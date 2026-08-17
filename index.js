@@ -246,6 +246,10 @@ if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
     }
     if (message.toUpperCase() === 'LESSON' || message.toUpperCase() === 'HI' || message.toUpperCase() === 'HELLO' || message.toUpperCase() === 'YES' || message.toUpperCase() === 'CONTINUE') {
       await sendMessage(cleanPhone, formatLesson(lesson, sub.day_number));
+      await supabase.from('subscribers').update({ awaiting_task: true, lesson_delivered_at: new Date().toISOString() }).eq('phone', cleanPhone);
+      return;
+    }
+      await sendMessage(cleanPhone, formatLesson(lesson, sub.day_number));
       return;
     }
 
@@ -268,12 +272,7 @@ if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
 
     const wordCount = message.trim().split(/\s+/).length;
     if (wordCount < 5) {
-      if (sub.awaiting_task) {
-        await sendMessage(cleanPhone, 'Welcome back! Here is your Day ' + sub.day_number + ' lesson:');
-        await sendMessage(cleanPhone, formatLesson(lesson, sub.day_number));
-      } else {
-        await sendMessage(cleanPhone, 'Your next lesson will arrive at your scheduled time. Keep going! 💪');
-      }
+      await sendMessage(cleanPhone, 'Your next lesson will arrive at your scheduled time. Keep going! 💪\n\nNeed your lesson now? Reply LESSON.');
       return;
     }
     const feedback = await getFeedback(lesson.task, message, lesson.feedback_prompt);
