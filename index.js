@@ -380,6 +380,11 @@ function safeEqual(a, b) {
   return crypto.timingSafeEqual(Buffer.from(a), Buffer.from(b));
 }
 
+function generateReferralCode(name) {
+  return name.split(' ')[0].toLowerCase().replace(/[^a-z]/g, '') +
+    Math.floor(1000 + Math.random() * 9000);
+}
+
 app.post('/paystack-webhook', async (req, res) => {
   try {
     const signature = req.headers['x-paystack-signature'] || '';
@@ -610,6 +615,47 @@ cron.schedule('0 7 * * *', async () => {
       info.fullLink + '\n\n' +
       'Otherwise your monthly renewal will happen automatically. Keep going!'
     );
+  }
+});
+
+// Auto-send referral links to newly approved affiliates and ambassadors — runs every 15 minutes
+cron.schedule('*/15 * * * *', async () => {
+  const { data: approvedAffiliates } = await supabase
+    .from('affiliates')
+    .select('*')
+    .eq('status', 'approved')
+    .or('link_sent.is.null,link_sent.eq.false');
+
+  for (const affiliate of approvedAffiliates || []) {
+    const link = 'https://skillstackng.com/choose?ref=' + affiliate.affiliate_code;
+    await sendMessage(affiliate.phone,
+      'Congratulations ' + affiliate.name + '! Your SkillStack NG affiliate application has been approved.\n\n' +
+      'Your unique referral link:\n' + link + '\n\n' +
+      'Share this link with anyone interested in learning Copywriting, Social Media Management, Content Writing, or Digital Marketing on WhatsApp.\n\n' +
+      'You earn a commission on every successful payment made through your link. We will notify you when a referral converts and process payouts weekly.\n\n' +
+      'Questions? Reply here anytime.'
+    );
+    await supabase.from('affiliates').update({ link_sent: true }).eq('phone', affiliate.phone);
+    console.log('Auto-sent affiliate link to: ' + affiliate.phone);
+  }
+
+  const { data: approvedAmbassadors } = await supabase
+    .from('ambassadors')
+    .select('*')
+    .eq('status', 'approved')
+    .or('link_sent.is.null,link_sent.eq.false');
+
+  for (const ambassador of approvedAmbassadors || []) {
+    const link = 'https://skillstackng.com/choose?ref=' + ambassador.ambassador_code;
+    await sendMessage(ambassador.phone,
+      'Congratulations ' + ambassador.name + '! Your SkillStack NG Campus Ambassador application has been approved.\n\n' +
+      'Your unique referral link:\n' + link + '\n\n' +
+      'Share this link with students on your campus interested in learning Copywriting, Social Media Management, Content Writing, or Digital Marketing on WhatsApp.\n\n' +
+      'You earn 30% commission on every successful payment made through your link. We will notify you when a referral converts and process payouts weekly.\n\n' +
+      'Questions? Reply here anytime.'
+    );
+    await supabase.from('ambassadors').update({ link_sent: true }).eq('phone', ambassador.phone);
+    console.log('Auto-sent ambassador link to: ' + ambassador.phone);
   }
 });
 
@@ -947,6 +993,9 @@ app.post('/ambassador-apply', async (req, res) => {
     let cleanPhone = (phone || '').replace(/\D/g, '');
     if (cleanPhone.startsWith('0')) cleanPhone = '234' + cleanPhone.substring(1);
 
+    // Generate unique ambassador code
+    const code = generateReferralCode(name);
+
     await supabase.from('ambassadors').insert({
       name,
       phone: cleanPhone,
@@ -956,7 +1005,12 @@ app.post('/ambassador-apply', async (req, res) => {
       state,
       plan,
       track,
+      ambassador_code: code,
       status: 'pending',
+      total_earnings: 0,
+      pending_payout: 0,
+      referral_count: 0,
+      link_sent: false,
       created_at: new Date().toISOString()
     });
 
@@ -968,8 +1022,10 @@ app.post('/ambassador-apply', async (req, res) => {
       'School: ' + school + '\n' +
       'Department: ' + department + '\n' +
       'State: ' + state + '\n' +
-      'Track: ' + track + '\n\n' +
-      'Plan: ' + plan
+      'Track: ' + track + '\n' +
+      'Code: ' + code + '\n\n' +
+      'Plan: ' + plan + '\n\n' +
+      'Approve by updating their status in Supabase to "approved" — their link will be sent automatically.'
     );
 
     res.status(200).json({ success: true });
@@ -994,8 +1050,7 @@ app.post('/affiliate-signup', async (req, res) => {
     if (cleanPhone.startsWith('0')) cleanPhone = '234' + cleanPhone.substring(1);
 
     // Generate unique affiliate code
-    const code = name.split(' ')[0].toLowerCase().replace(/[^a-z]/g, '') +
-      Math.floor(1000 + Math.random() * 9000);
+    const code = generateReferralCode(name);
 
     // Save to Supabase
     await supabase.from('affiliates').insert({
@@ -1011,6 +1066,7 @@ app.post('/affiliate-signup', async (req, res) => {
       total_earnings: 0,
       pending_payout: 0,
       referral_count: 0,
+      link_sent: false,
       created_at: new Date().toISOString()
     });
 
@@ -1045,14 +1101,30 @@ app.post('/track-referral', async (req, res) => {
       .eq('status', 'approved')
       .single();
 
-    if (!affiliate) return res.status(200).json({ success: false, reason: 'not found' });
+    if (affiliate) {
+      await supabase
+        .from('affiliates')
+        .update({ referral_count: (affiliate.referral_count || 0) + 1 })
+        .eq('affiliate_code', ref);
+      console.log('Referral tracked for affiliate: ' + ref);
+      return res.status(200).json({ success: true });
+    }
+
+    const { data: ambassador } = await supabase
+      .from('ambassadors')
+      .select('*')
+      .eq('ambassador_code', ref)
+      .eq('status', 'approved')
+      .single();
+
+    if (!ambassador) return res.status(200).json({ success: false, reason: 'not found' });
 
     await supabase
-      .from('affiliates')
-      .update({ referral_count: (affiliate.referral_count || 0) + 1 })
-      .eq('affiliate_code', ref);
+      .from('ambassadors')
+      .update({ referral_count: (ambassador.referral_count || 0) + 1 })
+      .eq('ambassador_code', ref);
 
-    console.log('Referral tracked for: ' + ref);
+    console.log('Referral tracked for ambassador: ' + ref);
     res.status(200).json({ success: true });
   } catch (err) {
     console.error('Track referral error:', err.message);
@@ -1083,9 +1155,44 @@ app.get('/approve-affiliate', async (req, res) => {
       'Questions? Reply here anytime.'
     );
 
+    await supabase.from('affiliates').update({ link_sent: true }).eq('phone', phone);
+
     res.status(200).send('Affiliate notified successfully: ' + phone);
   } catch (err) {
     console.error('Approve affiliate error:', err.message);
+    res.status(500).send('Error: ' + err.message);
+  }
+});
+
+app.get('/approve-ambassador', async (req, res) => {
+  try {
+    const phone = (req.query.phone || '').replace(/\D/g, '');
+    if (!phone) return res.status(400).send('Phone number required');
+
+    const { data: ambassador } = await supabase
+      .from('ambassadors')
+      .select('*')
+      .eq('phone', phone)
+      .single();
+
+    if (!ambassador) return res.status(404).send('Ambassador not found');
+    if (ambassador.status !== 'approved') return res.status(400).send('Ambassador not approved yet — update status in Supabase first');
+
+    const link = 'https://skillstackng.com/choose?ref=' + ambassador.ambassador_code;
+
+    await sendMessage(phone,
+      'Congratulations ' + ambassador.name + '! Your SkillStack NG Campus Ambassador application has been approved.\n\n' +
+      'Your unique referral link:\n' + link + '\n\n' +
+      'Share this link with students on your campus interested in learning Copywriting, Social Media Management, Content Writing, or Digital Marketing on WhatsApp.\n\n' +
+      'You earn 30% commission on every successful payment made through your link. We will notify you when a referral converts and process payouts weekly.\n\n' +
+      'Questions? Reply here anytime.'
+    );
+
+    await supabase.from('ambassadors').update({ link_sent: true }).eq('phone', phone);
+
+    res.status(200).send('Ambassador notified successfully: ' + phone);
+  } catch (err) {
+    console.error('Approve ambassador error:', err.message);
     res.status(500).send('Error: ' + err.message);
   }
 });
