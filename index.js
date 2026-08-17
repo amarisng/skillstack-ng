@@ -32,15 +32,36 @@ const PAYSTACK_SECRET = process.env.PAYSTACK_SECRET_KEY;
 const PAYSTACK_TEST_SECRET = process.env.PAYSTACK_TEST_SECRET_KEY;
 const VERIFY_TOKEN = process.env.WEBHOOK_VERIFY_TOKEN || 'skillstack_verify_2024';
 
+// Twilio rejects any message body over 1600 characters (error 21617) — split long
+// messages (e.g. lesson content) into multiple sequential WhatsApp messages instead.
+function splitMessage(body, maxLength = 1500) {
+  if (body.length <= maxLength) return [body];
+  const chunks = [];
+  let remaining = body;
+  while (remaining.length > maxLength) {
+    let splitAt = remaining.lastIndexOf('\n\n', maxLength);
+    if (splitAt < maxLength * 0.5) splitAt = remaining.lastIndexOf(' ', maxLength);
+    if (splitAt < 1) splitAt = maxLength;
+    chunks.push(remaining.slice(0, splitAt).trim());
+    remaining = remaining.slice(splitAt).trim();
+  }
+  if (remaining) chunks.push(remaining);
+  return chunks;
+}
+
 async function sendMessage(to, body) {
   try {
     const cleanNumber = to.replace(/\D/g, '');
     const formattedTo = 'whatsapp:+' + cleanNumber;
-    await twilioClient.messages.create({
-      from: TWILIO_NUMBER,
-      to: formattedTo,
-      body: body,
-    });
+    const chunks = splitMessage(body);
+    for (let i = 0; i < chunks.length; i++) {
+      const prefix = chunks.length > 1 ? '(' + (i + 1) + '/' + chunks.length + ')\n\n' : '';
+      await twilioClient.messages.create({
+        from: TWILIO_NUMBER,
+        to: formattedTo,
+        body: prefix + chunks[i],
+      });
+    }
     console.log('Sent to ' + cleanNumber);
   } catch (err) {
     console.error('Send error:', err.message);
