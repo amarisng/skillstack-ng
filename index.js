@@ -300,8 +300,8 @@ if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
     const isCW2 = sub.track === 'content_writing';
     const isDM2 = sub.track === 'digital_marketing';
     const monthlyLink = isSMM ? 'https://paystack.shop/pay/p1kkgoo91-' : isDM2 ? 'https://paystack.shop/pay/3ke4qasoo5' : 'https://paystack.shop/pay/2-h3igsfd2';
-    const fullLink = isSMM ? 'https://paystack.shop/pay/ok8zxwq28f' : isCW2 ? 'https://paystack.shop/pay/6gz2f87ft4' : isDM2 ? 'https://paystack.shop/pay/3ke4qasoo5' : 'https://paystack.shop/pay/m0m9ofipj4';
-    const fullPrice = isSMM ? '9,000 for 60 days' : isCW2 ? '13,000 for 90 days' : isDM2 ? '5,000/month' : '13,000 for 90 days';
+    const fullLink = isSMM ? 'https://paystack.shop/pay/6aanjfut9m' : isCW2 ? 'https://paystack.shop/pay/vd5zt2ws9q' : isDM2 ? 'https://paystack.shop/pay/wbmr9cgdyn' : 'https://paystack.shop/pay/m0m9ofipj4';
+    const fullPrice = isSMM ? '9,000 for 60 days' : isCW2 ? '13,000 for 90 days' : isDM2 ? '13,000 for 90 days' : '13,000 for 90 days';
     await sendMessage(cleanPhone, 'To activate your subscription pay here:\n\nMonthly — ₦5,000/month:\n' + monthlyLink + '\n\nFull plan — ₦' + fullPrice + ':\n' + fullLink);
     return;
   }
