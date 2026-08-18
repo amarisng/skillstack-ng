@@ -68,6 +68,44 @@ async function sendMessage(to, body) {
   }
 }
 
+async function sendEmail(to, subject, htmlContent) {
+  try {
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'api-key': process.env.BREVO_API_KEY
+      },
+      body: JSON.stringify({
+        sender: { name: 'SkillStack NG', email: 'hello@skillstackng.com' },
+        to: [{ email: to }],
+        subject: subject,
+        htmlContent: htmlContent
+      })
+    });
+    if (!response.ok) {
+      console.error('Email send error:', response.status, await response.text());
+      return;
+    }
+    console.log('Email sent to ' + to);
+  } catch (err) {
+    console.error('Email send error:', err.message);
+  }
+}
+
+function referralStatsEmailHtml(name, label, code, referrer) {
+  return '<p>Hi ' + name + ',</p>' +
+    '<p>Here is your weekly SkillStack NG ' + label + ' summary:</p>' +
+    '<ul>' +
+    '<li>Referrals: ' + (referrer.referral_count || 0) + '</li>' +
+    '<li>Total earned: ₦' + (referrer.total_earnings || 0).toLocaleString() + '</li>' +
+    '<li>Pending payout: ₦' + (referrer.pending_payout || 0).toLocaleString() + '</li>' +
+    '</ul>' +
+    '<p>Your referral link: <a href="https://skillstackng.com/choose?ref=' + code + '">https://skillstackng.com/choose?ref=' + code + '</a></p>' +
+    '<p>Payouts are processed weekly once your pending balance hits ₦5,000. Keep sharing!</p>' +
+    '<p>— SkillStack NG</p>';
+}
+
 async function getSubscriber(phone) {
   const cleanPhone = phone.replace(/\D/g, '');
   const { data } = await supabase
@@ -220,22 +258,10 @@ async function handleOnboarding(phone, message) {
   const cleanPhone = phone.replace(/\D/g, '');
 
   if (message.trim().toUpperCase() === 'EARNINGS') {
-    const { data: affiliate } = await supabase.from('affiliates').select('*').eq('phone', cleanPhone).eq('status', 'approved').single();
-    const { data: ambassador } = affiliate ? { data: null } : await supabase.from('ambassadors').select('*').eq('phone', cleanPhone).eq('status', 'approved').single();
-    const referrer = affiliate || ambassador;
-    if (referrer) {
-      const code = affiliate ? affiliate.affiliate_code : ambassador.ambassador_code;
-      const label = affiliate ? 'Affiliate' : 'Ambassador';
-      await sendMessage(cleanPhone,
-        '💰 Your SkillStack NG ' + label + ' Stats\n\n' +
-        'Referrals: ' + (referrer.referral_count || 0) + '\n' +
-        'Total earned: ₦' + (referrer.total_earnings || 0).toLocaleString() + '\n' +
-        'Pending payout: ₦' + (referrer.pending_payout || 0).toLocaleString() + '\n\n' +
-        'Your link:\nhttps://skillstackng.com/choose?ref=' + code + '\n\n' +
-        'Keep sharing — payouts are processed weekly once you hit ₦5,000.'
-      );
-      return;
-    }
+    await sendMessage(cleanPhone,
+      'Your referral stats (referrals, earnings, pending payout) are emailed to you every Monday — check your inbox! Not received one yet or need help? Email support@skillstackng.com.'
+    );
+    return;
   }
 
   const sub = await getSubscriber(cleanPhone);
@@ -756,7 +782,7 @@ cron.schedule('*/15 * * * *', async () => {
       'Your unique referral link:\n' + link + '\n\n' +
       'Share this link with anyone interested in learning Copywriting, Social Media Management, Content Writing, or Digital Marketing on WhatsApp.\n\n' +
       'You earn a commission on every successful payment made through your link. We will notify you when a referral converts and process payouts weekly.\n\n' +
-      'Reply EARNINGS any time to check your referrals and payout balance.\n\n' +
+      'We will email your referral and earnings stats to you every Monday.\n\n' +
       'Questions? Reply here anytime.'
     );
     await supabase.from('affiliates').update({ link_sent: true }).eq('phone', affiliate.phone);
@@ -776,12 +802,39 @@ cron.schedule('*/15 * * * *', async () => {
       'Your unique referral link:\n' + link + '\n\n' +
       'Share this link with students on your campus interested in learning Copywriting, Social Media Management, Content Writing, or Digital Marketing on WhatsApp.\n\n' +
       'You earn 30% commission on every successful payment made through your link. We will notify you when a referral converts and process payouts weekly.\n\n' +
-      'Reply EARNINGS any time to check your referrals and payout balance.\n\n' +
+      'We will email your referral and earnings stats to you every Monday.\n\n' +
       'Questions? Reply here anytime.'
     );
     await supabase.from('ambassadors').update({ link_sent: true }).eq('phone', ambassador.phone);
     console.log('Auto-sent ambassador link to: ' + ambassador.phone);
   }
+});
+
+// Weekly referral/earnings summary email for approved affiliates and ambassadors — every Monday 8AM WAT
+cron.schedule('0 7 * * 1', async () => {
+  console.log('Sending weekly referral stats emails...');
+
+  const { data: affiliates } = await supabase.from('affiliates').select('*').eq('status', 'approved');
+  for (const affiliate of affiliates || []) {
+    if (!affiliate.email) continue;
+    await sendEmail(
+      affiliate.email,
+      'Your SkillStack NG Affiliate Stats This Week',
+      referralStatsEmailHtml(affiliate.name, 'Affiliate', affiliate.affiliate_code, affiliate)
+    );
+  }
+
+  const { data: ambassadors } = await supabase.from('ambassadors').select('*').eq('status', 'approved');
+  for (const ambassador of ambassadors || []) {
+    if (!ambassador.email) continue;
+    await sendEmail(
+      ambassador.email,
+      'Your SkillStack NG Ambassador Stats This Week',
+      referralStatsEmailHtml(ambassador.name, 'Campus Ambassador', ambassador.ambassador_code, ambassador)
+    );
+  }
+
+  console.log('Weekly referral stats emails sent.');
 });
 
 app.get('/privacy', (req, res) => {
@@ -1277,7 +1330,7 @@ app.get('/approve-affiliate', async (req, res) => {
       'Your unique referral link:\n' + link + '\n\n' +
       'Share this link with anyone interested in learning Copywriting, Social Media Management, or Content Writing on WhatsApp.\n\n' +
       'You earn a commission on every successful payment made through your link. We will notify you when a referral converts and process payouts weekly.\n\n' +
-      'Reply EARNINGS any time to check your referrals and payout balance.\n\n' +
+      'We will email your referral and earnings stats to you every Monday.\n\n' +
       'Questions? Reply here anytime.'
     );
 
@@ -1311,7 +1364,7 @@ app.get('/approve-ambassador', async (req, res) => {
       'Your unique referral link:\n' + link + '\n\n' +
       'Share this link with students on your campus interested in learning Copywriting, Social Media Management, Content Writing, or Digital Marketing on WhatsApp.\n\n' +
       'You earn 30% commission on every successful payment made through your link. We will notify you when a referral converts and process payouts weekly.\n\n' +
-      'Reply EARNINGS any time to check your referrals and payout balance.\n\n' +
+      'We will email your referral and earnings stats to you every Monday.\n\n' +
       'Questions? Reply here anytime.'
     );
 
