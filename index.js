@@ -253,6 +253,22 @@ if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
       '12PM': '12:00', '6PM': '18:00', '9PM': '21:00'
     };
     const timePreference = timeMap[message.toUpperCase()];
+
+    if (sub.is_beta) {
+      // Already paid the beta fee — activate immediately instead of asking to pay again
+      await supabase.from('subscribers').update({
+        time_preference: timePreference,
+        active: 'true',
+        day_number: 1,
+        streak: 1,
+        last_active: new Date(Date.now() - 86400000).toISOString().split('T')[0]
+      }).eq('phone', cleanPhone);
+      const lesson = await getLesson(1, sub.track || 'copywriting');
+      await sendMessage(cleanPhone, 'Perfect ' + sub.name + '! Your lesson will arrive Monday to Friday at ' + message.toUpperCase() + '. Here is your Day 1 lesson right now:');
+      if (lesson) await sendMessage(cleanPhone, formatLesson(lesson, 1, sub.track));
+      return;
+    }
+
     await supabase.from('subscribers').update({ time_preference: timePreference }).eq('phone', cleanPhone);
 
     // Send correct payment links based on selected track
@@ -362,6 +378,14 @@ if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
     return;
   }
   if (sub.active === 'false') {
+    if (sub.is_beta) {
+      // Recovery path — already paid the beta fee but got stuck before activation
+      await supabase.from('subscribers').update({ active: 'true', day_number: 1, streak: 1 }).eq('phone', cleanPhone);
+      const lesson = await getLesson(1, sub.track || 'copywriting');
+      await sendMessage(cleanPhone, 'Sorry for the delay, ' + sub.name + '! Your beta payment is already confirmed — here is your Day 1 lesson:');
+      if (lesson) await sendMessage(cleanPhone, formatLesson(lesson, 1, sub.track));
+      return;
+    }
     const { monthlyLink, fullLink, fullPrice } = getTrackInfo(sub.track);
     await sendMessage(cleanPhone, 'To activate your subscription pay here:\n\nMonthly — ₦5,000/month:\n' + monthlyLink + '\n\nFull plan — ₦' + fullPrice + ':\n' + fullLink);
     return;
@@ -441,6 +465,7 @@ app.post('/paystack-webhook', async (req, res) => {
               active: 'false',
               streak: 0,
               plan_type: 'monthly',
+              is_beta: true,
               subscription_expires: new Date(Date.now() + 32 * 86400000).toISOString().split('T')[0],
               last_active: new Date().toISOString().split('T')[0]
             });
