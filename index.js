@@ -144,8 +144,9 @@ function formatLesson(lesson, dayNumber, track) {
   return 'Day ' + dayNumber + ' of ' + totalDays + ' - SkillStack NG\n\n' + lesson.title + '\n\n' + lesson.content + '\n\n---\nTODAYS TASK\n' + lesson.task + '\n\nReply with your answer and I will give you personal feedback.';
 }
 
-async function activateSubscriber(whatsappNumber, name, planType = 'monthly') {
+async function activateSubscriber(whatsappNumber, name, planType = 'monthly', paymentInfo = {}) {
   try {
+    const { refCode, amount, chargeReference } = paymentInfo;
     const cleanPhone = whatsappNumber.replace(/\D/g, '');
     let finalPhone = cleanPhone;
     if (finalPhone.startsWith('0')) {
@@ -164,9 +165,15 @@ async function activateSubscriber(whatsappNumber, name, planType = 'monthly') {
 
     if (sub) {
       if (sub.active === 'true') {
+        // Genuine renewal charge vs a duplicate webhook delivery for the same charge
+        if (chargeReference && sub.last_charge_reference !== chargeReference) {
+          await supabase.from('subscribers').update({ last_charge_reference: chargeReference }).eq('phone', finalPhone);
+          if (sub.referred_by) await creditReferral(sub.referred_by, amount, false);
+        }
         console.log('Subscriber already active — skipping duplicate: ' + finalPhone);
         return;
       }
+      const finalRefCode = sub.referred_by || refCode || null;
       await supabase.from('subscribers').update({
         active: 'true',
         day_number: 1,
@@ -174,8 +181,11 @@ async function activateSubscriber(whatsappNumber, name, planType = 'monthly') {
         plan_type: planType,
         subscription_expires: subscriptionExpires,
         last_active: new Date().toISOString().split('T')[0],
-        track: sub.track || 'copywriting'
+        track: sub.track || 'copywriting',
+        referred_by: finalRefCode,
+        last_charge_reference: chargeReference || null
       }).eq('phone', finalPhone);
+      if (finalRefCode) await creditReferral(finalRefCode, amount, true);
     } else {
       await supabase.from('subscribers').insert({
         phone: finalPhone,
@@ -187,8 +197,11 @@ async function activateSubscriber(whatsappNumber, name, planType = 'monthly') {
         streak: 1,
         plan_type: planType,
         subscription_expires: subscriptionExpires,
-        last_active: new Date().toISOString().split('T')[0]
+        last_active: new Date().toISOString().split('T')[0],
+        referred_by: refCode || null,
+        last_charge_reference: chargeReference || null
       });
+      if (refCode) await creditReferral(refCode, amount, true);
     }
 
     const trackLabel = trackInfo.label;
@@ -205,6 +218,26 @@ async function activateSubscriber(whatsappNumber, name, planType = 'monthly') {
 
 async function handleOnboarding(phone, message) {
   const cleanPhone = phone.replace(/\D/g, '');
+
+  if (message.trim().toUpperCase() === 'EARNINGS') {
+    const { data: affiliate } = await supabase.from('affiliates').select('*').eq('phone', cleanPhone).eq('status', 'approved').single();
+    const { data: ambassador } = affiliate ? { data: null } : await supabase.from('ambassadors').select('*').eq('phone', cleanPhone).eq('status', 'approved').single();
+    const referrer = affiliate || ambassador;
+    if (referrer) {
+      const code = affiliate ? affiliate.affiliate_code : ambassador.ambassador_code;
+      const label = affiliate ? 'Affiliate' : 'Ambassador';
+      await sendMessage(cleanPhone,
+        '💰 Your SkillStack NG ' + label + ' Stats\n\n' +
+        'Referrals: ' + (referrer.referral_count || 0) + '\n' +
+        'Total earned: ₦' + (referrer.total_earnings || 0).toLocaleString() + '\n' +
+        'Pending payout: ₦' + (referrer.pending_payout || 0).toLocaleString() + '\n\n' +
+        'Your link:\nhttps://skillstackng.com/choose?ref=' + code + '\n\n' +
+        'Keep sharing — payouts are processed weekly once you hit ₦5,000.'
+      );
+      return;
+    }
+  }
+
   const sub = await getSubscriber(cleanPhone);
 
   if (!sub) {
@@ -409,6 +442,54 @@ function generateReferralCode(name) {
     Math.floor(1000 + Math.random() * 9000);
 }
 
+// Paystack payment pages may or may not forward URL query params (?ref=CODE) into
+// transaction metadata — check every plausible location; returns null if absent,
+// which just means this particular signup won't be attributed to a referrer.
+function extractRefCode(data) {
+  if (!data.metadata) return null;
+  if (data.metadata.ref) return data.metadata.ref;
+  if (data.metadata.referrer) return data.metadata.referrer;
+  if (data.metadata.custom_fields) {
+    const refField = data.metadata.custom_fields.find(
+      f => f.variable_name === 'ref' || f.display_name === 'ref' ||
+           f.variable_name === 'referrer' || f.display_name === 'Referrer'
+    );
+    if (refField) return refField.value;
+  }
+  return null;
+}
+
+// Commission: 30% on a subscriber's first monthly payment, 19% on a first full-plan
+// payment, 10% on every subsequent monthly renewal. Rates from affiliate.html's
+// published commission table. Does not touch referral_count - that's tracked
+// separately by /track-referral (client-side, fires on the thankyou page).
+async function creditReferral(refCode, amount, isFirstPayment) {
+  if (!refCode || !amount) return;
+  const rate = isFirstPayment ? (amount >= 9000 ? 0.19 : 0.30) : 0.10;
+  const commission = Math.round(amount * rate);
+
+  const { data: affiliate } = await supabase
+    .from('affiliates').select('*').eq('affiliate_code', refCode).eq('status', 'approved').single();
+  if (affiliate) {
+    await supabase.from('affiliates').update({
+      total_earnings: (affiliate.total_earnings || 0) + commission,
+      pending_payout: (affiliate.pending_payout || 0) + commission
+    }).eq('affiliate_code', refCode);
+    console.log('Credited ₦' + commission + ' to affiliate ' + refCode);
+    return;
+  }
+
+  const { data: ambassador } = await supabase
+    .from('ambassadors').select('*').eq('ambassador_code', refCode).eq('status', 'approved').single();
+  if (ambassador) {
+    await supabase.from('ambassadors').update({
+      total_earnings: (ambassador.total_earnings || 0) + commission,
+      pending_payout: (ambassador.pending_payout || 0) + commission
+    }).eq('ambassador_code', refCode);
+    console.log('Credited ₦' + commission + ' to ambassador ' + refCode);
+  }
+}
+
 app.post('/paystack-webhook', async (req, res) => {
   try {
     const signature = req.headers['x-paystack-signature'] || '';
@@ -450,6 +531,8 @@ app.post('/paystack-webhook', async (req, res) => {
         const amount = data.amount / 100;
         let planType = 'monthly';
         if (amount >= 9000) planType = 'full';
+        const refCode = extractRefCode(data);
+        const chargeReference = data.reference;
 
         // Beta payment — run full onboarding inside bot
         if (amount <= 200) {
@@ -474,7 +557,7 @@ app.post('/paystack-webhook', async (req, res) => {
           return;
         }
 
-        await activateSubscriber(whatsappNumber, customerName, planType);
+        await activateSubscriber(whatsappNumber, customerName, planType, { refCode, amount, chargeReference });
       } else {
         console.log('No WhatsApp number found. Metadata: ' + JSON.stringify(data.metadata));
       }
@@ -658,6 +741,7 @@ cron.schedule('*/15 * * * *', async () => {
       'Your unique referral link:\n' + link + '\n\n' +
       'Share this link with anyone interested in learning Copywriting, Social Media Management, Content Writing, or Digital Marketing on WhatsApp.\n\n' +
       'You earn a commission on every successful payment made through your link. We will notify you when a referral converts and process payouts weekly.\n\n' +
+      'Reply EARNINGS any time to check your referrals and payout balance.\n\n' +
       'Questions? Reply here anytime.'
     );
     await supabase.from('affiliates').update({ link_sent: true }).eq('phone', affiliate.phone);
@@ -677,6 +761,7 @@ cron.schedule('*/15 * * * *', async () => {
       'Your unique referral link:\n' + link + '\n\n' +
       'Share this link with students on your campus interested in learning Copywriting, Social Media Management, Content Writing, or Digital Marketing on WhatsApp.\n\n' +
       'You earn 30% commission on every successful payment made through your link. We will notify you when a referral converts and process payouts weekly.\n\n' +
+      'Reply EARNINGS any time to check your referrals and payout balance.\n\n' +
       'Questions? Reply here anytime.'
     );
     await supabase.from('ambassadors').update({ link_sent: true }).eq('phone', ambassador.phone);
@@ -1177,6 +1262,7 @@ app.get('/approve-affiliate', async (req, res) => {
       'Your unique referral link:\n' + link + '\n\n' +
       'Share this link with anyone interested in learning Copywriting, Social Media Management, or Content Writing on WhatsApp.\n\n' +
       'You earn a commission on every successful payment made through your link. We will notify you when a referral converts and process payouts weekly.\n\n' +
+      'Reply EARNINGS any time to check your referrals and payout balance.\n\n' +
       'Questions? Reply here anytime.'
     );
 
@@ -1210,6 +1296,7 @@ app.get('/approve-ambassador', async (req, res) => {
       'Your unique referral link:\n' + link + '\n\n' +
       'Share this link with students on your campus interested in learning Copywriting, Social Media Management, Content Writing, or Digital Marketing on WhatsApp.\n\n' +
       'You earn 30% commission on every successful payment made through your link. We will notify you when a referral converts and process payouts weekly.\n\n' +
+      'Reply EARNINGS any time to check your referrals and payout balance.\n\n' +
       'Questions? Reply here anytime.'
     );
 
