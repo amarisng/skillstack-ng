@@ -445,16 +445,31 @@ function generateReferralCode(name) {
 // Paystack payment pages may or may not forward URL query params (?ref=CODE) into
 // transaction metadata — check every plausible location; returns null if absent,
 // which just means this particular signup won't be attributed to a referrer.
+function parseRefCode(value) {
+  if (typeof value !== 'string' || !value) return null;
+  // Paystack's metadata.referrer often carries a full URL/referrer chain rather than
+  // a clean value, e.g. "https://paystack.shop/pay/xxx?ref=CODE,https://skillstackng.com/"
+  // - pull the ref=CODE out of it if present.
+  const match = value.match(/[?&]ref=([a-zA-Z0-9]+)/);
+  if (match) return match[1];
+  if (/^[a-zA-Z0-9]+$/.test(value.trim())) return value.trim();
+  return null;
+}
+
 function extractRefCode(data) {
   if (!data.metadata) return null;
-  if (data.metadata.ref) return data.metadata.ref;
-  if (data.metadata.referrer) return data.metadata.referrer;
+  const candidates = [data.metadata.ref, data.metadata.referrer];
   if (data.metadata.custom_fields) {
-    const refField = data.metadata.custom_fields.find(
-      f => f.variable_name === 'ref' || f.display_name === 'ref' ||
-           f.variable_name === 'referrer' || f.display_name === 'Referrer'
-    );
-    if (refField) return refField.value;
+    data.metadata.custom_fields.forEach(f => {
+      if (f.variable_name === 'ref' || f.display_name === 'ref' ||
+          f.variable_name === 'referrer' || f.display_name === 'Referrer') {
+        candidates.push(f.value);
+      }
+    });
+  }
+  for (const candidate of candidates) {
+    const code = parseRefCode(candidate);
+    if (code) return code;
   }
   return null;
 }
