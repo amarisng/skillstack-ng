@@ -179,7 +179,7 @@ function getTrackInfo(track) {
 
 function formatLesson(lesson, dayNumber, track) {
   const totalDays = getTrackInfo(track).totalDays;
-  return 'Day ' + dayNumber + ' of ' + totalDays + ' - SkillStack NG\n\n' + lesson.title + '\n\n' + lesson.content + '\n\n---\nTODAYS TASK\n' + lesson.task + '\n\nReply with your answer and I will give you personal feedback.';
+  return 'Day ' + dayNumber + ' of ' + totalDays + ' - SkillStack NG\n\n' + lesson.title + '\n\n' + lesson.content + '\n\n---\nTODAYS TASK\n' + lesson.task + '\n\nReply with your answer and I will give you personal feedback.\n\n💡 Reply daily to keep your lessons coming — WhatsApp pauses messages to numbers that go quiet.';
 }
 
 async function activateSubscriber(whatsappNumber, name, planType = 'monthly', paymentInfo = {}) {
@@ -276,7 +276,7 @@ async function handleOnboarding(phone, message) {
       active: 'false',
       streak: 0,
     });
-    await sendMessage(cleanPhone, 'Welcome to SkillStack NG! 🎓\n\nWe deliver high-income skill lessons to your WhatsApp every weekday — 15 minutes a day, AI feedback on every task.\n\nChoose your track:\n\n1️⃣ Copywriting & Persuasion — 90 days\nWrite sales copy, ads, email sequences, and landing pages. Earn ₦100k–₦500k per project.\n\n2️⃣ Social Media Management — 60 days\nManage brand accounts professionally. Earn ₦80k–₦900k per month.\n\n3️⃣ Content Writing — 90 days\nWrite articles, blogs, and web content professionally. Earn ₦80k–₦400k per month.\n\n4️⃣ Digital Marketing Fundamentals — 90 days\nRun campaigns, manage ads, and grow brands online. Earn ₦100k–₦600k per month.\n\nReply 1, 2, 3 or 4 to get started.\n\nMade a mistake? Reply CHANGETRACK at any time before payment to restart.');
+    await sendMessage(cleanPhone, 'Welcome to SkillStack NG! 🎓\n\nWe deliver high-income skill lessons to your WhatsApp every weekday — 15 minutes a day, AI feedback on every task.\n\nChoose your track:\n\n1️⃣ Copywriting & Persuasion — 90 days\nWrite sales copy, ads, email sequences, and landing pages. Earn ₦100k–₦500k per project.\n\n2️⃣ Social Media Management — 60 days\nManage brand accounts professionally. Earn ₦80k–₦900k per month.\n\n3️⃣ Content Writing — 90 days\nWrite articles, blogs, and web content professionally. Earn ₦80k–₦400k per month.\n\n4️⃣ Digital Marketing Fundamentals — 90 days\nRun campaigns, manage ads, and grow brands online. Earn ₦100k–₦600k per month.\n\nReply 1, 2, 3 or 4 to get started.\n\nMade a mistake? Reply CHANGETRACK at any time before payment to restart.\n\n💡 Tip: Reply to your lesson each day, even just a few words — WhatsApp automatically pauses messages to numbers that go quiet, so staying active keeps your lessons coming.');
     return;
   }
 // Allow inactive subscribers to correct their track before payment
@@ -706,7 +706,7 @@ cron.schedule('0 9 * * *', async () => {
     const now = new Date();
     const watDay = new Date(now.getTime() + 60 * 60 * 1000).getDay();
     if (watDay === 0 || watDay === 6) continue;
-    await sendMessage(sub.phone, 'Hey ' + sub.name + '! You missed yesterday\'s lesson. Reply CONTINUE and I will send it now. Your streak is at ' + sub.streak + ' days — keep it going!');
+    await sendMessage(sub.phone, 'Hey ' + sub.name + '! You missed yesterday\'s lesson. Reply CONTINUE and I will send it now. Your streak is at ' + sub.streak + ' days — keep it going!\n\n⚠️ Heads up: if you stay quiet much longer, WhatsApp will automatically pause messages to your number. Reply today to keep your lessons coming.');
   }
 });
 
