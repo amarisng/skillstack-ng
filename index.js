@@ -579,21 +579,25 @@ app.post('/paystack-webhook', async (req, res) => {
         if (amount <= 200) {
           const betaPhone = whatsappNumber.replace(/\D/g, '');
           const existingSub = await getSubscriber(betaPhone);
-          if (!existingSub) {
-            await supabase.from('subscribers').insert({
-              phone: betaPhone,
-              name: '',
-              day_number: 0,
-              track: 'copywriting',
-              time_preference: '07:00',
-              active: 'false',
-              streak: 0,
-              plan_type: 'monthly',
-              is_beta: true,
-              subscription_expires: new Date(Date.now() + 32 * 86400000).toISOString().split('T')[0],
-              last_active: new Date().toISOString().split('T')[0]
-            });
+          if (existingSub) {
+            // Duplicate/retried webhook delivery for the same payment — don't re-send
+            // the welcome message and reset their onboarding progress.
+            console.log('Beta payment webhook duplicate — subscriber already exists, skipping resend: ' + betaPhone);
+            return;
           }
+          await supabase.from('subscribers').insert({
+            phone: betaPhone,
+            name: '',
+            day_number: 0,
+            track: 'copywriting',
+            time_preference: '07:00',
+            active: 'false',
+            streak: 0,
+            plan_type: 'monthly',
+            is_beta: true,
+            subscription_expires: new Date(Date.now() + 32 * 86400000).toISOString().split('T')[0],
+            last_active: new Date().toISOString().split('T')[0]
+          });
           await sendMessage(betaPhone, 'Payment confirmed! Welcome to SkillStack NG Beta. 🎉\n\nChoose your track:\n\n1️⃣ Copywriting & Persuasion — 90 days\n2️⃣ Social Media Management — 60 days\n3️⃣ Content Writing — 90 days\n4️⃣ Digital Marketing Fundamentals — 90 days\n\nReply 1, 2, 3 or 4 to get started.');
           return;
         }
