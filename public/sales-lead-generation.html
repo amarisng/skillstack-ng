@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1968827687158458');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1968827687158458&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sales & Lead Generation — SkillStack NG</title>
+  <meta name="description" content="Learn sales and lead generation in 90 days on WhatsApp. 15 minutes a day, AI feedback on every task, Nigerian examples throughout. ₦5,000/month."/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green: #00C48C;
+      --green-dark: #009e72;
+      --dark: #0D1F17;
+      --white: #FFFFFF;
+      --off-white: #F7FAF8;
+      --text: #1A2E1F;
+      --muted: #5A7A65;
+      --border: #D8EAE0;
+      --gold: #F5A623;
+      --red: #E53E3E;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--text); background: var(--white); overflow-x: hidden;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(13,31,23,0.97);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 60px;
+    }
+    .nav-logo { font-weight: 800; font-size: 1.1rem; color: #fff; text-decoration: none; }
+    .nav-logo span { color: var(--green); }
+    .nav-cta {
+      background: var(--green); color: var(--dark);
+      padding: 8px 20px; border-radius: 8px;
+      font-weight: 700; font-size: 0.85rem; text-decoration: none;
+    }
+
+    /* ANNOUNCEMENT BAR */
+    .announcement {
+      background: var(--gold);
+      color: var(--dark);
+      text-align: center;
+      padding: 10px 24px;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    /* HERO */
+    .hero {
+      background: linear-gradient(135deg, #0D1F17 0%, #0A2218 100%);
+      color: #fff;
+      padding: 72px 24px 80px;
+    }
+    .hero-inner {
+      max-width: 860px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 56px; align-items: center;
+    }
+    .eyebrow {
+      display: inline-block;
+      background: rgba(0,196,140,0.15);
+      border: 1px solid rgba(0,196,140,0.3);
+      color: var(--green);
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      border-radius: 20px; padding: 4px 14px; margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      font-weight: 800; line-height: 1.15; margin-bottom: 18px;
+    }
+    .hero h1 em { color: var(--green); font-style: normal; }
+    .hero-lead {
+      font-size: 1rem; color: rgba(255,255,255,0.7);
+      line-height: 1.7; margin-bottom: 28px;
+    }
+    .hero-bullets { list-style: none; margin-bottom: 32px; }
+    .hero-bullets li {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 0.88rem; color: rgba(255,255,255,0.8);
+      padding: 6px 0; line-height: 1.5;
+    }
+    .hero-bullets li::before {
+      content: "✓"; color: var(--green); font-weight: 800;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn-primary {
+      display: inline-block;
+      background: var(--green); color: var(--dark);
+      padding: 14px 28px; border-radius: 10px;
+      font-weight: 800; font-size: 1rem; text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn-primary:hover { background: var(--green-dark); }
+    .btn-secondary {
+      display: inline-block;
+      background: transparent;
+      border: 2px solid rgba(255,255,255,0.25);
+      color: #fff;
+      padding: 12px 24px; border-radius: 10px;
+      font-weight: 700; font-size: 0.95rem; text-decoration: none;
+      transition: border-color 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--green); color: var(--green); }
+
+    /* PRICE CARD in hero */
+    .price-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(0,196,140,0.25);
+      border-radius: 20px;
+      padding: 36px 28px;
+    }
+    .price-card-label {
+      font-size: 0.75rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.12em;
+      color: var(--green); margin-bottom: 8px;
+    }
+    .price-main {
+      font-size: 2.6rem; font-weight: 900;
+      color: #fff; line-height: 1; margin-bottom: 4px;
+    }
+    .price-sub {
+      font-size: 0.82rem; color: rgba(255,255,255,0.5);
+      margin-bottom: 24px;
+    }
+    .price-features { list-style: none; margin-bottom: 28px; }
+    .price-features li {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 0.85rem; color: rgba(255,255,255,0.75);
+      padding: 7px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .price-features li:last-child { border-bottom: none; }
+    .price-features li::before {
+      content: "✓"; color: var(--green); font-weight: 800; flex-shrink: 0;
+    }
+    .price-cta {
+      display: block; width: 100%;
+      background: var(--green); color: var(--dark);
+      padding: 14px; border-radius: 10px;
+      font-weight: 800; font-size: 1rem;
+      text-align: center; text-decoration: none;
+      transition: background 0.2s;
+    }
+    .price-cta:hover { background: var(--green-dark); }
+    .price-note {
+      text-align: center; font-size: 0.75rem;
+      color: rgba(255,255,255,0.4); margin-top: 12px;
+    }
+
+    /* SECTIONS */
+    section { padding: 72px 24px; }
+    .section-inner { max-width: 860px; margin: 0 auto; }
+    .section-label {
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--green); margin-bottom: 12px;
+    }
+    h2 {
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      font-weight: 800; line-height: 1.2;
+      color: var(--dark); margin-bottom: 16px;
+    }
+    .section-lead {
+      font-size: 1rem; color: var(--muted);
+      line-height: 1.7; max-width: 600px; margin-bottom: 48px;
+    }
+
+    /* HOW IT WORKS */
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+    .step {
+      background: var(--off-white);
+      border: 1px solid var(--border);
+      border-radius: 16px; padding: 28px 24px;
+    }
+    .step-num {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--green); color: var(--dark);
+      font-weight: 900; font-size: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 16px;
+    }
+    .step h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; color: var(--dark); }
+    .step p { font-size: 0.87rem; color: var(--muted); line-height: 1.6; }
+
+    /* CURRICULUM */
+    .curriculum { display: flex; flex-direction: column; gap: 16px; }
+    .week {
+      border: 1px solid var(--border);
+      border-radius: 14px; overflow: hidden;
+    }
+    .week-header {
+      background: var(--off-white);
+      padding: 18px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer;
+    }
+    .week-header h3 { font-size: 0.95rem; font-weight: 700; color: var(--dark); }
+    .week-header span { font-size: 0.8rem; color: var(--muted); }
+    .week-body { padding: 20px 24px; display: none; }
+    .week-body.open { display: block; }
+    .week-body ul { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 6px 20px; }
+    .week-body ul li {
+      font-size: 0.83rem; color: var(--muted);
+      padding: 4px 0;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .week-body ul li::before { content: "→"; color: var(--green); font-weight: 700; }
+
+    /* INCOME SECTION */
+    .income-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .income-card {
+      background: var(--off-white);
+      border: 1px solid var(--border);
+      border-radius: 14px; padding: 24px 20px;
+      text-align: center;
+    }
+    .income-card .role { font-size: 0.8rem; font-weight: 700; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.08em; }
+    .income-card .amount { font-size: 1.5rem; font-weight: 900; color: var(--dark); margin-bottom: 4px; }
+    .income-card .period { font-size: 0.75rem; color: var(--muted); }
+
+    /* FOUNDING COHORT NOTE (replaces testimonials until real students exist) */
+    .founding-note {
+      background: var(--off-white);
+      border: 1px dashed var(--border);
+      border-radius: 14px; padding: 32px;
+      text-align: center;
+    }
+    .founding-note p { font-size: 0.92rem; color: var(--muted); line-height: 1.7; max-width: 520px; margin: 0 auto; }
+
+    /* FAQ */
+    .faq { display: flex; flex-direction: column; gap: 12px; }
+    .faq-item { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .faq-q {
+      padding: 18px 20px;
+      font-weight: 700; font-size: 0.9rem; color: var(--dark);
+      cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--white);
+    }
+    .faq-q::after { content: "+"; font-size: 1.2rem; color: var(--green); font-weight: 700; }
+    .faq-q.open::after { content: "−"; }
+    .faq-a { padding: 0 20px; max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease; }
+    .faq-a.open { max-height: 300px; padding: 0 20px 18px; }
+    .faq-a p { font-size: 0.87rem; color: var(--muted); line-height: 1.7; }
+
+    /* CTA BANNER */
+    .cta-banner {
+      background: linear-gradient(135deg, #0D1F17, #0A2218);
+      color: #fff; text-align: center;
+      padding: 72px 24px;
+    }
+    .cta-banner h2 { color: #fff; margin-bottom: 16px; }
+    .cta-banner p { color: rgba(255,255,255,0.65); margin-bottom: 36px; font-size: 1rem; max-width: 500px; margin-left: auto; margin-right: auto; line-height: 1.7; }
+
+    /* FOOTER */
+    footer {
+      background: var(--dark); color: rgba(255,255,255,0.45);
+      text-align: center; padding: 32px 24px;
+      font-size: 0.8rem;
+    }
+    footer a { color: var(--green); text-decoration: none; }
+
+    /* RESPONSIVE */
+    @media (max-width: 680px) {
+      .hero-inner { grid-template-columns: 1fr; gap: 40px; }
+      .steps { grid-template-columns: 1fr; }
+      .income-grid { grid-template-columns: 1fr 1fr; }
+      .week-body ul { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="/">Skill<span>Stack</span> NG</a>
+  <a class="nav-cta" href="PENDING_PAYSTACK_LINK_MONTHLY" target="_blank">Enrol — ₦5,000/month</a>
+</nav>
+
+<div class="announcement">
+  🎯 Track 5 is live — Sales & Lead Generation. 90 days. WhatsApp delivery. AI feedback on every task.
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="eyebrow">Track 5 — Sales & Lead Generation</div>
+      <h1>Become a <em>Sales Professional</em> in 90 Days</h1>
+      <p class="hero-lead">Learn to prospect, open conversations, generate leads, and close deals — and earn ₦100k–₦600k per month — delivered to your WhatsApp, 15 minutes a day.</p>
+      <ul class="hero-bullets">
+        <li>65 lessons across sales fundamentals, lead generation, closing, and sales leadership</li>
+        <li>Real Nigerian business examples in every lesson</li>
+        <li>AI-powered personal feedback on every task you submit</li>
+        <li>No laptop required — everything on your phone</li>
+        <li>Weekday delivery, your preferred time</li>
+      </ul>
+      <div class="hero-btns">
+        <a class="btn-primary" href="PENDING_PAYSTACK_LINK_MONTHLY" target="_blank">Start for ₦5,000/month</a>
+        <a class="btn-secondary" href="#curriculum">See curriculum →</a>
+      </div>
+    </div>
+    <div>
+      <div class="price-card">
+        <div class="price-card-label">Monthly Plan</div>
+        <div class="price-main">₦5,000</div>
+        <div class="price-sub">per month · cancel anytime</div>
+        <ul class="price-features">
+          <li>65 lessons over 90 days</li>
+          <li>Sales fundamentals & lead generation</li>
+          <li>Closing, negotiation & sales leadership</li>
+          <li>AI feedback on every task</li>
+          <li>Nigerian examples throughout</li>
+          <li>WhatsApp delivery — no app needed</li>
+        </ul>
+        <a class="price-cta" href="PENDING_PAYSTACK_LINK_MONTHLY" target="_blank">Enrol Now</a>
+        <p class="price-note">Enter your WhatsApp number at checkout</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section style="background: var(--off-white);">
+  <div class="section-inner">
+    <div class="section-label">How It Works</div>
+    <h2>Learning on WhatsApp, built for busy Nigerians</h2>
+    <p class="section-lead">No Zoom classes. No offline sessions. No app to download. Your sales education arrives on WhatsApp every weekday morning.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Pay and enrol</h3>
+        <p>Complete payment and enter your WhatsApp number. Your account activates immediately after confirmation.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Receive your daily lesson</h3>
+        <p>Every weekday at your chosen time, a structured lesson arrives — context, concept, Nigerian example, and a task to complete.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Submit your task, get feedback</h3>
+        <p>Reply with your task response. Our AI coach gives you personalised, specific feedback within seconds — just like having a trainer in your pocket.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT YOU WILL EARN -->
+<section>
+  <div class="section-inner">
+    <div class="section-label">Income Potential</div>
+    <h2>What Nigerian sales professionals earn</h2>
+    <p class="section-lead">Sales is one of the few skills every business needs, always. Trained closers and lead generators are in constant demand across Nigerian companies.</p>
+    <div class="income-grid">
+      <div class="income-card">
+        <div class="role">Sales Development Rep</div>
+        <div class="amount">₦80k–₦200k</div>
+        <div class="period">per month</div>
+      </div>
+      <div class="income-card">
+        <div class="role">Business Development Exec</div>
+        <div class="amount">₦120k–₦300k</div>
+        <div class="period">per month</div>
+      </div>
+      <div class="income-card">
+        <div class="role">Sales Team Lead</div>
+        <div class="amount">₦250k–₦600k</div>
+        <div class="period">per month</div>
+      </div>
+      <div class="income-card">
+        <div class="role">Lead Generation Specialist</div>
+        <div class="amount">₦100k–₦250k</div>
+        <div class="period">per month</div>
+      </div>
+      <div class="income-card">
+        <div class="role">Freelance Sales Consultant</div>
+        <div class="amount">₦150k–₦450k</div>
+        <div class="period">per month</div>
+      </div>
+      <div class="income-card">
+        <div class="role">High-Ticket Closer</div>
+        <div class="amount">₦200k–₦600k</div>
+        <div class="period">per month</div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- SAMPLE LESSON -->
+<section style="background:#0A0A0A;padding:72px 24px;">
+  <div style="max-width:900px;margin:0 auto;text-align:center;">
+    <span style="display:inline-block;background:rgba(0,196,140,0.15);border:1px solid rgba(0,196,140,0.3);color:#00C48C;font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;border-radius:20px;padding:4px 14px;margin-bottom:16px;">See it in action</span>
+    <h2 style="font-size:clamp(1.6rem,4vw,2.2rem);font-weight:800;color:#fff;line-height:1.2;margin-bottom:14px;">This is what lands on your WhatsApp every morning.</h2>
+    <p style="font-size:1rem;color:rgba(255,255,255,0.65);line-height:1.7;max-width:540px;margin:0 auto 40px;">From payment to Day 5 — the full journey, playing automatically. A real lesson, a real task, real AI feedback. Every single weekday.</p>
+    <div style="display:flex;justify-content:center;">
+      <iframe src="/demo-video" style="width:360px;height:680px;border:none;border-radius:40px;box-shadow:0 40px 100px rgba(0,0,0,0.7);" scrolling="no"></iframe>
+    </div>
+  </div>
+</section>
+<!-- CURRICULUM -->
+<section id="curriculum" style="background: var(--off-white);">
+  <div class="section-inner">
+    <div class="section-label">Curriculum</div>
+    <h2>65 lessons across 6 skill blocks</h2>
+    <p class="section-lead">Every lesson is structured the same way: context, concept, Nigerian example, and a practical task with AI feedback. No theory without application.</p>
+    <div class="curriculum">
+
+      <div class="week">
+        <div class="week-header" onclick="toggleWeek(this)">
+          <h3>Week 1 — Sales Fundamentals</h3>
+          <span>Days 1–10</span>
+        </div>
+        <div class="week-body open">
+          <ul>
+            <li>What sales really is — and why it pays in Nigeria</li>
+            <li>The Nigerian sales mindset</li>
+            <li>Understanding your buyer — the Nigerian customer</li>
+            <li>The sales process — a step-by-step framework</li>
+            <li>Prospecting — finding the right Nigerian buyers</li>
+            <li>The art of opening a sales conversation</li>
+            <li>Discovery — asking the questions that close deals</li>
+            <li>How to present your offer compellingly</li>
+            <li>Handling objections — turning no into yes</li>
+            <li>Week 1 review — your first complete sales conversation</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="week">
+        <div class="week-header" onclick="toggleWeek(this)">
+          <h3>Week 2 — Closing & Building Your Sales System</h3>
+          <span>Days 11–20</span>
+        </div>
+        <div class="week-body">
+          <ul>
+            <li>How to close sales confidently</li>
+            <li>Following up — the Nigerian sales skill most people ignore</li>
+            <li>Building a sales pipeline</li>
+            <li>Sales communication — writing messages that get responses</li>
+            <li>Selling on the phone — Nigerian telesales skills</li>
+            <li>Selling face to face — Nigerian in-person sales</li>
+            <li>Sales negotiation — getting the best deal in Nigeria</li>
+            <li>Sales for freelancers and consultants in Nigeria</li>
+            <li>Selling in Nigerian markets — B2C and retail sales</li>
+            <li>Week 2 review — building your personal sales system</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="week">
+        <div class="week-header" onclick="toggleWeek(this)">
+          <h3>Week 3 — Lead Generation Mastery</h3>
+          <span>Days 21–30</span>
+        </div>
+        <div class="week-body">
+          <ul>
+            <li>What is lead generation and why it matters in Nigeria</li>
+            <li>Inbound lead generation — making them come to you</li>
+            <li>Outbound lead generation — finding and reaching Nigerian buyers</li>
+            <li>Social selling — LinkedIn and Twitter for Nigerian B2B leads</li>
+            <li>WhatsApp lead generation for Nigerian businesses</li>
+            <li>Email lead generation and nurturing in Nigeria</li>
+            <li>Qualifying leads — separating time-wasters from real buyers</li>
+            <li>CRM — managing your leads and pipeline like a professional</li>
+            <li>Referral systems — the most powerful Nigerian lead generation tool</li>
+            <li>Week 3 review — building your lead generation machine</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="week">
+        <div class="week-header" onclick="toggleWeek(this)">
+          <h3>Week 4 — Advanced Sales Techniques</h3>
+          <span>Days 31–40</span>
+        </div>
+        <div class="week-body">
+          <ul>
+            <li>Advanced closing techniques for complex Nigerian sales</li>
+            <li>Handling price objections in Nigeria</li>
+            <li>Sales scripts and talk tracks for Nigerian markets</li>
+            <li>Building and managing a high-performing sales team</li>
+            <li>Sales analytics and performance measurement</li>
+            <li>Sales psychology — understanding what drives Nigerian buyers</li>
+            <li>Digital sales tools for Nigerian salespeople</li>
+            <li>Sales ethics and professionalism in Nigeria</li>
+            <li>Creating a personal brand as a Nigerian sales professional</li>
+            <li>Week 4 review — your complete sales and lead generation system</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="week">
+        <div class="week-header" onclick="toggleWeek(this)">
+          <h3>Week 5 — Sales Leadership & Client Management</h3>
+          <span>Days 41–50</span>
+        </div>
+        <div class="week-body">
+          <ul>
+            <li>Always Be Solving — the ABS sales philosophy</li>
+            <li>Sales enablement — tools and resources that help you sell</li>
+            <li>Selling to the Nigerian government and public sector</li>
+            <li>Managing long sales cycles in Nigeria</li>
+            <li>Upselling and cross-selling to existing Nigerian clients</li>
+            <li>Handling difficult clients in Nigerian business</li>
+            <li>Sales leadership and managing your own performance</li>
+            <li>Client retention — keeping Nigerian clients for life</li>
+            <li>Selling in economic uncertainty — Nigerian markets</li>
+            <li>Week 5 review — advanced sales mastery</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="week">
+        <div class="week-header" onclick="toggleWeek(this)">
+          <h3>Week 6 — Building Your Sales Career & Business</h3>
+          <span>Days 51–65</span>
+        </div>
+        <div class="week-body">
+          <ul>
+            <li>Building multiple income streams from sales skills</li>
+            <li>The entrepreneur as salesperson</li>
+            <li>High-ticket sales in Nigeria</li>
+            <li>Sales career planning for Nigerian professionals</li>
+            <li>Staying motivated in sales</li>
+            <li>Advanced negotiation — complex Nigerian business deals</li>
+            <li>Understanding digital buyers in Nigeria</li>
+            <li>Sales operations — building systems that scale</li>
+            <li>International sales — selling from Nigeria to the world</li>
+            <li>Strategic partnerships and B2B alliances in Nigeria</li>
+            <li>Paid lead generation — when and how to use advertising</li>
+            <li>The future of sales in Nigeria</li>
+            <li>Day 63 — your sales business plan</li>
+            <li>Day 64 — the graduation project</li>
+            <li>Day 65 — completion and the road ahead</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- FOUNDING COHORT -->
+<section>
+  <div class="section-inner">
+    <div class="section-label">New Track</div>
+    <h2>You'd be joining the founding cohort</h2>
+    <p class="section-lead">Sales & Lead Generation just went live — real student results and testimonials will appear here as the first cohort completes the programme.</p>
+    <div class="founding-note">
+      <p>Every other SkillStack track started exactly where this one is now. If you enrol early, you get the same curriculum, the same AI feedback, and the same support — plus the founding member rate before it increases.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section style="background:#fff;padding:72px 24px;">
+  <div style="max-width:860px;margin:0 auto;text-align:center;">
+    <span style="display:inline-block;background:rgba(0,196,140,0.1);border:1px solid rgba(0,196,140,0.2);color:#00C48C;font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;border-radius:20px;padding:4px 14px;margin-bottom:16px;">Pricing</span>
+    <h2 style="font-size:clamp(1.6rem,4vw,2.2rem);font-weight:800;color:#0D1F17;margin-bottom:14px;">Simple, transparent pricing</h2>
+    <p style="font-size:1rem;color:#5A7A65;margin-bottom:48px;line-height:1.7;max-width:500px;margin-left:auto;margin-right:auto;">One skill. Two ways to pay. Cancel the monthly plan anytime — your progress is always saved.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:660px;margin:0 auto;">
+      <div style="border:1px solid #D8EAE0;border-radius:16px;padding:32px 24px;text-align:center;display:flex;flex-direction:column;">
+        <p style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#5A7A65;margin-bottom:12px;">Monthly</p>
+        <p style="font-size:2.4rem;font-weight:900;color:#0D1F17;line-height:1;margin-bottom:4px;">₦5,000</p>
+        <p style="font-size:0.82rem;color:#5A7A65;margin-bottom:16px;">per month · cancel anytime</p>
+        <div style="background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.25);border-radius:10px;padding:8px 14px;font-size:0.75rem;color:#C27A00;font-weight:600;margin-bottom:20px;">⚡ Price increasing to ₦8,500 soon</div>
+        <ul style="list-style:none;text-align:left;margin-bottom:24px;flex:1;padding:0;">
+          <li style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #D8EAE0;font-size:0.82rem;color:#1A2E1F;"><span style="color:#00C48C;font-weight:700;">✓</span> All 65 sales & lead generation lessons</li>
+          <li style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #D8EAE0;font-size:0.82rem;color:#1A2E1F;"><span style="color:#00C48C;font-weight:700;">✓</span> AI feedback on every task</li>
+          <li style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #D8EAE0;font-size:0.82rem;color:#1A2E1F;"><span style="color:#00C48C;font-weight:700;">✓</span> WhatsApp delivery daily</li>
+          <li style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #D8EAE0;font-size:0.82rem;color:#1A2E1F;"><span style="color:#00C48C;font-weight:700;">✓</span> Nigerian context throughout</li>
+          <li style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #D8EAE0;font-size:0.82rem;color:#1A2E1F;"><span style="color:#00C48C;font-weight:700;">✓</span> Streak and progress tracking</li>
+          <li style="display:flex;align-items:center;gap:10px;padding:7px 0;font-size:0.82rem;color:#1A2E1F;"><span style="color:#00C48C;font-weight:700;">✓</span> Completion certificate Day 90</li>
+        </ul>
+        <a href="PENDING_PAYSTACK_LINK_MONTHLY" style="display:block;background:#00C48C;color:#0D1F17;padding:12px;border-radius:10px;font-weight:800;font-size:0.9rem;text-decoration:none;margin-top:auto;">Start monthly →</a>
+        <p style="font-size:0.72rem;color:#5A7A65;margin-top:10px;">Card payment · Renews automatically</p>
+      </div>
+      <div style="border:2px solid #00C48C;border-radius:16px;padding:32px 24px;text-align:center;background:#F7FAF8;position:relative;display:flex;flex-direction:column;">
+        <div style="position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:#00C48C;color:#0D1F17;font-size:0.7rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;border-radius:20px;padding:4px 16px;white-space:nowrap;">⭐ Best Value</div>
+        <p style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#00C48C;margin-bottom:12px;">Full 90 Days</p>
+        <p style="font-size:2.4rem;font-weight:900;color:#0D1F17;line-height:1;margin-bottom:4px;">₦13,000</p>
+        <p style="font-size:0.82rem;color:#5A7A65;margin-bottom:8px;">one payment · no renewals · bank transfer accepted</p>
+        <span style="display:inline-block;background:rgba(0,196,140,0.08);border:1px solid rgba(0,196,140,0.2);border-radius:6px;padding:3px 10px;font-size:0.72rem;font-weight:700;color:#00C48C;margin-bottom:20px;">You save ₦2,000 vs monthly</span>
+        <ul style="list-style:none;text-align:left;margin-bottom:24px;flex:1;padding:0;">
+          <li style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #D8EAE0;font-size:0.82rem;color:#1A2E1F;"><span style="color:#00C48C;font-weight:700;">✓</span> All 65 sales & lead generation lessons</li>
+          <li style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #D8EAE0;font-size:0.82rem;color:#1A2E1F;"><span style="color:#00C48C;font-weight:700;">✓</span> AI feedback on every task</li>
+          <li style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #D8EAE0;font-size:0.82rem;color:#1A2E1F;"><span style="color:#00C48C;font-weight:700;">✓</span> WhatsApp delivery daily</li>
+          <li style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #D8EAE0;font-size:0.82rem;color:#1A2E1F;"><span style="color:#00C48C;font-weight:700;">✓</span> Nigerian context throughout</li>
+          <li style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #D8EAE0;font-size:0.82rem;color:#1A2E1F;"><span style="color:#00C48C;font-weight:700;">✓</span> Streak and progress tracking</li>
+          <li style="display:flex;align-items:center;gap:10px;padding:7px 0;font-size:0.82rem;color:#1A2E1F;"><span style="color:#00C48C;font-weight:700;">✓</span> Completion certificate Day 90</li>
+          <li style="display:flex;align-items:center;gap:10px;padding:7px 0;font-size:0.82rem;color:#1A2E1F;"><span style="color:#00C48C;font-weight:700;">✓</span> No monthly card charges ever</li>
+        </ul>
+        <a href="PENDING_PAYSTACK_LINK_FULL" style="display:block;background:#0D1F17;color:#00C48C;padding:12px;border-radius:10px;font-weight:800;font-size:0.9rem;text-decoration:none;margin-top:auto;">Pay once, start today →</a>
+        <p style="font-size:0.72rem;color:#5A7A65;margin-top:10px;">First lesson arrives immediately after payment</p>
+        <div style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:0.72rem;color:#00C48C;font-weight:600;margin-top:8px;">🏦 Bank transfer accepted</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section style="background: var(--off-white);">
+  <div class="section-inner">
+    <div class="section-label">Questions</div>
+    <h2>Frequently asked questions</h2>
+    <p class="section-lead">Everything you need to know before enrolling.</p>
+    <div class="faq">
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Do I need any prior sales experience?</div>
+        <div class="faq-a"><p>No. The Sales & Lead Generation track starts from the absolute basics — what sales really is, the Nigerian sales mindset, and understanding your buyer — before building into prospecting, closing, lead generation systems, and sales leadership. If you can read and have a smartphone, you are ready.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">How is this different from watching YouTube videos?</div>
+        <div class="faq-a"><p>YouTube videos are passive. SkillStack is active — every lesson ends with a task you must complete, and you receive personalised AI feedback on your specific submission. The accountability and feedback loop is what drives real skill development, not just knowledge.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">What exactly is delivered to my WhatsApp?</div>
+        <div class="faq-a"><p>Every weekday at your chosen time, you receive a structured lesson with four sections: Context (why this matters), Concept (the actual teaching), Nigerian Example (a real Nigerian business application), and a Task (your practical exercise for the day). You reply with your answer and receive AI feedback immediately.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Can I use this to freelance or find my own clients?</div>
+        <div class="faq-a"><p>Yes — and this track is specifically designed for that outcome. Lesson 18 covers selling as a freelancer or consultant, and Week 6 covers building multiple income streams, high-ticket sales, and your own sales business plan. The curriculum is built around the Nigerian market with Nigerian buyers, examples, and income benchmarks throughout.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">What happens if I miss a day?</div>
+        <div class="faq-a"><p>Nothing is lost. Your lesson waits for you and your day count only advances when you submit your task. If you miss a weekday, you will receive a re-engagement reminder the next morning. Your streak tracks your consistency but missing a day does not reset your progress.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">How do I cancel if I need to?</div>
+        <div class="faq-a"><p>The monthly plan is a Paystack subscription — you can cancel at any time from your Paystack account or by contacting us on WhatsApp. If you cancel, your lessons continue until the end of your current billing period. Your progress is saved permanently so you can pick up exactly where you left off if you return.</p></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CTA BANNER -->
+<section class="cta-banner">
+  <div class="section-inner">
+    <h2>Start your 90-day sales journey today</h2>
+    <p>₦5,000 per month. Cancel anytime. Your first lesson arrives within 24 hours of payment.</p>
+    <a class="btn-primary" href="PENDING_PAYSTACK_LINK_MONTHLY" target="_blank" style="font-size: 1.1rem; padding: 16px 36px;">Enrol Now — ₦5,000/month</a>
+  </div>
+</section>
+
+<!-- LEAD CAPTURE BAR -->
+<div style="background:#0D1F17;padding:40px 24px;text-align:center;border-top:2px solid rgba(0,196,140,0.2);">
+  <p style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.14em;color:rgba(255,255,255,0.4);margin-bottom:10px;">Free Resource</p>
+  <p style="font-size:1.1rem;font-weight:800;color:#fff;margin-bottom:8px;">Not ready to start yet? Get the free guide first.</p>
+  <p style="font-size:0.88rem;color:rgba(255,255,255,0.6);margin-bottom:20px;line-height:1.6;max-width:480px;margin-left:auto;margin-right:auto;">The Nigerian Skills Income Guide 2026 — 40 pages covering all 6 tracks, income rates, and how to choose the right one for you.</p>
+  <a href="/free-guide" style="display:inline-block;background:#00C48C;color:#0D1F17;padding:12px 28px;border-radius:10px;font-weight:800;font-size:0.9rem;text-decoration:none;">Download free — no payment required →</a>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 Amaris Synergy Limited · <a href="/privacy">Privacy Policy</a> · <a href="/terms">Terms of Service</a> · <a href="/">SkillStack NG</a></p>
+</footer>
+
+<script>
+  function toggleWeek(el) {
+    const body = el.nextElementSibling;
+    body.classList.toggle('open');
+  }
+  function toggleFaq(el) {
+    const answer = el.nextElementSibling;
+    el.classList.toggle('open');
+    answer.classList.toggle('open');
+  }
+
+  // Affiliate ref tracking
+  (function() {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get('ref');
+    if (ref) localStorage.setItem('ssng_ref', ref);
+    const storedRef = localStorage.getItem('ssng_ref');
+    if (storedRef) {
+      document.querySelectorAll('a[href*="paystack.shop"]').forEach(function(link) {
+        const url = new URL(link.href);
+        url.searchParams.set('ref', storedRef);
+        link.href = url.toString();
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>

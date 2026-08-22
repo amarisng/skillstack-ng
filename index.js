@@ -178,6 +178,17 @@ const TRACKS = {
     fullLink: 'https://paystack.shop/pay/bo96lsmt2c',
     fullPrice: '13,000 for 90 days (save 2,000)',
     fullExpiryDays: 95
+  },
+  sales_lead_generation: {
+    label: 'Sales & Lead Generation',
+    totalDays: 90,
+    // TODO: replace with the real Paystack payment page links before this track
+    // goes live — see PENDING_LAUNCH notes. These placeholders are intentionally
+    // broken so a premature deploy fails loudly instead of taking real payments nowhere.
+    monthlyLink: 'PENDING_PAYSTACK_LINK_MONTHLY',
+    fullLink: 'PENDING_PAYSTACK_LINK_FULL',
+    fullPrice: '13,000 for 90 days (save 2,000)',
+    fullExpiryDays: 95
   }
 };
 
@@ -292,7 +303,7 @@ async function handleReferrerActivation(cleanPhone, table, codeField, label, app
   await sendMessage(cleanPhone,
     'Congratulations ' + record.name + '! Your SkillStack NG ' + label + ' application has been approved.\n\n' +
     'Your unique referral link:\n' + link + '\n\n' +
-    'Share this link with anyone interested in learning Copywriting, Social Media Management, Content Writing, or Digital Marketing on WhatsApp.\n\n' +
+    'Share this link with anyone interested in learning Copywriting, Social Media Management, Content Writing, Digital Marketing, or Sales & Lead Generation on WhatsApp.\n\n' +
     'You earn a commission on every successful payment made through your link. We will notify you when a referral converts and process payouts weekly.\n\n' +
     'We will email your referral and earnings stats to you every Monday.\n\n' +
     'Questions? Reply here anytime. Text ' + keyword + ' any time to get your link again.'
@@ -335,7 +346,7 @@ async function handleOnboarding(phone, message) {
       active: 'false',
       streak: 0,
     });
-    await sendMessage(cleanPhone, 'Welcome to SkillStack NG! 🎓\n\nWe deliver high-income skill lessons to your WhatsApp every weekday — 15 minutes a day, AI feedback on every task.\n\nChoose your track:\n\n1️⃣ Copywriting & Persuasion — 90 days\nWrite sales copy, ads, email sequences, and landing pages. Earn ₦100k–₦500k per project.\n\n2️⃣ Social Media Management — 60 days\nManage brand accounts professionally. Earn ₦80k–₦900k per month.\n\n3️⃣ Content Writing — 90 days\nWrite articles, blogs, and web content professionally. Earn ₦80k–₦400k per month.\n\n4️⃣ Digital Marketing Fundamentals — 90 days\nRun campaigns, manage ads, and grow brands online. Earn ₦100k–₦600k per month.\n\nReply 1, 2, 3 or 4 to get started.\n\nMade a mistake? Reply CHANGETRACK at any time before payment to restart.\n\n💡 Tip: Reply to your lesson each day, even just a few words — WhatsApp automatically pauses messages to numbers that go quiet, so staying active keeps your lessons coming.');
+    await sendMessage(cleanPhone, 'Welcome to SkillStack NG! 🎓\n\nWe deliver high-income skill lessons to your WhatsApp every weekday — 15 minutes a day, AI feedback on every task.\n\nChoose your track:\n\n1️⃣ Copywriting & Persuasion — 90 days\nWrite sales copy, ads, email sequences, and landing pages. Earn ₦100k–₦500k per project.\n\n2️⃣ Social Media Management — 60 days\nManage brand accounts professionally. Earn ₦80k–₦900k per month.\n\n3️⃣ Content Writing — 90 days\nWrite articles, blogs, and web content professionally. Earn ₦80k–₦400k per month.\n\n4️⃣ Digital Marketing Fundamentals — 90 days\nRun campaigns, manage ads, and grow brands online. Earn ₦100k–₦600k per month.\n\n5️⃣ Sales & Lead Generation — 90 days\nClose deals and generate consistent leads for Nigerian businesses. Earn ₦100k–₦600k per month.\n\nReply 1, 2, 3, 4 or 5 to get started.\n\nMade a mistake? Reply CHANGETRACK at any time before payment to restart.\n\n💡 Tip: Reply to your lesson each day, even just a few words — WhatsApp automatically pauses messages to numbers that go quiet, so staying active keeps your lessons coming.');
     return;
   }
 // Allow inactive subscribers to correct their track before payment
@@ -345,13 +356,19 @@ async function handleOnboarding(phone, message) {
   }
 if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
   await supabase.from('subscribers').update({ track: 'copywriting', name: '' }).eq('phone', cleanPhone);
- await sendMessage(cleanPhone, 'No problem! Let\'s start over.\n\nChoose your track:\n\n1️⃣ Copywriting & Persuasion — 90 days\n2️⃣ Social Media Management — 60 days\n3️⃣ Content Writing — 90 days\n4️⃣ Digital Marketing Fundamentals — 90 days\n\nReply 1, 2, 3 or 4.');
+ await sendMessage(cleanPhone, 'No problem! Let\'s start over.\n\nChoose your track:\n\n1️⃣ Copywriting & Persuasion — 90 days\n2️⃣ Social Media Management — 60 days\n3️⃣ Content Writing — 90 days\n4️⃣ Digital Marketing Fundamentals — 90 days\n5️⃣ Sales & Lead Generation — 90 days\n\nReply 1, 2, 3, 4 or 5.');
   return;
 }
   // Handle track selection
-  if (sub.active === 'false' && sub.name === '' && (message === '1' || message === '2' || message === '3' || message === '4')) {
-    const selectedTrack = message === '1' ? 'copywriting' : message === '2' ? 'social_media_management' : message === '3' ? 'content_writing' : 'digital_marketing';
-    const trackName = message === '1' ? 'Copywriting & Persuasion (90 days)' : message === '2' ? 'Social Media Management (60 days)' : message === '3' ? 'Content Writing (90 days)' : 'Digital Marketing Fundamentals (90 days)';
+  const TRACK_MENU = {
+    '1': { track: 'copywriting', name: 'Copywriting & Persuasion (90 days)' },
+    '2': { track: 'social_media_management', name: 'Social Media Management (60 days)' },
+    '3': { track: 'content_writing', name: 'Content Writing (90 days)' },
+    '4': { track: 'digital_marketing', name: 'Digital Marketing Fundamentals (90 days)' },
+    '5': { track: 'sales_lead_generation', name: 'Sales & Lead Generation (90 days)' }
+  };
+  if (sub.active === 'false' && sub.name === '' && TRACK_MENU[message]) {
+    const { track: selectedTrack, name: trackName } = TRACK_MENU[message];
     await supabase.from('subscribers').update({ track: selectedTrack, name: 'AWAITING' }).eq('phone', cleanPhone);
     await sendMessage(cleanPhone, 'Great choice! ' + trackName + ' it is.\n\nFirst — what is your first name?');
     return;
@@ -514,7 +531,7 @@ if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
     return;
   }
 
-  await sendMessage(cleanPhone, 'Welcome back! Reply 1 for Copywriting, 2 for Social Media Management, 3 for Content Writing or 4 for Digital Marketing to get started.');
+  await sendMessage(cleanPhone, 'Welcome back! Reply 1 for Copywriting, 2 for Social Media Management, 3 for Content Writing, 4 for Digital Marketing or 5 for Sales & Lead Generation to get started.');
 }
 
 function safeEqual(a, b) {
@@ -657,7 +674,7 @@ app.post('/paystack-webhook', async (req, res) => {
             subscription_expires: new Date(Date.now() + 32 * 86400000).toISOString().split('T')[0],
             last_active: new Date().toISOString().split('T')[0]
           });
-          await sendMessage(betaPhone, 'Payment confirmed! Welcome to SkillStack NG Beta. 🎉\n\nChoose your track:\n\n1️⃣ Copywriting & Persuasion — 90 days\n2️⃣ Social Media Management — 60 days\n3️⃣ Content Writing — 90 days\n4️⃣ Digital Marketing Fundamentals — 90 days\n\nReply 1, 2, 3 or 4 to get started.');
+          await sendMessage(betaPhone, 'Payment confirmed! Welcome to SkillStack NG Beta. 🎉\n\nChoose your track:\n\n1️⃣ Copywriting & Persuasion — 90 days\n2️⃣ Social Media Management — 60 days\n3️⃣ Content Writing — 90 days\n4️⃣ Digital Marketing Fundamentals — 90 days\n5️⃣ Sales & Lead Generation — 90 days\n\nReply 1, 2, 3, 4 or 5 to get started.');
           return;
         }
 
@@ -843,7 +860,7 @@ cron.schedule('*/15 * * * *', async () => {
     const sent = await sendMessage(affiliate.phone,
       'Congratulations ' + affiliate.name + '! Your SkillStack NG affiliate application has been approved.\n\n' +
       'Your unique referral link:\n' + link + '\n\n' +
-      'Share this link with anyone interested in learning Copywriting, Social Media Management, Content Writing, or Digital Marketing on WhatsApp.\n\n' +
+      'Share this link with anyone interested in learning Copywriting, Social Media Management, Content Writing, Digital Marketing, or Sales & Lead Generation on WhatsApp.\n\n' +
       'You earn a commission on every successful payment made through your link. We will notify you when a referral converts and process payouts weekly.\n\n' +
       'We will email your referral and earnings stats to you every Monday.\n\n' +
       'Questions? Reply here anytime.'
@@ -869,7 +886,7 @@ cron.schedule('*/15 * * * *', async () => {
     const sent = await sendMessage(ambassador.phone,
       'Congratulations ' + ambassador.name + '! Your SkillStack NG Campus Ambassador application has been approved.\n\n' +
       'Your unique referral link:\n' + link + '\n\n' +
-      'Share this link with students on your campus interested in learning Copywriting, Social Media Management, Content Writing, or Digital Marketing on WhatsApp.\n\n' +
+      'Share this link with students on your campus interested in learning Copywriting, Social Media Management, Content Writing, Digital Marketing, or Sales & Lead Generation on WhatsApp.\n\n' +
       'You earn 30% commission on every successful payment made through your link. We will notify you when a referral converts and process payouts weekly.\n\n' +
       'We will email your referral and earnings stats to you every Monday.\n\n' +
       'Questions? Reply here anytime.'
@@ -1224,6 +1241,9 @@ app.get('/demo-video', (req, res) => {
 app.get('/digital-marketing', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'digital-marketing.html'));
 });
+app.get('/sales-lead-generation', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'sales-lead-generation.html'));
+});
 app.get('/social-media-management', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'social-media-management.html'));
 });
@@ -1400,7 +1420,7 @@ app.get('/approve-affiliate', async (req, res) => {
     const sent = await sendMessage(phone,
       'Congratulations ' + affiliate.name + '! Your SkillStack NG affiliate application has been approved.\n\n' +
       'Your unique referral link:\n' + link + '\n\n' +
-      'Share this link with anyone interested in learning Copywriting, Social Media Management, or Content Writing on WhatsApp.\n\n' +
+      'Share this link with anyone interested in learning Copywriting, Social Media Management, Content Writing, Digital Marketing, or Sales & Lead Generation on WhatsApp.\n\n' +
       'You earn a commission on every successful payment made through your link. We will notify you when a referral converts and process payouts weekly.\n\n' +
       'We will email your referral and earnings stats to you every Monday.\n\n' +
       'Questions? Reply here anytime.'
@@ -1439,7 +1459,7 @@ app.get('/approve-ambassador', async (req, res) => {
     const sent = await sendMessage(phone,
       'Congratulations ' + ambassador.name + '! Your SkillStack NG Campus Ambassador application has been approved.\n\n' +
       'Your unique referral link:\n' + link + '\n\n' +
-      'Share this link with students on your campus interested in learning Copywriting, Social Media Management, Content Writing, or Digital Marketing on WhatsApp.\n\n' +
+      'Share this link with students on your campus interested in learning Copywriting, Social Media Management, Content Writing, Digital Marketing, or Sales & Lead Generation on WhatsApp.\n\n' +
       'You earn 30% commission on every successful payment made through your link. We will notify you when a referral converts and process payouts weekly.\n\n' +
       'We will email your referral and earnings stats to you every Monday.\n\n' +
       'Questions? Reply here anytime.'
@@ -1454,51 +1474,6 @@ app.get('/approve-ambassador', async (req, res) => {
     res.status(200).send('Ambassador notified successfully: ' + phone);
   } catch (err) {
     console.error('Approve ambassador error:', err.message);
-    res.status(500).send('Error: ' + err.message);
-  }
-});
-
-// One-off, read-only: check exactly what track value/lesson count was uploaded
-// for the new Freelancing track before wiring it up anywhere. Remove after use.
-app.get('/admin/check-new-track', async (req, res) => {
-  try {
-    if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
-    const { data: lessons } = await supabase.from('lessons').select('track, lesson_number');
-    const byTrack = {};
-    for (const l of lessons || []) {
-      if (!byTrack[l.track]) byTrack[l.track] = [];
-      byTrack[l.track].push(l.lesson_number);
-    }
-    const summary = Object.keys(byTrack).map(track => ({
-      track,
-      count: byTrack[track].length,
-      min: Math.min(...byTrack[track]),
-      max: Math.max(...byTrack[track])
-    }));
-
-    const { data: waitlist } = await supabase.from('waitlist').select('name, email, phone, track');
-    const waitlistCounts = {};
-    for (const w of waitlist || []) {
-      waitlistCounts[w.track] = (waitlistCounts[w.track] || 0) + 1;
-    }
-
-    res.status(200).json({ lessonsByTrack: summary, waitlistByTrack: waitlistCounts });
-  } catch (err) {
-    console.error('Check new track error:', err.message);
-    res.status(500).send('Error: ' + err.message);
-  }
-});
-
-app.get('/admin/track-titles', async (req, res) => {
-  try {
-    if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
-    const track = req.query.track;
-    if (!track) return res.status(400).send('track query param required');
-    const { data: lessons } = await supabase.from('lessons').select('lesson_number, title, task')
-      .eq('track', track).order('lesson_number', { ascending: true });
-    res.status(200).json(lessons || []);
-  } catch (err) {
-    console.error('Track titles error:', err.message);
     res.status(500).send('Error: ' + err.message);
   }
 });
