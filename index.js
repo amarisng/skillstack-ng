@@ -49,6 +49,10 @@ function splitMessage(body, maxLength = 1500) {
   return chunks;
 }
 
+// Returns true if the message actually sent. Twilio rejects WhatsApp sends to
+// numbers with no open 24h session (e.g. they never messaged us first) — callers
+// that gate on delivery (link_sent flags, "notified successfully" responses) need
+// to know when that happens instead of assuming success.
 async function sendMessage(to, body) {
   try {
     const cleanNumber = to.replace(/\D/g, '');
@@ -63,8 +67,10 @@ async function sendMessage(to, body) {
       });
     }
     console.log('Sent to ' + cleanNumber);
+    return true;
   } catch (err) {
     console.error('Send error:', err.message);
+    return false;
   }
 }
 
@@ -254,6 +260,39 @@ async function activateSubscriber(whatsappNumber, name, planType = 'monthly', pa
   }
 }
 
+// Handles the AFFILIATE/AMBASSADOR WhatsApp trigger word: looks up the applicant
+// by phone and either sends their approved link now (this reply is guaranteed to
+// land since it's a direct response to their inbound message), tells them their
+// application is still pending, or points them to the application form.
+async function handleReferrerActivation(cleanPhone, table, codeField, label, applyUrl, keyword) {
+  const { data: record } = await supabase.from(table).select('*').eq('phone', cleanPhone).single();
+
+  if (!record) {
+    await sendMessage(cleanPhone,
+      'We do not have a ' + label + ' application on file for this number.\n\nApply here: ' + applyUrl
+    );
+    return;
+  }
+
+  if (record.status !== 'approved') {
+    await sendMessage(cleanPhone,
+      'Thanks ' + record.name + '! Your ' + label + ' application is still under review. We will message your referral link right here as soon as you are approved.'
+    );
+    return;
+  }
+
+  const link = 'https://skillstackng.com/choose?ref=' + record[codeField];
+  await sendMessage(cleanPhone,
+    'Congratulations ' + record.name + '! Your SkillStack NG ' + label + ' application has been approved.\n\n' +
+    'Your unique referral link:\n' + link + '\n\n' +
+    'Share this link with anyone interested in learning Copywriting, Social Media Management, Content Writing, or Digital Marketing on WhatsApp.\n\n' +
+    'You earn a commission on every successful payment made through your link. We will notify you when a referral converts and process payouts weekly.\n\n' +
+    'We will email your referral and earnings stats to you every Monday.\n\n' +
+    'Questions? Reply here anytime. Text ' + keyword + ' any time to get your link again.'
+  );
+  await supabase.from(table).update({ link_sent: true }).eq('phone', cleanPhone);
+}
+
 async function handleOnboarding(phone, message) {
   const cleanPhone = phone.replace(/\D/g, '');
 
@@ -261,6 +300,19 @@ async function handleOnboarding(phone, message) {
     await sendMessage(cleanPhone,
       'Your referral stats (referrals, earnings, pending payout) are emailed to you every Monday — check your inbox! Not received one yet or need help? Email support@skillstackng.com.'
     );
+    return;
+  }
+
+  // WhatsApp only lets a business message a number that has messaged it first
+  // (or an approved template, which we don't have set up). Affiliates/ambassadors
+  // sign up on a web form and never text us, so without this trigger their
+  // approval link can never actually be delivered — see AFFILIATE/AMBASSADOR handling.
+  if (message.trim().toUpperCase() === 'AFFILIATE') {
+    await handleReferrerActivation(cleanPhone, 'affiliates', 'affiliate_code', 'Affiliate', 'https://skillstackng.com/affiliate', 'AFFILIATE');
+    return;
+  }
+  if (message.trim().toUpperCase() === 'AMBASSADOR') {
+    await handleReferrerActivation(cleanPhone, 'ambassadors', 'ambassador_code', 'Campus Ambassador', 'https://skillstackng.com/ambassador', 'AMBASSADOR');
     return;
   }
 
@@ -781,7 +833,7 @@ cron.schedule('*/15 * * * *', async () => {
 
   for (const affiliate of approvedAffiliates || []) {
     const link = 'https://skillstackng.com/choose?ref=' + affiliate.affiliate_code;
-    await sendMessage(affiliate.phone,
+    const sent = await sendMessage(affiliate.phone,
       'Congratulations ' + affiliate.name + '! Your SkillStack NG affiliate application has been approved.\n\n' +
       'Your unique referral link:\n' + link + '\n\n' +
       'Share this link with anyone interested in learning Copywriting, Social Media Management, Content Writing, or Digital Marketing on WhatsApp.\n\n' +
@@ -789,8 +841,14 @@ cron.schedule('*/15 * * * *', async () => {
       'We will email your referral and earnings stats to you every Monday.\n\n' +
       'Questions? Reply here anytime.'
     );
-    await supabase.from('affiliates').update({ link_sent: true }).eq('phone', affiliate.phone);
-    console.log('Auto-sent affiliate link to: ' + affiliate.phone);
+    // Only clear the flag on confirmed delivery — WhatsApp rejects this send unless
+    // the affiliate has texted us within the last 24h, which most haven't yet.
+    // Their AFFILIATE keyword reply (handleReferrerActivation) is the reliable path;
+    // this cron only succeeds for the ones who happened to text in before approval.
+    if (sent) {
+      await supabase.from('affiliates').update({ link_sent: true }).eq('phone', affiliate.phone);
+      console.log('Auto-sent affiliate link to: ' + affiliate.phone);
+    }
   }
 
   const { data: approvedAmbassadors } = await supabase
@@ -801,7 +859,7 @@ cron.schedule('*/15 * * * *', async () => {
 
   for (const ambassador of approvedAmbassadors || []) {
     const link = 'https://skillstackng.com/choose?ref=' + ambassador.ambassador_code;
-    await sendMessage(ambassador.phone,
+    const sent = await sendMessage(ambassador.phone,
       'Congratulations ' + ambassador.name + '! Your SkillStack NG Campus Ambassador application has been approved.\n\n' +
       'Your unique referral link:\n' + link + '\n\n' +
       'Share this link with students on your campus interested in learning Copywriting, Social Media Management, Content Writing, or Digital Marketing on WhatsApp.\n\n' +
@@ -809,8 +867,10 @@ cron.schedule('*/15 * * * *', async () => {
       'We will email your referral and earnings stats to you every Monday.\n\n' +
       'Questions? Reply here anytime.'
     );
-    await supabase.from('ambassadors').update({ link_sent: true }).eq('phone', ambassador.phone);
-    console.log('Auto-sent ambassador link to: ' + ambassador.phone);
+    if (sent) {
+      await supabase.from('ambassadors').update({ link_sent: true }).eq('phone', ambassador.phone);
+      console.log('Auto-sent ambassador link to: ' + ambassador.phone);
+    }
   }
 });
 
@@ -1329,7 +1389,7 @@ app.get('/approve-affiliate', async (req, res) => {
 
     const link = 'https://skillstackng.com/choose?ref=' + affiliate.affiliate_code;
 
-    await sendMessage(phone,
+    const sent = await sendMessage(phone,
       'Congratulations ' + affiliate.name + '! Your SkillStack NG affiliate application has been approved.\n\n' +
       'Your unique referral link:\n' + link + '\n\n' +
       'Share this link with anyone interested in learning Copywriting, Social Media Management, or Content Writing on WhatsApp.\n\n' +
@@ -1337,6 +1397,10 @@ app.get('/approve-affiliate', async (req, res) => {
       'We will email your referral and earnings stats to you every Monday.\n\n' +
       'Questions? Reply here anytime.'
     );
+
+    if (!sent) {
+      return res.status(200).send('Message NOT delivered (no open WhatsApp session with ' + phone + ') — they need to text AFFILIATE to our WhatsApp number to receive it.');
+    }
 
     await supabase.from('affiliates').update({ link_sent: true }).eq('phone', phone);
 
@@ -1363,7 +1427,7 @@ app.get('/approve-ambassador', async (req, res) => {
 
     const link = 'https://skillstackng.com/choose?ref=' + ambassador.ambassador_code;
 
-    await sendMessage(phone,
+    const sent = await sendMessage(phone,
       'Congratulations ' + ambassador.name + '! Your SkillStack NG Campus Ambassador application has been approved.\n\n' +
       'Your unique referral link:\n' + link + '\n\n' +
       'Share this link with students on your campus interested in learning Copywriting, Social Media Management, Content Writing, or Digital Marketing on WhatsApp.\n\n' +
@@ -1371,6 +1435,10 @@ app.get('/approve-ambassador', async (req, res) => {
       'We will email your referral and earnings stats to you every Monday.\n\n' +
       'Questions? Reply here anytime.'
     );
+
+    if (!sent) {
+      return res.status(200).send('Message NOT delivered (no open WhatsApp session with ' + phone + ') — they need to text AMBASSADOR to our WhatsApp number to receive it.');
+    }
 
     await supabase.from('ambassadors').update({ link_sent: true }).eq('phone', phone);
 
