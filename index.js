@@ -182,11 +182,8 @@ const TRACKS = {
   sales_lead_generation: {
     label: 'Sales & Lead Generation',
     totalDays: 90,
-    // TODO: replace with the real Paystack payment page links before this track
-    // goes live — see PENDING_LAUNCH notes. These placeholders are intentionally
-    // broken so a premature deploy fails loudly instead of taking real payments nowhere.
-    monthlyLink: 'PENDING_PAYSTACK_LINK_MONTHLY',
-    fullLink: 'PENDING_PAYSTACK_LINK_FULL',
+    monthlyLink: 'https://paystack.shop/pay/w0dyjpy39w',
+    fullLink: 'https://paystack.shop/pay/n28xp6t6so',
     fullPrice: '13,000 for 90 days (save 2,000)',
     fullExpiryDays: 95
   }
