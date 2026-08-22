@@ -1458,6 +1458,37 @@ app.get('/approve-ambassador', async (req, res) => {
   }
 });
 
+// One-off, read-only: check exactly what track value/lesson count was uploaded
+// for the new Freelancing track before wiring it up anywhere. Remove after use.
+app.get('/admin/check-new-track', async (req, res) => {
+  try {
+    if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
+    const { data: lessons } = await supabase.from('lessons').select('track, lesson_number');
+    const byTrack = {};
+    for (const l of lessons || []) {
+      if (!byTrack[l.track]) byTrack[l.track] = [];
+      byTrack[l.track].push(l.lesson_number);
+    }
+    const summary = Object.keys(byTrack).map(track => ({
+      track,
+      count: byTrack[track].length,
+      min: Math.min(...byTrack[track]),
+      max: Math.max(...byTrack[track])
+    }));
+
+    const { data: waitlist } = await supabase.from('waitlist').select('name, email, phone, track');
+    const waitlistCounts = {};
+    for (const w of waitlist || []) {
+      waitlistCounts[w.track] = (waitlistCounts[w.track] || 0) + 1;
+    }
+
+    res.status(200).json({ lessonsByTrack: summary, waitlistByTrack: waitlistCounts });
+  } catch (err) {
+    console.error('Check new track error:', err.message);
+    res.status(500).send('Error: ' + err.message);
+  }
+});
+
 app.get('/beta', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'beta.html'));
 });
