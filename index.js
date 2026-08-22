@@ -91,12 +91,23 @@ async function sendEmail(to, subject, htmlContent) {
     });
     if (!response.ok) {
       console.error('Email send error:', response.status, await response.text());
-      return;
+      return false;
     }
     console.log('Email sent to ' + to);
+    return true;
   } catch (err) {
     console.error('Email send error:', err.message);
+    return false;
   }
+}
+
+function referrerActivationEmailHtml(name, label, keyword, waLink) {
+  return '<p>Hi ' + name + ',</p>' +
+    '<p>Your SkillStack NG ' + label + ' application was approved, but we discovered a bug that meant your referral link was never actually delivered to your WhatsApp — WhatsApp does not allow us to message a number that has not messaged us first, and this step was missing from the application flow.</p>' +
+    '<p><strong>To get your link now:</strong> send the word <strong>' + keyword + '</strong> to our WhatsApp number.</p>' +
+    '<p><a href="' + waLink + '" style="display:inline-block;background:#25D366;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">Text ' + keyword + ' on WhatsApp →</a></p>' +
+    '<p>You will get your unique referral link back immediately. Sorry for the delay — thanks for your patience.</p>' +
+    '<p>— SkillStack NG</p>';
 }
 
 function referralStatsEmailHtml(name, label, code, referrer) {
@@ -1448,6 +1459,50 @@ app.get('/approve-ambassador', async (req, res) => {
     res.status(500).send('Error: ' + err.message);
   }
 });
+
+// One-off: email everyone approved before the AFFILIATE/AMBASSADOR WhatsApp
+// activation keyword existed, so their link was never delivered. ?send=true to
+// actually send — default is a dry run that just lists who would be emailed.
+// Remove this route once it has been run.
+app.get('/admin/notify-unreached-referrers', async (req, res) => {
+  try {
+    if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
+    const doSend = req.query.send === 'true';
+
+    const { data: affiliates } = await supabase
+      .from('affiliates').select('*').eq('status', 'approved')
+      .or('link_sent.is.null,link_sent.eq.false');
+    const { data: ambassadors } = await supabase
+      .from('ambassadors').select('*').eq('status', 'approved')
+      .or('link_sent.is.null,link_sent.eq.false');
+
+    const results = [];
+    for (const a of affiliates || []) {
+      const entry = { type: 'affiliate', name: a.name, email: a.email, phone: a.phone };
+      if (doSend && a.email) {
+        const waLink = 'https://wa.me/15554075935?text=AFFILIATE';
+        entry.emailed = await sendEmail(a.email, 'Action needed: activate WhatsApp delivery for your SkillStack NG referral link',
+          referrerActivationEmailHtml(a.name, 'Affiliate', 'AFFILIATE', waLink));
+      }
+      results.push(entry);
+    }
+    for (const am of ambassadors || []) {
+      const entry = { type: 'ambassador', name: am.name, email: am.email, phone: am.phone };
+      if (doSend && am.email) {
+        const waLink = 'https://wa.me/15554075935?text=AMBASSADOR';
+        entry.emailed = await sendEmail(am.email, 'Action needed: activate WhatsApp delivery for your SkillStack NG referral link',
+          referrerActivationEmailHtml(am.name, 'Campus Ambassador', 'AMBASSADOR', waLink));
+      }
+      results.push(entry);
+    }
+
+    res.status(200).json({ mode: doSend ? 'sent' : 'dry-run', count: results.length, results });
+  } catch (err) {
+    console.error('Notify unreached referrers error:', err.message);
+    res.status(500).send('Error: ' + err.message);
+  }
+});
+
 app.get('/beta', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'beta.html'));
 });
