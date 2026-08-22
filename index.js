@@ -1469,16 +1469,18 @@ app.get('/admin/notify-unreached-referrers', async (req, res) => {
     if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
     const doSend = req.query.send === 'true';
 
+    // link_sent can't be trusted for records approved before dbbd38a — the old
+    // code set it to true unconditionally, even when the WhatsApp send silently
+    // failed (which it always did, since none of them had a session open). So
+    // this pulls every approved record, not just link_sent=false ones.
     const { data: affiliates } = await supabase
-      .from('affiliates').select('*').eq('status', 'approved')
-      .or('link_sent.is.null,link_sent.eq.false');
+      .from('affiliates').select('*').eq('status', 'approved');
     const { data: ambassadors } = await supabase
-      .from('ambassadors').select('*').eq('status', 'approved')
-      .or('link_sent.is.null,link_sent.eq.false');
+      .from('ambassadors').select('*').eq('status', 'approved');
 
     const results = [];
     for (const a of affiliates || []) {
-      const entry = { type: 'affiliate', name: a.name, email: a.email, phone: a.phone };
+      const entry = { type: 'affiliate', name: a.name, email: a.email, phone: a.phone, link_sent: a.link_sent, created_at: a.created_at };
       if (doSend && a.email) {
         const waLink = 'https://wa.me/15554075935?text=AFFILIATE';
         entry.emailed = await sendEmail(a.email, 'Action needed: activate WhatsApp delivery for your SkillStack NG referral link',
@@ -1487,7 +1489,7 @@ app.get('/admin/notify-unreached-referrers', async (req, res) => {
       results.push(entry);
     }
     for (const am of ambassadors || []) {
-      const entry = { type: 'ambassador', name: am.name, email: am.email, phone: am.phone };
+      const entry = { type: 'ambassador', name: am.name, email: am.email, phone: am.phone, link_sent: am.link_sent, created_at: am.created_at };
       if (doSend && am.email) {
         const waLink = 'https://wa.me/15554075935?text=AMBASSADOR';
         entry.emailed = await sendEmail(am.email, 'Action needed: activate WhatsApp delivery for your SkillStack NG referral link',
