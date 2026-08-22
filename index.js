@@ -1458,29 +1458,6 @@ app.get('/approve-ambassador', async (req, res) => {
   }
 });
 
-// One-off: ask Prinsenry Izuchukwu Ifekwe which bank account to keep after their
-// duplicate affiliate application (Gtbank on the approved row vs Opay on the new
-// pending row — see 42a152a). Remove this route once it has been run.
-app.get('/admin/ask-prinsenry-bank', async (req, res) => {
-  try {
-    if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
-    const waLink = 'https://wa.me/15554075935?text=AFFILIATE';
-    const sent = await sendEmail('kaisama204@gmail.com',
-      'Quick check on your SkillStack NG affiliate bank details',
-      '<p>Hi Prinsenry,</p>' +
-      '<p>We noticed you submitted a new affiliate application today with different bank details (Opay) from the ones on your original approved application (Gtbank).</p>' +
-      '<p>Can you confirm — do you want us to switch your payout account to the new Opay details, or keep the original Gtbank account? Just reply to this email either way.</p>' +
-      '<p>Also, a reminder: to get your referral link, text <strong>AFFILIATE</strong> to our WhatsApp number.</p>' +
-      '<p><a href="' + waLink + '" style="display:inline-block;background:#25D366;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">Text AFFILIATE on WhatsApp →</a></p>' +
-      '<p>— SkillStack NG</p>'
-    );
-    res.status(200).json({ emailed: sent });
-  } catch (err) {
-    console.error('Ask Prinsenry bank error:', err.message);
-    res.status(500).send('Error: ' + err.message);
-  }
-});
-
 app.get('/beta', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'beta.html'));
 });
