@@ -267,7 +267,12 @@ async function activateSubscriber(whatsappNumber, name, planType = 'monthly', pa
 // land since it's a direct response to their inbound message), tells them their
 // application is still pending, or points them to the application form.
 async function handleReferrerActivation(cleanPhone, table, codeField, label, applyUrl, keyword) {
-  const { data: record } = await supabase.from(table).select('*').eq('phone', cleanPhone).single();
+  // A phone number can have more than one row here (e.g. someone reapplies to
+  // update bank details) — .single() errors out when that happens, so pull
+  // every match and prefer an approved one over a pending duplicate.
+  const { data: matches } = await supabase.from(table).select('*').eq('phone', cleanPhone)
+    .order('created_at', { ascending: false });
+  const record = (matches || []).find(r => r.status === 'approved') || (matches || [])[0];
 
   if (!record) {
     await sendMessage(cleanPhone,
@@ -1380,11 +1385,12 @@ app.get('/approve-affiliate', async (req, res) => {
     const phone = (req.query.phone || '').replace(/\D/g, '');
     if (!phone) return res.status(400).send('Phone number required');
 
-    const { data: affiliate } = await supabase
+    const { data: affiliateMatches } = await supabase
       .from('affiliates')
       .select('*')
       .eq('phone', phone)
-      .single();
+      .order('created_at', { ascending: false });
+    const affiliate = (affiliateMatches || []).find(r => r.status === 'approved') || (affiliateMatches || [])[0];
 
     if (!affiliate) return res.status(404).send('Affiliate not found');
     if (affiliate.status !== 'approved') return res.status(400).send('Affiliate not approved yet — update status in Supabase first');
@@ -1418,11 +1424,12 @@ app.get('/approve-ambassador', async (req, res) => {
     const phone = (req.query.phone || '').replace(/\D/g, '');
     if (!phone) return res.status(400).send('Phone number required');
 
-    const { data: ambassador } = await supabase
+    const { data: ambassadorMatches } = await supabase
       .from('ambassadors')
       .select('*')
       .eq('phone', phone)
-      .single();
+      .order('created_at', { ascending: false });
+    const ambassador = (ambassadorMatches || []).find(r => r.status === 'approved') || (ambassadorMatches || [])[0];
 
     if (!ambassador) return res.status(404).send('Ambassador not found');
     if (ambassador.status !== 'approved') return res.status(400).send('Ambassador not approved yet — update status in Supabase first');
