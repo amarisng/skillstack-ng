@@ -71,6 +71,16 @@ src="https://www.facebook.com/tr?id=1968827687158458&ev=PageView&noscript=1"
       padding: 8px 20px; border-radius: 8px;
       font-weight: 700; font-size: 0.85rem;
       text-decoration: none;
+      white-space: nowrap;
+    }
+    /* On mobile the logo + "Support" link + full CTA text don't fit on one
+       line, so the fixed-height nav overflows and wraps ugly across 2 rows.
+       Drop the secondary Support link and shorten the CTA to just "Start →". */
+    @media (max-width: 480px) {
+      .nav-support-link { display: none; }
+      .nav-cta-detail { display: none; }
+      .nav-cta { padding: 7px 14px; font-size: 0.8rem; }
+      .nav-logo { font-size: 0.95rem; }
     }
 
     /* ── HERO — dark green ── */
@@ -500,7 +510,7 @@ src="https://www.facebook.com/tr?id=1968827687158458&ev=PageView&noscript=1"
 <!-- NAV -->
 <nav>
   <a class="nav-logo" href="/">Skill<span>Stack</span> NG</a>
-  <div style="display:flex;align-items:center;gap:16px;">   <a href="/support" style="color:rgba(255,255,255,0.6);font-size:0.8rem;text-decoration:none;">Support</a>   <a class="nav-cta" href="/choose">Start for ₦5,000/month →</a> </div>
+  <div style="display:flex;align-items:center;gap:16px;">   <a href="/support" class="nav-support-link" style="color:rgba(255,255,255,0.6);font-size:0.8rem;text-decoration:none;">Support</a>   <a class="nav-cta" href="/choose">Start<span class="nav-cta-detail"> for ₦5,000/month</span> →</a> </div>
 </nav>
 
 <!-- HERO — dark green -->

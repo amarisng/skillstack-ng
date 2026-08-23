@@ -199,8 +199,8 @@ const TRACKS = {
   freelancing: {
     label: 'Freelancing & Getting Online Clients',
     totalDays: 90,
-    monthlyLink: 'PENDING_PAYSTACK_LINK_MONTHLY',
-    fullLink: 'PENDING_PAYSTACK_LINK_FULL',
+    monthlyLink: 'https://paystack.shop/pay/r63q8robgg',
+    fullLink: 'https://paystack.shop/pay/m6p-e7pt98',
     fullPrice: '13,000 for 90 days (save 2,000)',
     fullExpiryDays: 95
   }
