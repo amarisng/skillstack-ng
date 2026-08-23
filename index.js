@@ -1519,35 +1519,27 @@ app.get('/approve-ambassador', async (req, res) => {
   }
 });
 
-// One-off, read-only: check for duplicate phone rows across affiliates/ambassadors
-// (the class of bug found with Prinsenry — see 42a152a) and dump a specific
-// affiliate's record for debugging a reported "sent to registration page" issue.
-// Remove after use.
-app.get('/admin/check-referrer-duplicates', async (req, res) => {
+// One-off, read-only: check exactly what track value/lesson count the newly
+// uploaded Freelancing content landed under before wiring it up anywhere —
+// same check that caught the Sales & Lead Generation mix-up. Remove after use.
+app.get('/admin/check-new-track', async (req, res) => {
   try {
     if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
-    const phone = req.query.phone;
-
-    const { data: affiliates } = await supabase.from('affiliates').select('*');
-    const { data: ambassadors } = await supabase.from('ambassadors').select('*');
-
-    const countBy = (rows) => {
-      const counts = {};
-      for (const r of rows || []) counts[r.phone] = (counts[r.phone] || 0) + 1;
-      return Object.entries(counts).filter(([, c]) => c > 1).map(([p, c]) => ({ phone: p, count: c }));
-    };
-
-    const result = {
-      affiliateDuplicates: countBy(affiliates),
-      ambassadorDuplicates: countBy(ambassadors)
-    };
-    if (phone) {
-      result.matchingAffiliateRows = (affiliates || []).filter(a => a.phone === phone);
-      result.matchingAmbassadorRows = (ambassadors || []).filter(a => a.phone === phone);
+    const { data: lessons } = await supabase.from('lessons').select('track, lesson_number');
+    const byTrack = {};
+    for (const l of lessons || []) {
+      if (!byTrack[l.track]) byTrack[l.track] = [];
+      byTrack[l.track].push(l.lesson_number);
     }
-    res.status(200).json(result);
+    const summary = Object.keys(byTrack).map(track => ({
+      track,
+      count: byTrack[track].length,
+      min: Math.min(...byTrack[track]),
+      max: Math.max(...byTrack[track])
+    }));
+    res.status(200).json({ lessonsByTrack: summary });
   } catch (err) {
-    console.error('Check referrer duplicates error:', err.message);
+    console.error('Check new track error:', err.message);
     res.status(500).send('Error: ' + err.message);
   }
 });
