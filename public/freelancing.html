@@ -285,13 +285,18 @@ src="https://www.facebook.com/tr?id=1968827687158458&ev=PageView&noscript=1"
       .week-body ul { grid-template-columns: 1fr; }
       .pricing-cols { grid-template-columns: 1fr !important; }
     }
+    /* Support link hides on mobile to keep the nav on one line */
+    .nav-support-link { color: rgba(255,255,255,0.6); font-size: 0.8rem; text-decoration: none; }
+    @media (max-width: 480px) {
+      .nav-support-link { display: none; }
+    }
   </style>
 </head>
 <body>
 
 <nav>
   <a class="nav-logo" href="/">Skill<span>Stack</span> NG</a>
-  <a class="nav-cta" href="https://paystack.shop/pay/r63q8robgg" target="_blank">Enrol — ₦5,000/month</a>
+  <div style="display:flex;align-items:center;gap:16px;"><a href="/support" class="nav-support-link">Support</a>   <a class="nav-cta" href="https://paystack.shop/pay/r63q8robgg" target="_blank">Enrol — ₦5,000/month</a></div>
 </nav>
 
 <div class="announcement">
@@ -422,7 +427,7 @@ src="https://www.facebook.com/tr?id=1968827687158458&ev=PageView&noscript=1"
     <h2 style="font-size:clamp(1.6rem,4vw,2.2rem);font-weight:800;color:#fff;line-height:1.2;margin-bottom:14px;">This is what lands on your WhatsApp every morning.</h2>
     <p style="font-size:1rem;color:rgba(255,255,255,0.65);line-height:1.7;max-width:540px;margin:0 auto 40px;">From payment to Day 5 — the full journey, playing automatically. A real lesson, a real task, real AI feedback. Every single weekday.</p>
     <div style="display:flex;justify-content:center;">
-      <iframe src="/demo-video" style="width:360px;height:680px;border:none;border-radius:40px;box-shadow:0 40px 100px rgba(0,0,0,0.7);" scrolling="no"></iframe>
+      <iframe src="/demo-video" style="width:360px;max-width:100%;aspect-ratio:360/680;height:auto;border:none;border-radius:40px;box-shadow:0 40px 100px rgba(0,0,0,0.7);" scrolling="no"></iframe>
     </div>
   </div>
 </section>

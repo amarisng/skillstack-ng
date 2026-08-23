@@ -233,6 +233,11 @@ src="https://www.facebook.com/tr?id=1968827687158458&ev=PageView&noscript=1"
       .copy-btn { width: 100%; text-align: center; }
       .wa-card { padding: 24px 18px; }
     }
+    /* Support link hides on mobile to keep the nav on one line */
+    .nav-support-link { color: rgba(255,255,255,0.6); font-size: 0.8rem; text-decoration: none; }
+    @media (max-width: 480px) {
+      .nav-support-link { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -242,6 +247,7 @@ src="https://www.facebook.com/tr?id=1968827687158458&ev=PageView&noscript=1"
 <!-- NAV -->
 <nav>
   <a class="nav-logo" href="/">Skill<span>Stack</span> NG</a>
+  <a href="/support" class="nav-support-link">Support</a>
 </nav>
 
 <!-- HERO -->

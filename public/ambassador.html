@@ -283,6 +283,11 @@ src="https://www.facebook.com/tr?id=1968827687158458&ev=PageView&noscript=1"
       .form-card { padding: 28px 20px; }
       section { padding: 56px 20px; }
     }
+    /* Support link hides on mobile to keep the nav on one line */
+    .nav-support-link { color: rgba(255,255,255,0.6); font-size: 0.8rem; text-decoration: none; }
+    @media (max-width: 480px) {
+      .nav-support-link { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -290,7 +295,7 @@ src="https://www.facebook.com/tr?id=1968827687158458&ev=PageView&noscript=1"
 <!-- NAV -->
 <nav>
   <a class="nav-logo" href="/">Skill<span>Stack</span> NG</a>
-  <a class="nav-cta" href="#apply">Apply now →</a>
+  <div style="display:flex;align-items:center;gap:16px;"><a href="/support" class="nav-support-link">Support</a>   <a class="nav-cta" href="#apply">Apply now →</a></div>
 </nav>
 
 <!-- HERO -->
