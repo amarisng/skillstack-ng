@@ -129,50 +129,42 @@ src="https://www.facebook.com/tr?id=1968827687158458&ev=PageView&noscript=1"
     }
     .btn-secondary:hover { border-color: var(--green); color: var(--green); }
 
-    /* PRICE CARD in hero */
-    .price-card {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(0,196,140,0.25);
-      border-radius: 20px;
-      padding: 36px 28px;
+    /* WHATSAPP MOCKUP in hero — matches copywriting.html/content-writing.html/
+       social-media-management.html; digital-marketing.html uses a price-card
+       here instead, but that's the outlier, not the pattern to follow. */
+    .wa-mockup {
+      background: #E5DDD5; border-radius: 20px;
+      overflow: hidden; max-width: 360px; margin: 0 auto;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.4);
     }
-    .price-card-label {
-      font-size: 0.75rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 0.12em;
-      color: var(--green); margin-bottom: 8px;
-    }
-    .price-main {
-      font-size: 2.6rem; font-weight: 900;
-      color: #fff; line-height: 1; margin-bottom: 4px;
-    }
-    .price-sub {
-      font-size: 0.82rem; color: rgba(255,255,255,0.5);
-      margin-bottom: 24px;
-    }
-    .price-features { list-style: none; margin-bottom: 28px; }
-    .price-features li {
+    .wa-hdr {
+      background: #075E54; padding: 12px 16px;
       display: flex; align-items: center; gap: 10px;
-      font-size: 0.85rem; color: rgba(255,255,255,0.75);
-      padding: 7px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
     }
-    .price-features li:last-child { border-bottom: none; }
-    .price-features li::before {
-      content: "✓"; color: var(--green); font-weight: 800; flex-shrink: 0;
+    .wa-av {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--green);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 0.75rem; color: var(--dark);
     }
-    .price-cta {
-      display: block; width: 100%;
-      background: var(--green); color: var(--dark);
-      padding: 14px; border-radius: 10px;
-      font-weight: 800; font-size: 1rem;
-      text-align: center; text-decoration: none;
-      transition: background 0.2s;
+    .wa-nm { font-size: 0.9rem; font-weight: 700; color: #fff; }
+    .wa-st { font-size: 0.7rem; color: rgba(255,255,255,0.7); }
+    .wa-body { padding: 12px 10px; display: flex; flex-direction: column; gap: 8px; }
+    .wa-bubble {
+      background: #fff; border-radius: 10px 10px 10px 2px;
+      padding: 10px 12px; font-size: 0.78rem; line-height: 1.5; color: #111;
     }
-    .price-cta:hover { background: var(--green-dark); }
-    .price-note {
-      text-align: center; font-size: 0.75rem;
-      color: rgba(255,255,255,0.4); margin-top: 12px;
+    .wa-bubble.sent {
+      background: #DCF8C6; border-radius: 10px 10px 2px 10px;
+      align-self: flex-end;
     }
+    .wa-tag {
+      display: inline-block;
+      background: rgba(7,94,84,0.1); color: #075E54;
+      font-size: 0.65rem; font-weight: 700;
+      border-radius: 3px; padding: 1px 5px; margin-bottom: 4px;
+    }
+    .wa-time { font-size: 0.62rem; color: #999; text-align: right; margin-top: 3px; }
 
     /* SECTIONS */
     section { padding: 72px 24px; }
@@ -327,20 +319,32 @@ src="https://www.facebook.com/tr?id=1968827687158458&ev=PageView&noscript=1"
       </div>
     </div>
     <div>
-      <div class="price-card">
-        <div class="price-card-label">Monthly Plan</div>
-        <div class="price-main">₦5,000</div>
-        <div class="price-sub">per month · cancel anytime</div>
-        <ul class="price-features">
-          <li>65 lessons over 90 days</li>
-          <li>Sales fundamentals & lead generation</li>
-          <li>Closing, negotiation & sales leadership</li>
-          <li>AI feedback on every task</li>
-          <li>Nigerian examples throughout</li>
-          <li>WhatsApp delivery — no app needed</li>
-        </ul>
-        <a class="price-cta" href="https://paystack.shop/pay/w0dyjpy39w" target="_blank">Enrol Now</a>
-        <p class="price-note">Enter your WhatsApp number at checkout</p>
+      <div class="wa-mockup">
+        <div class="wa-hdr">
+          <div class="wa-av">SN</div>
+          <div>
+            <div class="wa-nm">SkillStack NG</div>
+            <div class="wa-st">● online</div>
+          </div>
+        </div>
+        <div class="wa-body">
+          <div class="wa-bubble">
+            <div class="wa-tag">DAY 1 OF 90</div><br/>
+            <strong>What Sales Really Is</strong><br/><br/>
+            Sales is not manipulation — it's helping someone solve a real problem, and getting paid for it. Every top earner in Nigeria, from bank RMs to real estate agents, is skilled at this one thing.
+            <div class="wa-time">7:01 AM</div>
+          </div>
+          <div class="wa-bubble sent">
+            Sales is showing someone why what I have solves their problem. Most Nigerians fear it because it feels like begging. If I got great at it, I could finally charge what my work is worth.
+            <div class="wa-time">7:19 AM ✓✓</div>
+          </div>
+          <div class="wa-bubble">
+            ✅ Strong self-awareness — you named the real fear, not just the surface one<br/>
+            ⚠️ "Charge what my work is worth" is vague — what's one specific price you'd raise?<br/>
+            💡 Try: "I'd charge ₦50k instead of ₦20k for the same logo, because I'd know how to explain the value."
+            <div class="wa-time">7:19 AM</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
