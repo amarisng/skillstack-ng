@@ -182,7 +182,7 @@ const TRACKS = {
   sales_lead_generation: {
     label: 'Sales & Lead Generation',
     totalDays: 90,
-    monthlyLink: 'https://paystack.shop/pay/w0dyjpy39w',
+    monthlyLink: 'https://paystack.shop/pay/x3irlfttwr',
     fullLink: 'https://paystack.shop/pay/n28xp6t6so',
     fullPrice: '13,000 for 90 days (save 2,000)',
     fullExpiryDays: 95
