@@ -1519,27 +1519,16 @@ app.get('/approve-ambassador', async (req, res) => {
   }
 });
 
-// One-off, read-only: check exactly what track value/lesson count the newly
-// uploaded Freelancing content landed under before wiring it up anywhere —
-// same check that caught the Sales & Lead Generation mix-up. Remove after use.
-app.get('/admin/check-new-track', async (req, res) => {
+app.get('/admin/track-titles', async (req, res) => {
   try {
     if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
-    const { data: lessons } = await supabase.from('lessons').select('track, lesson_number');
-    const byTrack = {};
-    for (const l of lessons || []) {
-      if (!byTrack[l.track]) byTrack[l.track] = [];
-      byTrack[l.track].push(l.lesson_number);
-    }
-    const summary = Object.keys(byTrack).map(track => ({
-      track,
-      count: byTrack[track].length,
-      min: Math.min(...byTrack[track]),
-      max: Math.max(...byTrack[track])
-    }));
-    res.status(200).json({ lessonsByTrack: summary });
+    const track = req.query.track;
+    if (!track) return res.status(400).send('track query param required');
+    const { data: lessons } = await supabase.from('lessons').select('lesson_number, title, task')
+      .eq('track', track).order('lesson_number', { ascending: true });
+    res.status(200).json(lessons || []);
   } catch (err) {
-    console.error('Check new track error:', err.message);
+    console.error('Track titles error:', err.message);
     res.status(500).send('Error: ' + err.message);
   }
 });
