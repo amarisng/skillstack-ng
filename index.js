@@ -334,6 +334,22 @@ async function handleOnboarding(phone, message) {
   const sub = await getSubscriber(cleanPhone);
 
   if (!sub) {
+    // Guard against affiliates/ambassadors landing here by accident — e.g. the
+    // AFFILIATE/AMBASSADOR keyword didn't come through exactly (a mistyped word,
+    // or a pre-filled wa.me link that didn't carry over). Without this check they
+    // silently get registered as a brand-new student instead of reaching their
+    // actual referral link — this is what happened to Adeojo Aderonke (2026-08-23).
+    const { data: existingAffiliate } = await supabase.from('affiliates').select('id').eq('phone', cleanPhone).limit(1);
+    if (existingAffiliate && existingAffiliate.length) {
+      await sendMessage(cleanPhone, 'Looks like you have an affiliate application with us — text AFFILIATE to get your referral link.\n\nWant to also enrol as a student? Reply HI to start.');
+      return;
+    }
+    const { data: existingAmbassador } = await supabase.from('ambassadors').select('id').eq('phone', cleanPhone).limit(1);
+    if (existingAmbassador && existingAmbassador.length) {
+      await sendMessage(cleanPhone, 'Looks like you have a Campus Ambassador application with us — text AMBASSADOR to get your referral link.\n\nWant to also enrol as a student? Reply HI to start.');
+      return;
+    }
+
     await supabase.from('subscribers').insert({
       phone: cleanPhone,
       name: '',
@@ -766,14 +782,19 @@ cron.schedule('0 8 * * 6', async () => {
 
 cron.schedule('0 9 * * *', async () => {
   console.log('Running re-engagement check...');
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  const yesterdayStr = yesterday.toISOString().split('T')[0];
+  // last_active gets bumped to today the moment a lesson is *delivered* (see the
+  // hourly cron above), not when it's actually answered — so for anyone with a
+  // 12PM/6PM/9PM time_preference, last_active === yesterday is simply their normal
+  // daily state and does NOT mean they missed anything. awaiting_task is the field
+  // that actually means "hasn't answered yet"; last_active != today just excludes
+  // people whose lesson was delivered earlier this same morning (give them the day).
+  const today = new Date().toISOString().split('T')[0];
   const { data: missedSubscribers } = await supabase
     .from('subscribers')
     .select('*')
     .eq('active', 'true')
-    .eq('last_active', yesterdayStr);
+    .eq('awaiting_task', true)
+    .neq('last_active', today);
   if (!missedSubscribers) return;
   for (const sub of missedSubscribers) {
     const now = new Date();
