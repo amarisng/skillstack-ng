@@ -101,6 +101,15 @@ async function sendEmail(to, subject, htmlContent) {
   }
 }
 
+function referrerActivationEmailHtml(name, label, keyword, waLink) {
+  return '<p>Hi ' + name + ',</p>' +
+    '<p>Your SkillStack NG ' + label + ' application has been approved! 🎉</p>' +
+    '<p>WhatsApp only lets us message a number that has messaged us first, so to get your unique referral link, send the word <strong>' + keyword + '</strong> to our WhatsApp number.</p>' +
+    '<p><a href="' + waLink + '" style="display:inline-block;background:#25D366;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">Text ' + keyword + ' on WhatsApp →</a></p>' +
+    '<p>You will get your unique referral link back immediately.</p>' +
+    '<p>— SkillStack NG</p>';
+}
+
 function referralStatsEmailHtml(name, label, code, referrer) {
   return '<p>Hi ' + name + ',</p>' +
     '<p>Here is your weekly SkillStack NG ' + label + ' summary:</p>' +
@@ -1445,7 +1454,14 @@ app.get('/approve-affiliate', async (req, res) => {
     );
 
     if (!sent) {
-      return res.status(200).send('Message NOT delivered (no open WhatsApp session with ' + phone + ') — they need to text AFFILIATE to our WhatsApp number to receive it.');
+      if (affiliate.email) {
+        const emailed = await sendEmail(affiliate.email,
+          'Your SkillStack NG Affiliate Application Has Been Approved!',
+          referrerActivationEmailHtml(affiliate.name, 'Affiliate', 'AFFILIATE', 'https://wa.me/15554075935?text=AFFILIATE')
+        );
+        return res.status(200).send((emailed ? 'WhatsApp not delivered, emailed instead: ' : 'WhatsApp not delivered AND email failed: ') + affiliate.email);
+      }
+      return res.status(200).send('Message NOT delivered (no open WhatsApp session with ' + phone + ') and no email on file — they need to text AFFILIATE to our WhatsApp number to receive it.');
     }
 
     await supabase.from('affiliates').update({ link_sent: true }).eq('phone', phone);
@@ -1484,7 +1500,14 @@ app.get('/approve-ambassador', async (req, res) => {
     );
 
     if (!sent) {
-      return res.status(200).send('Message NOT delivered (no open WhatsApp session with ' + phone + ') — they need to text AMBASSADOR to our WhatsApp number to receive it.');
+      if (ambassador.email) {
+        const emailed = await sendEmail(ambassador.email,
+          'Your SkillStack NG Campus Ambassador Application Has Been Approved!',
+          referrerActivationEmailHtml(ambassador.name, 'Campus Ambassador', 'AMBASSADOR', 'https://wa.me/15554075935?text=AMBASSADOR')
+        );
+        return res.status(200).send((emailed ? 'WhatsApp not delivered, emailed instead: ' : 'WhatsApp not delivered AND email failed: ') + ambassador.email);
+      }
+      return res.status(200).send('Message NOT delivered (no open WhatsApp session with ' + phone + ') and no email on file — they need to text AMBASSADOR to our WhatsApp number to receive it.');
     }
 
     await supabase.from('ambassadors').update({ link_sent: true }).eq('phone', phone);
