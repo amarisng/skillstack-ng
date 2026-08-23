@@ -1531,20 +1531,6 @@ app.get('/approve-ambassador', async (req, res) => {
   }
 });
 
-app.get('/admin/track-titles', async (req, res) => {
-  try {
-    if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
-    const track = req.query.track;
-    if (!track) return res.status(400).send('track query param required');
-    const { data: lessons } = await supabase.from('lessons').select('lesson_number, title, task')
-      .eq('track', track).order('lesson_number', { ascending: true });
-    res.status(200).json(lessons || []);
-  } catch (err) {
-    console.error('Track titles error:', err.message);
-    res.status(500).send('Error: ' + err.message);
-  }
-});
-
 app.get('/beta', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'beta.html'));
 });
