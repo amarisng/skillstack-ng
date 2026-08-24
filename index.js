@@ -28,6 +28,7 @@ const twilioClient = twilio(
 
 const TWILIO_NUMBER = process.env.TWILIO_WHATSAPP_NUMBER;
 const ADMIN_WHATSAPP_NUMBER = process.env.ADMIN_WHATSAPP_NUMBER || '2347063667303';
+const REFERRER_COMMUNITY_LINK = 'https://chat.whatsapp.com/BZWNc00a5EKBHBYoAyu0Kz';
 const PAYSTACK_SECRET = process.env.PAYSTACK_SECRET_KEY;
 const PAYSTACK_TEST_SECRET = process.env.PAYSTACK_TEST_SECRET_KEY;
 const VERIFY_TOKEN = process.env.WEBHOOK_VERIFY_TOKEN || 'skillstack_verify_2024';
@@ -320,6 +321,7 @@ async function handleReferrerActivation(cleanPhone, table, codeField, label, app
     'Share this link with anyone interested in learning Copywriting, Social Media Management, Content Writing, Digital Marketing, Sales & Lead Generation, or Freelancing on WhatsApp.\n\n' +
     'You earn a commission on every successful payment made through your link. We will notify you when a referral converts and process payouts weekly.\n\n' +
     'We will email your referral and earnings stats to you every Monday.\n\n' +
+    'Join our ' + label + ' community on WhatsApp for tips, updates, and support:\n' + REFERRER_COMMUNITY_LINK + '\n\n' +
     'Questions? Reply here anytime. Text ' + keyword + ' any time to get your link again.'
   );
   await supabase.from(table).update({ link_sent: true }).eq('phone', cleanPhone);
@@ -926,6 +928,7 @@ cron.schedule('*/15 * * * *', async () => {
       'Share this link with anyone interested in learning Copywriting, Social Media Management, Content Writing, Digital Marketing, Sales & Lead Generation, or Freelancing on WhatsApp.\n\n' +
       'You earn a commission on every successful payment made through your link. We will notify you when a referral converts and process payouts weekly.\n\n' +
       'We will email your referral and earnings stats to you every Monday.\n\n' +
+      'Join our affiliate community on WhatsApp for tips, updates, and support:\n' + REFERRER_COMMUNITY_LINK + '\n\n' +
       'Questions? Reply here anytime.'
     );
     // Only clear the flag on confirmed delivery — WhatsApp rejects this send unless
@@ -952,6 +955,7 @@ cron.schedule('*/15 * * * *', async () => {
       'Share this link with students on your campus interested in learning Copywriting, Social Media Management, Content Writing, Digital Marketing, Sales & Lead Generation, or Freelancing on WhatsApp.\n\n' +
       'You earn 30% commission on every successful payment made through your link. We will notify you when a referral converts and process payouts weekly.\n\n' +
       'We will email your referral and earnings stats to you every Monday.\n\n' +
+      'Join our ambassador community on WhatsApp for tips, updates, and support:\n' + REFERRER_COMMUNITY_LINK + '\n\n' +
       'Questions? Reply here anytime.'
     );
     if (sent) {
@@ -1489,6 +1493,7 @@ app.get('/approve-affiliate', async (req, res) => {
       'Share this link with anyone interested in learning Copywriting, Social Media Management, Content Writing, Digital Marketing, Sales & Lead Generation, or Freelancing on WhatsApp.\n\n' +
       'You earn a commission on every successful payment made through your link. We will notify you when a referral converts and process payouts weekly.\n\n' +
       'We will email your referral and earnings stats to you every Monday.\n\n' +
+      'Join our affiliate community on WhatsApp for tips, updates, and support:\n' + REFERRER_COMMUNITY_LINK + '\n\n' +
       'Questions? Reply here anytime.'
     );
 
@@ -1535,6 +1540,7 @@ app.get('/approve-ambassador', async (req, res) => {
       'Share this link with students on your campus interested in learning Copywriting, Social Media Management, Content Writing, Digital Marketing, Sales & Lead Generation, or Freelancing on WhatsApp.\n\n' +
       'You earn 30% commission on every successful payment made through your link. We will notify you when a referral converts and process payouts weekly.\n\n' +
       'We will email your referral and earnings stats to you every Monday.\n\n' +
+      'Join our ambassador community on WhatsApp for tips, updates, and support:\n' + REFERRER_COMMUNITY_LINK + '\n\n' +
       'Questions? Reply here anytime.'
     );
 
