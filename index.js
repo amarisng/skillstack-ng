@@ -367,6 +367,11 @@ async function handleOnboarding(phone, message) {
       'See full details or pay: https://skillstackng.com/choose\n\n' +
       'Ready to start right here? Reply 1, 2, 3, 4, 5 or 6.'
     );
+    // Log-only — lets us see how many people the exit-popup/track-page CTA
+    // actually reach, since these leads otherwise only exist as WhatsApp
+    // threads with no queryable record. Never blocks the reply above.
+    const { error: pricingLogError } = await supabase.from('pricing_inquiries').insert({ phone: cleanPhone });
+    if (pricingLogError) console.error('Pricing inquiry log error:', pricingLogError.message);
     return;
   }
 
