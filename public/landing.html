@@ -142,46 +142,17 @@ src="https://www.facebook.com/tr?id=1968827687158458&ev=PageView&noscript=1"
     }
 
     /* WhatsApp mockup */
-    .wa-mockup {
-      background: #E5DDD5;
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+    /* Hero video — replaces the old static WhatsApp chat mockup with the
+       real "The Better Way to Learn" ad creative (vertical 9:16 short).
+       Visible on mobile too (the old mockup was hidden there); the grid
+       already stacks to 1 column under 680px so it just flows below the text. */
+    .hero-video-wrap {
       max-width: 300px; margin: 0 auto;
+      border-radius: 20px; overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+      aspect-ratio: 9 / 16;
     }
-    .wa-hdr {
-      background: #075E54;
-      padding: 12px 16px;
-      display: flex; align-items: center; gap: 10px;
-    }
-    .wa-av {
-      width: 34px; height: 34px; border-radius: 50%;
-      background: var(--green);
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 800; font-size: 0.75rem; color: #fff;
-      flex-shrink: 0;
-    }
-    .wa-nm { font-size: 0.9rem; font-weight: 700; color: #fff; }
-    .wa-st { font-size: 0.7rem; color: rgba(255,255,255,0.7); }
-    .wa-body { padding: 12px 10px; display: flex; flex-direction: column; gap: 8px; }
-    .wa-bubble {
-      background: #fff;
-      border-radius: 10px 10px 10px 2px;
-      padding: 10px 12px;
-      font-size: 0.78rem; line-height: 1.5; color: #111;
-    }
-    .wa-bubble.sent {
-      background: #DCF8C6;
-      border-radius: 10px 10px 2px 10px;
-      align-self: flex-end;
-    }
-    .wa-tag {
-      display: inline-block;
-      background: rgba(7,94,84,0.1); color: #075E54;
-      font-size: 0.65rem; font-weight: 700;
-      border-radius: 3px; padding: 1px 5px; margin-bottom: 4px;
-    }
-    .wa-time { font-size: 0.62rem; color: #999; text-align: right; margin-top: 3px; }
+    .hero-video-wrap iframe { width: 100%; height: 100%; display: block; border: none; }
 
     /* ── LIGHT SECTIONS ── */
     section { padding: 80px 24px; }
@@ -497,7 +468,6 @@ src="https://www.facebook.com/tr?id=1968827687158458&ev=PageView&noscript=1"
     /* ── RESPONSIVE ── */
     @media (max-width: 680px) {
       .hero-inner { grid-template-columns: 1fr; }
-      .wa-mockup { display: none; }
       section { padding: 56px 20px; }
       .cert-card { flex-direction: column; text-align: center; padding: 28px 20px; }
       .cert-feats { justify-content: center; }
@@ -530,33 +500,8 @@ src="https://www.facebook.com/tr?id=1968827687158458&ev=PageView&noscript=1"
       </div>
     </div>
     <div>
-      <div class="wa-mockup">
-        <div class="wa-hdr">
-          <div class="wa-av">SN</div>
-          <div>
-            <div class="wa-nm">SkillStack NG</div>
-            <div class="wa-st">● online</div>
-          </div>
-        </div>
-        <div class="wa-body">
-          <div class="wa-bubble">
-            <div class="wa-tag">DAY 1 OF 90</div><br/>
-            <strong>What is copywriting?</strong><br/><br/>
-            Copy has one job — to make someone take action. Every word either pushes the reader toward that action or pulls them away. Nothing is neutral.
-            <div class="wa-time">7:01 AM</div>
-          </div>
-          <div class="wa-bubble sent">
-            A: Brown leather bag, medium size.<br/><br/>
-            B: The bag that makes your outfit make sense — carry it to an interview and an owambe and both times it's right.
-            <div class="wa-time">7:18 AM ✓✓</div>
-          </div>
-          <div class="wa-bubble">
-            ✅ Strong — "makes your outfit make sense" is a real benefit<br/>
-            ⚠️ Version A says "quality" — that's claimed by everyone. Be specific.<br/>
-            💡 Name the occasion. "The bag for owambe season" beats any generic claim.
-            <div class="wa-time">7:18 AM</div>
-          </div>
-        </div>
+      <div class="hero-video-wrap">
+        <iframe src="https://www.youtube-nocookie.com/embed/Pn30P0gL4AE?rel=0" title="SkillStack NG — The Better Way to Learn" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
       </div>
     </div>
   </div>
