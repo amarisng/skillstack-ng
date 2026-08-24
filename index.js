@@ -1315,9 +1315,8 @@ app.get('/freelancing', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'freelancing.html'));
 });
 
-app.get('/blog', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'blog', 'index.html'));
-});
+// No explicit /blog route — express.static already serves public/blog/index.html
+// for both /blog (301s to add the trailing slash first) and /blog/.
 const BLOG_SLUGS = [
   'pas-copywriting-formula',
   'content-calendar-nigerian-brands',
