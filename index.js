@@ -1314,6 +1314,23 @@ app.get('/sales-lead-generation', (req, res) => {
 app.get('/freelancing', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'freelancing.html'));
 });
+
+app.get('/blog', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'blog', 'index.html'));
+});
+const BLOG_SLUGS = [
+  'pas-copywriting-formula',
+  'content-calendar-nigerian-brands',
+  'headlines-that-earn-the-click',
+  'digital-marketing-funnel-nigeria',
+  'open-a-sales-conversation',
+  'price-freelance-services-nigeria'
+];
+BLOG_SLUGS.forEach(slug => {
+  app.get('/blog/' + slug, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'blog', slug + '.html'));
+  });
+});
 app.get('/social-media-management', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'social-media-management.html'));
 });
