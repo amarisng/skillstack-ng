@@ -348,6 +348,28 @@ async function handleOnboarding(phone, message) {
     return;
   }
 
+  // Lets anyone get real pricing without leaving WhatsApp or waiting on a
+  // reply — used as the CTA on track pages and the exit-intent popup instead
+  // of a lead-capture form, since texting this in *is* the capture (we get
+  // their number and an open session, same guaranteed-delivery pattern as
+  // AFFILIATE/AMBASSADOR) and skips the "no session yet" delivery problem
+  // entirely.
+  if (message.trim().toUpperCase() === 'PRICING') {
+    const order = ['copywriting', 'social_media_management', 'content_writing', 'digital_marketing', 'sales_lead_generation', 'freelancing'];
+    const numerals = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣'];
+    const lines = order.map((key, i) => {
+      const t = TRACKS[key];
+      return numerals[i] + ' ' + t.label + ' — ' + t.totalDays + ' days\n₦5,000/month or ₦' + t.fullPrice;
+    });
+    await sendMessage(cleanPhone,
+      'SkillStack NG pricing 💰\n\n' + lines.join('\n\n') +
+      '\n\nEvery track: WhatsApp delivery, AI feedback on every task, cancel the monthly plan anytime.\n\n' +
+      'See full details or pay: https://skillstackng.com/choose\n\n' +
+      'Ready to start right here? Reply 1, 2, 3, 4, 5 or 6.'
+    );
+    return;
+  }
+
   const sub = await getSubscriber(cleanPhone);
 
   if (!sub) {

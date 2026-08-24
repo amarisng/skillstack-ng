@@ -468,6 +468,14 @@ src="https://www.facebook.com/tr?id=1968827687158458&ev=PageView&noscript=1"
   </div>
 </div>
 
+
+<!-- QUICK PRICING CTA -->
+<div style="background:#F7FAF8;border-top:1px solid #D8EAE0;border-bottom:1px solid #D8EAE0;padding:28px 24px;text-align:center;">
+  <p style="font-size:0.95rem;font-weight:700;color:#0D1F17;margin-bottom:4px;">Not ready to enrol yet?</p>
+  <p style="font-size:0.85rem;color:#5A7A65;margin-bottom:16px;">Get pricing for every track sent straight to your WhatsApp.</p>
+  <a href="https://wa.me/15554075935?text=PRICING" target="_blank" style="display:inline-block;background:#00C48C;color:#0D1F17;padding:12px 24px;border-radius:10px;font-weight:800;font-size:0.9rem;text-decoration:none;">Get pricing on WhatsApp →</a>
+</div>
+
 <!-- PROBLEM -->
 <section class="problem-section">
   <div class="container section-center">
@@ -827,7 +835,47 @@ src="https://www.facebook.com/tr?id=1968827687158458&ev=PageView&noscript=1"
     <a href="/terms">Terms of Service</a> ·
     <a href="/support">Support</a> ·     <a href="mailto:support@skillstackng.com">support@skillstackng.com</a> ·     <a href="mailto:hello@skillstackng.com">hello@skillstackng.com</a>
   </p>
+
 </footer>
+
+<!-- EXIT-INTENT PRICING POPUP -->
+<div id="exitPopup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fff;border-radius:20px;max-width:380px;width:100%;padding:32px 28px;text-align:center;position:relative;">
+    <button onclick="closeExitPopup()" aria-label="Close" style="position:absolute;top:10px;right:14px;background:none;border:none;font-size:1.4rem;color:#999;cursor:pointer;line-height:1;">×</button>
+    <div style="font-size:2.2rem;margin-bottom:12px;">💬</div>
+    <h3 style="font-size:1.15rem;font-weight:800;color:#0D1F17;margin-bottom:10px;">Not ready to enrol yet?</h3>
+    <p style="font-size:0.88rem;color:#5A7A65;line-height:1.6;margin-bottom:22px;">Get today's pricing for every track sent straight to your WhatsApp — no forms, no spam, just the numbers.</p>
+    <a href="https://wa.me/15554075935?text=PRICING" target="_blank" onclick="closeExitPopup()" style="display:block;background:#00C48C;color:#0D1F17;padding:14px;border-radius:10px;font-weight:800;font-size:0.92rem;text-decoration:none;margin-bottom:12px;">Get pricing on WhatsApp →</a>
+    <a href="/free-guide" style="font-size:0.78rem;color:#5A7A65;text-decoration:underline;">Or get the free skills guide instead</a>
+  </div>
+</div>
+<script>
+(function(){
+  if (sessionStorage.getItem('ssng_exit_shown')) return;
+  function showExitPopup(){
+    if (sessionStorage.getItem('ssng_exit_shown')) return;
+    sessionStorage.setItem('ssng_exit_shown', '1');
+    var el = document.getElementById('exitPopup');
+    if (el) el.style.display = 'flex';
+  }
+  window.closeExitPopup = function(){
+    var el = document.getElementById('exitPopup');
+    if (el) el.style.display = 'none';
+  };
+  // Desktop: mouse leaves toward the top of the viewport (classic exit-intent)
+  document.addEventListener('mouseout', function(e){
+    if (!e.relatedTarget && e.clientY <= 0) showExitPopup();
+  });
+  // Mobile has no mouse events — use scroll depth + dwell time as a proxy
+  // for "engaged but not converting" instead
+  var scrolledDeep = false;
+  window.addEventListener('scroll', function(){
+    if (document.documentElement.scrollHeight <= window.innerHeight) return;
+    if ((window.scrollY + window.innerHeight) / document.documentElement.scrollHeight > 0.6) scrolledDeep = true;
+  });
+  setTimeout(function(){ if (scrolledDeep) showExitPopup(); }, 25000);
+})();
+</script>
 <script>
   // AFFILIATE REF TRACKING
   (function() {
