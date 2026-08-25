@@ -1580,26 +1580,6 @@ app.get('/approve-ambassador', async (req, res) => {
   }
 });
 
-// One-off, read-only: look up an affiliate/ambassador by email to find their
-// phone for a manual /approve-affiliate hit (Adeyemitola reported no email
-// after a direct Supabase approval — status is set, but nothing was ever
-// triggered since /approve-affiliate wasn't called and the 15-min cron
-// deliberately doesn't email on failure, to avoid spamming every 15 min).
-// Remove after use.
-app.get('/admin/find-referrer', async (req, res) => {
-  try {
-    if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
-    const email = req.query.email;
-    if (!email) return res.status(400).send('email query param required');
-    const { data: affiliates } = await supabase.from('affiliates').select('*').eq('email', email);
-    const { data: ambassadors } = await supabase.from('ambassadors').select('*').eq('email', email);
-    res.status(200).json({ affiliates: affiliates || [], ambassadors: ambassadors || [] });
-  } catch (err) {
-    console.error('Find referrer error:', err.message);
-    res.status(500).send('Error: ' + err.message);
-  }
-});
-
 app.get('/beta', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'beta.html'));
 });
