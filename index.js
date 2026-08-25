@@ -1592,31 +1592,6 @@ app.get('/approve-ambassador', async (req, res) => {
   }
 });
 
-// One-off, read-only: check Twilio's actual delivery status for messages sent
-// to a number — link_sent=true only means Twilio accepted the send request,
-// not that WhatsApp delivered it. Adeojo Aderonke (2347049753840) reports
-// receiving nothing on WhatsApp or email despite link_sent=true. Remove after use.
-app.get('/admin/check-message-status', async (req, res) => {
-  try {
-    if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
-    const phone = (req.query.phone || '').replace(/\D/g, '');
-    if (!phone) return res.status(400).send('phone query param required');
-    const messages = await twilioClient.messages.list({ to: 'whatsapp:+' + phone, limit: 20 });
-    const result = messages.map(m => ({
-      dateSent: m.dateSent,
-      status: m.status,
-      errorCode: m.errorCode,
-      errorMessage: m.errorMessage,
-      direction: m.direction,
-      bodyPreview: (m.body || '').slice(0, 60)
-    }));
-    res.status(200).json(result);
-  } catch (err) {
-    console.error('Check message status error:', err.message);
-    res.status(500).send('Error: ' + err.message);
-  }
-});
-
 app.get('/beta', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'beta.html'));
 });
