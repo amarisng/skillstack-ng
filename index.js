@@ -50,25 +50,37 @@ function splitMessage(body, maxLength = 1500) {
   return chunks;
 }
 
-// Returns true if the message actually sent. Twilio rejects WhatsApp sends to
-// numbers with no open 24h session (e.g. they never messaged us first) — callers
-// that gate on delivery (link_sent flags, "notified successfully" responses) need
-// to know when that happens instead of assuming success.
+// Returns true only if the message was actually delivered. Twilio's
+// messages.create() resolves as soon as Twilio *accepts* the request — for a
+// WhatsApp send outside the recipient's 24h session window, Twilio still
+// accepts it and only rejects it a moment later (status 'undelivered', error
+// 63016) once it hears back from WhatsApp. Trusting create() not throwing
+// was the bug: callers gating on delivery (link_sent flags, email fallback)
+// were marking sends as successful that had actually failed. Since 63016 is
+// a policy rejection (not a network delay), it resolves in a couple of
+// seconds, so a short poll after create() is enough to catch it.
 async function sendMessage(to, body) {
   try {
     const cleanNumber = to.replace(/\D/g, '');
     const formattedTo = 'whatsapp:+' + cleanNumber;
     const chunks = splitMessage(body);
+    let allDelivered = true;
     for (let i = 0; i < chunks.length; i++) {
       const prefix = chunks.length > 1 ? '(' + (i + 1) + '/' + chunks.length + ')\n\n' : '';
-      await twilioClient.messages.create({
+      const msg = await twilioClient.messages.create({
         from: TWILIO_NUMBER,
         to: formattedTo,
         body: prefix + chunks[i],
       });
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      const updated = await twilioClient.messages(msg.sid).fetch();
+      if (updated.status === 'undelivered' || updated.status === 'failed') {
+        console.error('Message undelivered to ' + cleanNumber + ' (error ' + updated.errorCode + ')');
+        allDelivered = false;
+      }
     }
-    console.log('Sent to ' + cleanNumber);
-    return true;
+    console.log('Sent to ' + cleanNumber + (allDelivered ? '' : ' (undelivered)'));
+    return allDelivered;
   } catch (err) {
     console.error('Send error:', err.message);
     return false;
