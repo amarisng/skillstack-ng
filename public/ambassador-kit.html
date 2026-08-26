@@ -95,12 +95,52 @@ src="https://www.facebook.com/tr?id=1968827687158458&ev=PageView&noscript=1"
       font-family: inherit;
     }
     .download-btn:hover { background: var(--green-dark); }
+
+    /* VIDEOS */
+    .videos-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 18px;
+    }
+    .video-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+    }
+    .video-thumb-wrap {
+      position: relative; display: block; aspect-ratio: 9 / 16;
+      background: var(--dark); overflow: hidden;
+    }
+    .video-thumb-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .video-play-badge {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.15);
+    }
+    .video-play-badge span {
+      width: 52px; height: 52px; border-radius: 50%; background: rgba(13,31,23,0.7);
+      display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.2rem;
+      border: 2px solid rgba(255,255,255,0.6);
+    }
+    .video-footer { padding: 12px 14px; }
+    .video-name { font-size: 0.78rem; font-weight: 700; color: var(--text); margin-bottom: 10px; line-height: 1.4; }
+    .video-actions { display: flex; gap: 8px; }
+    .video-btn {
+      flex: 1; text-align: center; border-radius: 6px; padding: 7px 6px;
+      font-size: 0.72rem; font-weight: 700; text-decoration: none; font-family: inherit;
+    }
+    .video-btn.watch { background: var(--off-white); color: var(--text); border: 1px solid var(--border); }
+    .video-btn.share { background: var(--green); color: var(--dark); }
   </style>
 </head>
 <body>
 <div class="kit">
-  <h1>🎒 Your Ambassador Resource Kit</h1>
-  <p class="subtitle">Everything you need to start promoting SkillStack NG on your campus. Copy the messages, download the banners, and start sharing today. All links go to skillstackng.com — your referral code is automatically tracked.</p>
+  <h1>🎒 Your Ambassador & Affiliate Resource Kit</h1>
+  <p class="subtitle">Everything you need to start promoting SkillStack NG. Watch and share the video creatives, copy the messages, download the banners — start sharing today. All links go to skillstackng.com — your referral code is automatically tracked.</p>
+
+  <!-- VIDEO CREATIVES -->
+  <div class="kit-section" id="videos">
+    <h2>🎬 Video Creatives</h2>
+    <p style="font-size:0.85rem;color:var(--muted);margin-bottom:24px;line-height:1.6;">Tap Watch to preview, or Share to send straight to a WhatsApp contact or group — no download needed, the video plays right from YouTube.</p>
+    <div class="videos-grid" id="videosGrid"></div>
+  </div>
 
   <!-- WHATSAPP MESSAGES -->
   <div class="kit-section">
@@ -598,6 +638,45 @@ function copyText(btn) {
     setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
   });
 }
+
+const videos = [
+  { label: 'SkillStack NG — Landing Page Awareness', id: 'vkO6BTJEy9Y' },
+  { label: 'Copywriting & Persuasion — Video 1', id: 'VbcIjF5bY4g' },
+  { label: 'Copywriting & Persuasion — Video 2', id: 'aoAmnuj5ne8' },
+  { label: 'Social Media Management — Video 1', id: 'rc83x4EVj0U' },
+  { label: 'Social Media Management — Video 2', id: 'b_keDVrsHIk' },
+  { label: 'Content Writing — Video 1', id: 'hToh5xXBjLY' },
+  { label: 'Content Writing — Video 2', id: 'ky_2BmO9NOE' },
+  { label: 'Digital Marketing Fundamentals — Video 1', id: 'c9gojumCxPo' },
+  { label: 'Digital Marketing Fundamentals — Video 2', id: 'TWfM1W1o1pE' },
+  { label: 'Sales & Lead Generation — Video 1', id: 'RmVU3NYOZbo' },
+  { label: 'Sales & Lead Generation — Video 2', id: 'nMOvmexzkLQ' },
+  { label: 'Freelancing & Getting Clients — Video 1', id: 'vGZQvb0EFWo' },
+  { label: 'Freelancing & Getting Clients — Video 2', id: '37n5CZlskWs' }
+];
+
+const videosGrid = document.getElementById('videosGrid');
+videos.forEach(v => {
+  const watchUrl = 'https://youtube.com/shorts/' + v.id;
+  const shareText = 'Check this out — ' + v.label + ':\n' + watchUrl + '\n\nLearn practical skills on WhatsApp, 15 minutes a day: skillstackng.com';
+  const shareUrl = 'https://wa.me/?text=' + encodeURIComponent(shareText);
+
+  const card = document.createElement('div');
+  card.className = 'video-card';
+  card.innerHTML =
+    '<a href="' + watchUrl + '" target="_blank" class="video-thumb-wrap">' +
+      '<img src="https://img.youtube.com/vi/' + v.id + '/hqdefault.jpg" alt="' + v.label + '" loading="lazy">' +
+      '<div class="video-play-badge"><span>▶</span></div>' +
+    '</a>' +
+    '<div class="video-footer">' +
+      '<div class="video-name">' + v.label + '</div>' +
+      '<div class="video-actions">' +
+        '<a href="' + watchUrl + '" target="_blank" class="video-btn watch">▶ Watch</a>' +
+        '<a href="' + shareUrl + '" target="_blank" class="video-btn share">Share →</a>' +
+      '</div>' +
+    '</div>';
+  videosGrid.appendChild(card);
+});
 
 const G = '#00C48C', D = '#0D1F17', W = '#FFFFFF', GOLD = '#F5A623';
 
