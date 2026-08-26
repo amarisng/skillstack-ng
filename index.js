@@ -1614,6 +1614,61 @@ app.get('/', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
+// CORS preflight for DOF health check
+app.options('/dof-health-check', (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  res.sendStatus(200);
+});
+
+// DOF Health Check endpoint
+app.post('/dof-health-check', async (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+
+  const { answers } = req.body;
+  if (!answers || !Array.isArray(answers)) {
+    return res.status(400).json({ success: false, error: 'Invalid request' });
+  }
+
+  const summaryText = answers.map(a => `${a.question}: ${a.answer}`).join('\n');
+
+  try {
+    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    const message = await client.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 1000,
+      system: `You are the AI assessment engine for Doctor of the Future (DOF), a Nigerian nutrition practice run by Gideon Bassey, a professional nutritionist in Lagos. Analyse the person's health survey answers and produce a personalized Nigerian nutrition assessment. Be warm, encouraging, and clinically grounded. Always use Nigerian foods and context.
+
+Respond ONLY with valid JSON and nothing else — no markdown, no backticks, no preamble:
+{
+  "health_score": <integer 10-100, honest score based on their lifestyle and health risk>,
+  "summary": <2 clear sentences about their current health situation>,
+  "insight_1": <1-2 sentences: most important insight about their specific situation>,
+  "insight_2": <1-2 sentences: second key insight tied to their diet or habits>,
+  "insight_3": <1-2 sentences: encouraging — what is possible for them>,
+  "eat_1": { "food": "<specific Nigerian food>", "reason": "<1 sentence why it helps their situation>" },
+  "eat_2": { "food": "<specific Nigerian food>", "reason": "<1 sentence>" },
+  "eat_3": { "food": "<specific Nigerian food>", "reason": "<1 sentence>" },
+  "avoid_1": { "food": "<Nigerian food from their answers>", "reason": "<1 sentence specific harm>" },
+  "avoid_2": { "food": "<Nigerian food>", "reason": "<1 sentence>" },
+  "avoid_3": { "food": "<Nigerian food>", "reason": "<1 sentence>" },
+  "program_name": <exactly one of: "KnightUp Challenge", "Weight Gain and Gut Fix Bootcamp", "Sexual Health and Fertility Bootcamp", "Premium Nutrition Plan", "Star Nutrition Plan">,
+  "program_reason": <1-2 sentences why this DOF program fits their situation>,
+  "first_action": <single most important thing to start or stop TODAY, specific and practical>
+}`,
+      messages: [{ role: 'user', content: `Health survey answers:\n\n${summaryText}\n\nGenerate the JSON assessment.` }]
+    });
+
+    const raw = message.content[0].text.replace(/```json|```/g, '').trim();
+    const result = JSON.parse(raw);
+    return res.json({ success: true, result });
+
+  } catch (err) {
+    console.error('DOF assessment error:', err.message);
+    return res.status(500).json({ success: false, error: 'Assessment generation failed' });
+  }
+});
 app.listen(PORT, () => {
   console.log('SkillStack NG running on port ' + PORT);
 });
