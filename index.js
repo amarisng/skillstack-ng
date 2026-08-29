@@ -224,6 +224,29 @@ function getTrackInfo(track) {
   return TRACKS[track] || TRACKS.copywriting;
 }
 
+// Brand-new subscribers who pay directly from a track's landing page (the
+// normal ad-traffic path) never go through WhatsApp onboarding first, so
+// there was no way to know which track they actually paid for — the webhook
+// only ever saw a WhatsApp number and an amount, and 5 of the 6 tracks share
+// the same price. Confirmed via a real transaction (Christopher Okafor,
+// 2026-08-29) that Paystack's metadata.referrer reliably contains the exact
+// payment page slug the customer paid through, e.g.
+// "https://paystack.shop/pay/vd5zt2ws9q,https://skillstackng.com/" — which
+// maps straight back to a track via TRACKS' own monthly/full links.
+const PAYSTACK_SLUG_TO_TRACK = {};
+Object.keys(TRACKS).forEach(key => {
+  const t = TRACKS[key];
+  PAYSTACK_SLUG_TO_TRACK[t.monthlyLink.split('/').pop()] = key;
+  PAYSTACK_SLUG_TO_TRACK[t.fullLink.split('/').pop()] = key;
+});
+function extractTrackFromReferrer(referrer) {
+  if (!referrer) return null;
+  for (const slug in PAYSTACK_SLUG_TO_TRACK) {
+    if (referrer.includes(slug)) return PAYSTACK_SLUG_TO_TRACK[slug];
+  }
+  return null;
+}
+
 function formatLesson(lesson, dayNumber, track) {
   const totalDays = getTrackInfo(track).totalDays;
   return 'Day ' + dayNumber + ' of ' + totalDays + ' - SkillStack NG\n\n' + lesson.title + '\n\n' + lesson.content + '\n\n---\nTODAYS TASK\n' + lesson.task + '\n\nReply with your answer and I will give you personal feedback.\n\n💡 Reply daily to keep your lessons coming — WhatsApp pauses messages to numbers that go quiet.';
@@ -231,7 +254,7 @@ function formatLesson(lesson, dayNumber, track) {
 
 async function activateSubscriber(whatsappNumber, name, planType = 'monthly', paymentInfo = {}) {
   try {
-    const { refCode, amount, chargeReference } = paymentInfo;
+    const { refCode, amount, chargeReference, detectedTrack } = paymentInfo;
     const cleanPhone = whatsappNumber.replace(/\D/g, '');
     let finalPhone = cleanPhone;
     if (finalPhone.startsWith('0')) {
@@ -241,8 +264,13 @@ async function activateSubscriber(whatsappNumber, name, planType = 'monthly', pa
     console.log('Activating subscriber: ' + finalPhone);
     let sub = await getSubscriber(finalPhone);
 
+    // Existing subscribers keep whatever track they already chose during
+    // onboarding; brand-new ones only have detectedTrack (from the Paystack
+    // referrer) to go on, falling back to copywriting if that's absent too.
+    const effectiveTrack = sub ? sub.track : (detectedTrack || 'copywriting');
+
     // Set subscription expiry — full plans get the track's programme length, monthly always renews in 32 days
-    const trackInfo = getTrackInfo(sub && sub.track);
+    const trackInfo = getTrackInfo(effectiveTrack);
     const expiryDays = planType === 'full' ? trackInfo.fullExpiryDays : 32;
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + expiryDays);
@@ -276,7 +304,7 @@ async function activateSubscriber(whatsappNumber, name, planType = 'monthly', pa
         phone: finalPhone,
         name: name || 'Subscriber',
         day_number: 1,
-        track: 'copywriting',
+        track: effectiveTrack,
         time_preference: null,
         active: 'true',
         streak: 1,
@@ -724,6 +752,7 @@ app.post('/paystack-webhook', async (req, res) => {
         if (amount >= 9000) planType = 'full';
         const refCode = extractRefCode(data);
         const chargeReference = data.reference;
+        const detectedTrack = extractTrackFromReferrer(data.metadata && data.metadata.referrer);
 
         // Beta payment — run full onboarding inside bot
         if (amount <= 200) {
@@ -752,7 +781,7 @@ app.post('/paystack-webhook', async (req, res) => {
           return;
         }
 
-        await activateSubscriber(whatsappNumber, customerName, planType, { refCode, amount, chargeReference });
+        await activateSubscriber(whatsappNumber, customerName, planType, { refCode, amount, chargeReference, detectedTrack });
       } else {
         console.log('No WhatsApp number found. Metadata: ' + JSON.stringify(data.metadata));
       }
