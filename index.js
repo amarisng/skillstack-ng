@@ -254,7 +254,7 @@ function formatLesson(lesson, dayNumber, track) {
 
 async function activateSubscriber(whatsappNumber, name, planType = 'monthly', paymentInfo = {}) {
   try {
-    const { refCode, amount, chargeReference, detectedTrack } = paymentInfo;
+    const { refCode, amount, chargeReference, detectedTrack, customerEmail } = paymentInfo;
     const cleanPhone = whatsappNumber.replace(/\D/g, '');
     let finalPhone = cleanPhone;
     if (finalPhone.startsWith('0')) {
@@ -312,7 +312,9 @@ async function activateSubscriber(whatsappNumber, name, planType = 'monthly', pa
         subscription_expires: subscriptionExpires,
         last_active: new Date().toISOString().split('T')[0],
         referred_by: refCode || null,
-        last_charge_reference: chargeReference || null
+        last_charge_reference: chargeReference || null,
+        email: customerEmail || null,
+        activation_reminder_sent: false
       });
       if (refCode) await creditReferral(refCode, amount, true);
     }
@@ -731,6 +733,7 @@ app.post('/paystack-webhook', async (req, res) => {
       const data = event.data;
       const customerName = data.customer && data.customer.first_name
         ? data.customer.first_name : 'Subscriber';
+      const customerEmail = (data.customer && data.customer.email) || null;
 
       let whatsappNumber = null;
       if (data.metadata && data.metadata.custom_fields) {
@@ -781,7 +784,7 @@ app.post('/paystack-webhook', async (req, res) => {
           return;
         }
 
-        await activateSubscriber(whatsappNumber, customerName, planType, { refCode, amount, chargeReference, detectedTrack });
+        await activateSubscriber(whatsappNumber, customerName, planType, { refCode, amount, chargeReference, detectedTrack, customerEmail });
       } else {
         console.log('No WhatsApp number found. Metadata: ' + JSON.stringify(data.metadata));
       }
@@ -891,6 +894,49 @@ cron.schedule('0 9 * * *', async () => {
     const watDay = new Date(now.getTime() + 60 * 60 * 1000).getDay();
     if (watDay === 0 || watDay === 6) continue;
     await sendMessage(sub.phone, 'Hey ' + sub.name + '! You missed yesterday\'s lesson. Reply CONTINUE and I will send it now. Your streak is at ' + sub.streak + ' days — keep it going!\n\n⚠️ Heads up: if you stay quiet much longer, WhatsApp will automatically pause messages to your number. Reply today to keep your lessons coming.');
+  }
+});
+
+// Daily check for subscribers who paid but never actually texted the bot, so
+// their WhatsApp session never opened and no lesson has ever reached them
+// (see Christopher Okafor, 2026-08-29 — same root cause as the affiliate/
+// ambassador delivery bug). Catches yesterday's signups in a ~20-30h-old
+// window, checks Twilio for any inbound message ever, and emails a one-time
+// nudge if they've truly never engaged. activation_reminder_sent ensures
+// this only ever fires once per subscriber.
+cron.schedule('0 8 * * *', async () => {
+  console.log('Running new-subscriber activation check...');
+  const windowStart = new Date(Date.now() - 30 * 3600000).toISOString();
+  const windowEnd = new Date(Date.now() - 20 * 3600000).toISOString();
+  const { data: candidates } = await supabase
+    .from('subscribers')
+    .select('*')
+    .eq('active', 'true')
+    .eq('activation_reminder_sent', false)
+    .not('email', 'is', null)
+    .gte('created_at', windowStart)
+    .lte('created_at', windowEnd);
+  if (!candidates || candidates.length === 0) return;
+
+  for (const sub of candidates) {
+    try {
+      const inbound = await twilioClient.messages.list({ from: 'whatsapp:+' + sub.phone, limit: 1 });
+      if (inbound.length === 0) {
+        await sendEmail(sub.email,
+          'Your SkillStack NG lessons are waiting for you',
+          '<p>Hi ' + sub.name + ',</p>' +
+          '<p>Your SkillStack NG subscription is active, but WhatsApp only lets us message a number that has messaged us first — so your Day 1 lesson is still waiting on our side.</p>' +
+          '<p>Send the word <strong>HI</strong> to our WhatsApp number to get started right away.</p>' +
+          '<p><a href="https://wa.me/15554075935?text=HI" style="display:inline-block;background:#25D366;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">Text HI on WhatsApp →</a></p>' +
+          '<p>Questions? Just reply to this email.</p>' +
+          '<p>— SkillStack NG</p>'
+        );
+        console.log('Sent activation reminder to ' + sub.phone);
+      }
+      await supabase.from('subscribers').update({ activation_reminder_sent: true }).eq('phone', sub.phone);
+    } catch (err) {
+      console.error('Activation reminder error for ' + sub.phone + ':', err.message);
+    }
   }
 });
 
@@ -1656,6 +1702,23 @@ app.get('/admin/subscriber-status', async (req, res) => {
     });
   } catch (err) {
     console.error('Subscriber status error:', err.message);
+    res.status(500).send('Error: ' + err.message);
+  }
+});
+
+// One-off: backfill Christopher Okafor's email (his record predates the
+// email/activation_reminder_sent columns) so tomorrow's automated activation
+// check picks him up like everyone going forward, instead of him being
+// invisible to the new system. Remove after use.
+app.get('/admin/backfill-christopher-email', async (req, res) => {
+  try {
+    if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
+    await supabase.from('subscribers').update({
+      email: 'chris.kk4u@gmail.com',
+      activation_reminder_sent: false
+    }).eq('phone', '2348033220047');
+    res.status(200).send('Backfilled');
+  } catch (err) {
     res.status(500).send('Error: ' + err.message);
   }
 });
