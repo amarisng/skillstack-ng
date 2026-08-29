@@ -1598,6 +1598,28 @@ app.get('/approve-ambassador', async (req, res) => {
   }
 });
 
+// One-off, read-only: fetch a Paystack transaction's full raw data to see if
+// it reveals which payment page was used (the receipt Amaris got shows
+// "Page: Full 90 Days ... Content Writing Track", so Paystack knows this
+// internally — checking whether the API actually exposes it, since the
+// webhook payload's fields alone don't include a track/page identifier).
+// Remove after use.
+app.get('/admin/check-paystack-tx', async (req, res) => {
+  try {
+    if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
+    const reference = req.query.reference;
+    if (!reference) return res.status(400).send('reference query param required');
+    const response = await fetch('https://api.paystack.co/transaction/verify/' + encodeURIComponent(reference), {
+      headers: { Authorization: 'Bearer ' + PAYSTACK_SECRET }
+    });
+    const data = await response.json();
+    res.status(200).json(data);
+  } catch (err) {
+    console.error('Check Paystack tx error:', err.message);
+    res.status(500).send('Error: ' + err.message);
+  }
+});
+
 app.get('/beta', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'beta.html'));
 });
