@@ -1706,23 +1706,6 @@ app.get('/admin/subscriber-status', async (req, res) => {
   }
 });
 
-// One-off: backfill Christopher Okafor's email (his record predates the
-// email/activation_reminder_sent columns) so tomorrow's automated activation
-// check picks him up like everyone going forward, instead of him being
-// invisible to the new system. Remove after use.
-app.get('/admin/backfill-christopher-email', async (req, res) => {
-  try {
-    if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
-    await supabase.from('subscribers').update({
-      email: 'chris.kk4u@gmail.com',
-      activation_reminder_sent: false
-    }).eq('phone', '2348033220047');
-    res.status(200).send('Backfilled');
-  } catch (err) {
-    res.status(500).send('Error: ' + err.message);
-  }
-});
-
 app.get('/beta', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'beta.html'));
 });
