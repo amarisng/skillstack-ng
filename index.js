@@ -595,7 +595,7 @@ if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
       return;
     }
     const feedback = await getFeedback(lesson.task, message, lesson.feedback_prompt);
-    await sendMessage(cleanPhone, 'Feedback on Day ' + sub.day_number + ':\n\n' + feedback + '\n\nStreak: ' + (sub.streak + 1) + ' days. Keep going!');
+    await sendMessage(cleanPhone, 'Feedback on Day ' + sub.day_number + ':\n\n' + feedback + '\n\nStreak: ' + (sub.streak + 1) + ' days. Keep going!\n\nQuestions, stuck on something, or not sure what to do next? Just reply here — happy to help.');
     const nextDay = sub.day_number < 65 ? sub.day_number + 1 : sub.day_number;
     await supabase.from('subscribers').update({
       day_number: nextDay,
