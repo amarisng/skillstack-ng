@@ -1598,65 +1598,6 @@ app.get('/approve-ambassador', async (req, res) => {
   }
 });
 
-// One-off, read-only: verify a new subscriber's activation went through
-// correctly (Christopher Okafor, Content Writing Full plan, paid via ad
-// traffic — WhatsApp 08033220047). Checks the subscribers row plus Twilio's
-// actual delivery status for the welcome message. Remove after use.
-app.get('/admin/check-subscriber', async (req, res) => {
-  try {
-    if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
-    let phone = (req.query.phone || '').replace(/\D/g, '');
-    if (phone.startsWith('0')) phone = '234' + phone.substring(1);
-    if (!phone) return res.status(400).send('phone query param required');
-
-    const sub = await getSubscriber(phone);
-    const messages = await twilioClient.messages.list({ to: 'whatsapp:+' + phone, limit: 10 });
-    const messageLog = messages.map(m => ({
-      dateSent: m.dateSent,
-      status: m.status,
-      errorCode: m.errorCode,
-      direction: m.direction,
-      bodyPreview: (m.body || '').slice(0, 80)
-    }));
-    res.status(200).json({ subscriber: sub, messageLog });
-  } catch (err) {
-    console.error('Check subscriber error:', err.message);
-    res.status(500).send('Error: ' + err.message);
-  }
-});
-
-// One-off: fix Christopher Okafor's subscriber record. He paid for the
-// Content Writing full plan (Paystack reference T736054486223121) but
-// activateSubscriber() hardcodes 'copywriting' for brand-new subscribers
-// (no way to know the real track from the webhook payload — see the
-// broader bug this exposes). Both his welcome messages also came back
-// undelivered (error 63016, same session-window issue as before), so
-// WhatsApp can't reach him proactively either. Corrects the track and
-// emails him instructions to text HI to activate delivery. Remove after use.
-app.get('/admin/fix-christopher', async (req, res) => {
-  try {
-    if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
-    const phone = '2348033220047';
-
-    await supabase.from('subscribers').update({ track: 'content_writing' }).eq('phone', phone);
-
-    const emailed = await sendEmail('chris.kk4u@gmail.com',
-      'Your SkillStack NG Content Writing subscription is ready',
-      '<p>Hi Christopher,</p>' +
-      '<p>Your payment for the SkillStack NG <strong>Content Writing</strong> full 90-day plan (ref T736054486223121) is confirmed, and your account is fully set up on the correct track.</p>' +
-      '<p>WhatsApp only lets us message a number that has messaged us first, so to get your Day 1 lesson, send the word <strong>HI</strong> to our WhatsApp number.</p>' +
-      '<p><a href="https://wa.me/15554075935?text=HI" style="display:inline-block;background:#25D366;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">Text HI on WhatsApp →</a></p>' +
-      '<p>Sorry for the delay — thanks for your patience, and welcome to SkillStack NG!</p>' +
-      '<p>— SkillStack NG</p>'
-    );
-
-    res.status(200).json({ trackFixed: true, emailed });
-  } catch (err) {
-    console.error('Fix Christopher error:', err.message);
-    res.status(500).send('Error: ' + err.message);
-  }
-});
-
 app.get('/beta', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'beta.html'));
 });
