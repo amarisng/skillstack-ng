@@ -1627,6 +1627,39 @@ app.get('/approve-ambassador', async (req, res) => {
   }
 });
 
+// Permanent (unlike the one-off /admin endpoints elsewhere): a repeatable way
+// to check any subscriber's setup and actual WhatsApp delivery status,
+// instead of rebuilding a one-off diagnostic every time a "did they get it"
+// question comes up. Checks Supabase's subscriber record against Twilio's
+// real delivery log — link_sent/active flags only ever prove we *attempted*
+// a send, not that WhatsApp delivered it.
+app.get('/admin/subscriber-status', async (req, res) => {
+  try {
+    if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
+    let phone = (req.query.phone || '').replace(/\D/g, '');
+    if (phone.startsWith('0')) phone = '234' + phone.substring(1);
+    if (!phone) return res.status(400).send('phone query param required');
+
+    const sub = await getSubscriber(phone);
+    const messages = await twilioClient.messages.list({ to: 'whatsapp:+' + phone, limit: 10 });
+    const outboundLog = messages.filter(m => m.direction === 'outbound-api').map(m => ({
+      dateSent: m.dateSent, status: m.status, errorCode: m.errorCode, bodyPreview: (m.body || '').slice(0, 80)
+    }));
+    const inboundMessages = await twilioClient.messages.list({ from: 'whatsapp:+' + phone, limit: 5 });
+    const lastInbound = inboundMessages[0] ? { dateSent: inboundMessages[0].dateSent, bodyPreview: (inboundMessages[0].body || '').slice(0, 80) } : null;
+
+    res.status(200).json({
+      subscriber: sub,
+      everReplied: !!lastInbound,
+      lastInbound,
+      outboundLog
+    });
+  } catch (err) {
+    console.error('Subscriber status error:', err.message);
+    res.status(500).send('Error: ' + err.message);
+  }
+});
+
 app.get('/beta', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'beta.html'));
 });
