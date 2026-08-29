@@ -1598,6 +1598,33 @@ app.get('/approve-ambassador', async (req, res) => {
   }
 });
 
+// One-off, read-only: verify a new subscriber's activation went through
+// correctly (Christopher Okafor, Content Writing Full plan, paid via ad
+// traffic — WhatsApp 08033220047). Checks the subscribers row plus Twilio's
+// actual delivery status for the welcome message. Remove after use.
+app.get('/admin/check-subscriber', async (req, res) => {
+  try {
+    if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
+    let phone = (req.query.phone || '').replace(/\D/g, '');
+    if (phone.startsWith('0')) phone = '234' + phone.substring(1);
+    if (!phone) return res.status(400).send('phone query param required');
+
+    const sub = await getSubscriber(phone);
+    const messages = await twilioClient.messages.list({ to: 'whatsapp:+' + phone, limit: 10 });
+    const messageLog = messages.map(m => ({
+      dateSent: m.dateSent,
+      status: m.status,
+      errorCode: m.errorCode,
+      direction: m.direction,
+      bodyPreview: (m.body || '').slice(0, 80)
+    }));
+    res.status(200).json({ subscriber: sub, messageLog });
+  } catch (err) {
+    console.error('Check subscriber error:', err.message);
+    res.status(500).send('Error: ' + err.message);
+  }
+});
+
 app.get('/beta', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'beta.html'));
 });
