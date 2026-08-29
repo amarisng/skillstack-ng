@@ -1620,6 +1620,67 @@ app.get('/admin/check-paystack-tx', async (req, res) => {
   }
 });
 
+// One-off, read-only: audit every subscriber who has a recorded Paystack
+// charge — cross-check the track their payment's referrer slug actually maps
+// to (via TRACKS' own monthly/full links) against what's stored in
+// Supabase, to find out how widespread the track-detection bug actually is
+// before deciding whether/how to fix it. Remove after use.
+app.get('/admin/audit-tracks', async (req, res) => {
+  try {
+    if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
+
+    const slugToTrack = {};
+    Object.keys(TRACKS).forEach(key => {
+      const t = TRACKS[key];
+      slugToTrack[t.monthlyLink.split('/').pop()] = key;
+      slugToTrack[t.fullLink.split('/').pop()] = key;
+    });
+
+    const { data: subs } = await supabase.from('subscribers').select('*')
+      .not('last_charge_reference', 'is', null);
+
+    const results = [];
+    for (const sub of subs || []) {
+      try {
+        const response = await fetch('https://api.paystack.co/transaction/verify/' + encodeURIComponent(sub.last_charge_reference), {
+          headers: { Authorization: 'Bearer ' + PAYSTACK_SECRET }
+        });
+        const tx = await response.json();
+        const referrer = tx.data && tx.data.metadata && tx.data.metadata.referrer;
+        let detectedTrack = null;
+        if (referrer) {
+          for (const slug in slugToTrack) {
+            if (referrer.includes(slug)) { detectedTrack = slugToTrack[slug]; break; }
+          }
+        }
+        results.push({
+          phone: sub.phone,
+          name: sub.name,
+          storedTrack: sub.track,
+          detectedTrack,
+          mismatch: detectedTrack !== null && detectedTrack !== sub.track,
+          referrer: referrer || null,
+          reference: sub.last_charge_reference,
+          created_at: sub.created_at
+        });
+      } catch (txErr) {
+        results.push({ phone: sub.phone, error: txErr.message, reference: sub.last_charge_reference });
+      }
+    }
+
+    const mismatches = results.filter(r => r.mismatch);
+    res.status(200).json({
+      totalChecked: results.length,
+      mismatchCount: mismatches.length,
+      mismatches,
+      allResults: results
+    });
+  } catch (err) {
+    console.error('Audit tracks error:', err.message);
+    res.status(500).send('Error: ' + err.message);
+  }
+});
+
 app.get('/beta', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'beta.html'));
 });
