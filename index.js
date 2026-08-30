@@ -137,6 +137,14 @@ function referralStatsEmailHtml(name, label, code, referrer) {
     '<p>— SkillStack NG</p>';
 }
 
+function saleConfirmationEmailHtml(name, label, commission, isFirstPayment) {
+  return '<p>Hi ' + name + ',</p>' +
+    '<p>🎉 Good news — someone just ' + (isFirstPayment ? 'signed up' : 'renewed') + ' through your ' + label.toLowerCase() + ' link.</p>' +
+    '<p>You just earned <strong>₦' + commission.toLocaleString() + '</strong> commission. It has been added to your pending payout balance.</p>' +
+    '<p>Payouts are processed weekly once your pending balance hits ₦5,000. Keep sharing your link!</p>' +
+    '<p>— SkillStack NG</p>';
+}
+
 async function getSubscriber(phone) {
   const cleanPhone = phone.replace(/\D/g, '');
   const { data } = await supabase
@@ -697,6 +705,7 @@ async function creditReferral(refCode, amount, isFirstPayment) {
       pending_payout: (affiliate.pending_payout || 0) + commission
     }).eq('affiliate_code', refCode);
     console.log('Credited ₦' + commission + ' to affiliate ' + refCode);
+    await notifyReferrerOfSale(affiliate, 'Affiliate', commission, isFirstPayment);
     return;
   }
 
@@ -708,6 +717,22 @@ async function creditReferral(refCode, amount, isFirstPayment) {
       pending_payout: (ambassador.pending_payout || 0) + commission
     }).eq('ambassador_code', refCode);
     console.log('Credited ₦' + commission + ' to ambassador ' + refCode);
+    await notifyReferrerOfSale(ambassador, 'Ambassador', commission, isFirstPayment);
+  }
+}
+
+// Per-sale confirmation, on top of the Monday summary email. WhatsApp is
+// best-effort only (proactive sends fail outside an open session most of the
+// time — see the aug29 delivery-reliability findings), so email is the
+// channel this is actually guaranteed to land on.
+async function notifyReferrerOfSale(referrer, label, commission, isFirstPayment) {
+  const waMsg = '🎉 New ' + (isFirstPayment ? 'sale' : 'renewal') + ' through your ' + label + ' link! You earned ₦' + commission.toLocaleString() + ' commission.';
+  if (referrer.phone) await sendMessage(referrer.phone, waMsg);
+  if (referrer.email) {
+    await sendEmail(referrer.email,
+      'You earned ₦' + commission.toLocaleString() + ' — new SkillStack NG referral!',
+      saleConfirmationEmailHtml(referrer.name, label, commission, isFirstPayment)
+    );
   }
 }
 
