@@ -289,7 +289,7 @@ async function activateSubscriber(whatsappNumber, name, planType = 'monthly', pa
         // Genuine renewal charge vs a duplicate webhook delivery for the same charge
         if (chargeReference && sub.last_charge_reference !== chargeReference) {
           await supabase.from('subscribers').update({ last_charge_reference: chargeReference }).eq('phone', finalPhone);
-          if (sub.referred_by) await creditReferral(sub.referred_by, amount, false);
+          if (sub.referred_by) await creditReferral(sub.referred_by, amount, false, finalPhone, sub.name);
         }
         console.log('Subscriber already active — skipping duplicate: ' + finalPhone);
         return;
@@ -306,7 +306,7 @@ async function activateSubscriber(whatsappNumber, name, planType = 'monthly', pa
         referred_by: finalRefCode,
         last_charge_reference: chargeReference || null
       }).eq('phone', finalPhone);
-      if (finalRefCode) await creditReferral(finalRefCode, amount, true);
+      if (finalRefCode) await creditReferral(finalRefCode, amount, true, finalPhone, sub.name || name);
     } else {
       await supabase.from('subscribers').insert({
         phone: finalPhone,
@@ -324,7 +324,7 @@ async function activateSubscriber(whatsappNumber, name, planType = 'monthly', pa
         email: customerEmail || null,
         activation_reminder_sent: false
       });
-      if (refCode) await creditReferral(refCode, amount, true);
+      if (refCode) await creditReferral(refCode, amount, true, finalPhone, name);
     }
 
     const trackLabel = trackInfo.label;
@@ -692,7 +692,7 @@ function extractRefCode(data) {
 // payment, 10% on every subsequent monthly renewal. Rates from affiliate.html's
 // published commission table. Does not touch referral_count - that's tracked
 // separately by /track-referral (client-side, fires on the thankyou page).
-async function creditReferral(refCode, amount, isFirstPayment) {
+async function creditReferral(refCode, amount, isFirstPayment, subscriberPhone, subscriberName) {
   if (!refCode || !amount) return;
   const rate = isFirstPayment ? (amount >= 9000 ? 0.19 : 0.30) : 0.10;
   const commission = Math.round(amount * rate);
@@ -705,6 +705,7 @@ async function creditReferral(refCode, amount, isFirstPayment) {
       pending_payout: (affiliate.pending_payout || 0) + commission
     }).eq('affiliate_code', refCode);
     console.log('Credited ₦' + commission + ' to affiliate ' + refCode);
+    await logReferralSale(refCode, 'affiliate', affiliate.name, subscriberPhone, subscriberName, amount, commission, isFirstPayment);
     await notifyReferrerOfSale(affiliate, 'Affiliate', commission, isFirstPayment);
     return;
   }
@@ -717,8 +718,25 @@ async function creditReferral(refCode, amount, isFirstPayment) {
       pending_payout: (ambassador.pending_payout || 0) + commission
     }).eq('ambassador_code', refCode);
     console.log('Credited ₦' + commission + ' to ambassador ' + refCode);
+    await logReferralSale(refCode, 'ambassador', ambassador.name, subscriberPhone, subscriberName, amount, commission, isFirstPayment);
     await notifyReferrerOfSale(ambassador, 'Ambassador', commission, isFirstPayment);
   }
+}
+
+// Per-sale audit trail — the affiliates/ambassadors tables only carry running
+// totals, so this is the only place "who bought, when, for how much" lives.
+async function logReferralSale(referrerCode, referrerType, referrerName, subscriberPhone, subscriberName, amount, commission, isFirstPayment) {
+  const { error } = await supabase.from('referral_sales').insert({
+    referrer_code: referrerCode,
+    referrer_type: referrerType,
+    referrer_name: referrerName || null,
+    subscriber_phone: subscriberPhone || null,
+    subscriber_name: subscriberName || null,
+    amount: amount,
+    commission: commission,
+    is_first_payment: isFirstPayment
+  });
+  if (error) console.error('logReferralSale error:', error.message);
 }
 
 // Per-sale confirmation, on top of the Monday summary email. WhatsApp is
