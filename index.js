@@ -1732,6 +1732,28 @@ app.get('/approve-ambassador', async (req, res) => {
   }
 });
 
+// One-off: direct recovery email to Christopher Okafor, explaining the
+// punctuation bug and how to get going now that it's fixed. Build, use, remove.
+app.get('/admin/email-christopher-recovery', async (req, res) => {
+  try {
+    if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
+    const sent = await sendEmail('chris.kk4u@gmail.com',
+      'Your SkillStack NG lessons — here\'s what happened, and how to start now',
+      '<p>Hi Christopher,</p>' +
+      '<p>We looked into why your Content Writing lessons haven\'t started yet, and found exactly what went wrong — wanted to explain and get you sorted right away.</p>' +
+      '<p>After your payment went through, our two automatic welcome messages didn\'t reach you on WhatsApp — a delivery issue on our side, nothing you did wrong. When you texted <strong>"HI."</strong> to try to get things going, our system had a separate bug: it didn\'t recognize your message because of the period at the end. That confused reply you got ("you have already submitted today\'s task") was that bug, not anything on your end. Both issues are now fixed.</p>' +
+      '<p>To get your lessons started right now:</p>' +
+      '<p><a href="https://wa.me/15554075935?text=HI" style="display:inline-block;background:#25D366;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">Text HI on WhatsApp →</a></p>' +
+      '<p>Reply HI, then tell us your preferred lesson time (6AM, 7AM, 8AM, 12PM, 6PM, or 9PM) — your Day 1 Content Writing lesson will arrive right after.</p>' +
+      '<p>Sorry for the delay — you\'re fully paid up and ready to go. If anything doesn\'t work as expected, just reply to this email or WhatsApp us at support@skillstackng.com.</p>' +
+      '<p>— SkillStack NG</p>'
+    );
+    res.status(200).send(sent ? 'Recovery email sent to Christopher' : 'Email failed to send');
+  } catch (err) {
+    res.status(500).send('Error: ' + err.message);
+  }
+});
+
 // Permanent (unlike the one-off /admin endpoints elsewhere): a repeatable way
 // to check any subscriber's setup and actual WhatsApp delivery status,
 // instead of rebuilding a one-off diagnostic every time a "did they get it"
