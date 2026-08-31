@@ -97,6 +97,10 @@ async function sendMessage(to, body) {
 
 async function sendEmail(to, subject, htmlContent) {
   try {
+    // Node's native fetch has no default timeout — without one, a slow/stuck
+    // response from Brevo hangs this call (and anything awaiting it) forever.
+    // Confirmed live 2026-08-31: this is what made checkInboxForReplies()
+    // appear to hang for minutes after actually finishing its real work.
     const response = await fetch('https://api.brevo.com/v3/smtp/email', {
       method: 'POST',
       headers: {
@@ -108,7 +112,8 @@ async function sendEmail(to, subject, htmlContent) {
         to: [{ email: to }],
         subject: subject,
         htmlContent: htmlContent
-      })
+      }),
+      signal: AbortSignal.timeout(15000)
     });
     if (!response.ok) {
       console.error('Email send error:', response.status, await response.text());
