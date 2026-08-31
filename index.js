@@ -230,6 +230,7 @@ async function checkInboxForReplies() {
   });
 
   const drafted = [];
+  const debug = [];
   let error = null;
   try {
     await client.connect();
@@ -259,7 +260,11 @@ async function checkInboxForReplies() {
       // To/Cc plus the headers Cloudflare Email Routing adds on forward).
       const toText = (parsed.to && parsed.to.text || '') + ' ' + (parsed.cc && parsed.cc.text || '');
       const deliveredTo = (parsed.headers.get('delivered-to') || '') + ' ' + (parsed.headers.get('x-original-to') || '') + ' ' + (parsed.headers.get('x-forwarded-to') || '');
-      if (!/@skillstackng\.com/i.test(toText + ' ' + deliveredTo)) continue;
+      const matchesScope = /@skillstackng\.com/i.test(toText + ' ' + deliveredTo);
+      if (process.env.EMAIL_DEBUG === 'true') {
+        debug.push({ fromAddress, subject: parsed.subject, toText, deliveredTo, matchesScope, allHeaders: Array.from(parsed.headers.keys()) });
+      }
+      if (!matchesScope) continue;
 
       const { data: existing } = await supabase.from('email_reply_drafts').select('id').eq('message_id', messageId).limit(1);
       if (existing && existing.length) continue;
@@ -296,7 +301,7 @@ async function checkInboxForReplies() {
       drafted.length + ' new email reply draft' + (drafted.length > 1 ? 's are' : ' is') + ' waiting in your Gmail Drafts folder:\n\n' + drafted.join('\n')
     );
   }
-  return { ok: !error, error, drafted };
+  return { ok: !error, error, drafted, debug };
 }
 
 const TRACKS = {
