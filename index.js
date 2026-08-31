@@ -391,8 +391,14 @@ async function handleReferrerActivation(cleanPhone, table, codeField, label, app
 
 async function handleOnboarding(phone, message) {
   const cleanPhone = phone.replace(/\D/g, '');
+  // Keyword replies get typed with trailing punctuation all the time ("HI.",
+  // "STOP!") — a bare === match on message.toUpperCase() silently misses
+  // those, dropping the subscriber into the wrong fallback with no error.
+  // Confirmed live 2026-08-30: Christopher Okafor texted "HI." in exactly the
+  // reply we asked for and got treated as an unrecognized message.
+  const cmd = message.trim().toUpperCase().replace(/[.!?,;:]+$/, '');
 
-  if (message.trim().toUpperCase() === 'EARNINGS') {
+  if (cmd === 'EARNINGS') {
     await sendMessage(cleanPhone,
       'Your referral stats (referrals, earnings, pending payout) are emailed to you every Monday — check your inbox! Not received one yet or need help? Email support@skillstackng.com.'
     );
@@ -403,11 +409,11 @@ async function handleOnboarding(phone, message) {
   // (or an approved template, which we don't have set up). Affiliates/ambassadors
   // sign up on a web form and never text us, so without this trigger their
   // approval link can never actually be delivered — see AFFILIATE/AMBASSADOR handling.
-  if (message.trim().toUpperCase() === 'AFFILIATE') {
+  if (cmd === 'AFFILIATE') {
     await handleReferrerActivation(cleanPhone, 'affiliates', 'affiliate_code', 'Affiliate', 'https://skillstackng.com/affiliate', 'AFFILIATE');
     return;
   }
-  if (message.trim().toUpperCase() === 'AMBASSADOR') {
+  if (cmd === 'AMBASSADOR') {
     await handleReferrerActivation(cleanPhone, 'ambassadors', 'ambassador_code', 'Campus Ambassador', 'https://skillstackng.com/ambassador', 'AMBASSADOR');
     return;
   }
@@ -418,7 +424,7 @@ async function handleOnboarding(phone, message) {
   // their number and an open session, same guaranteed-delivery pattern as
   // AFFILIATE/AMBASSADOR) and skips the "no session yet" delivery problem
   // entirely.
-  if (message.trim().toUpperCase() === 'PRICING') {
+  if (cmd === 'PRICING') {
     const order = ['copywriting', 'social_media_management', 'content_writing', 'digital_marketing', 'sales_lead_generation', 'freelancing'];
     const numerals = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣'];
     const lines = order.map((key, i) => {
@@ -471,11 +477,11 @@ async function handleOnboarding(phone, message) {
     return;
   }
 // Allow inactive subscribers to correct their track before payment
-  if (message.toUpperCase() === 'HELP' || message.toUpperCase() === 'SUPPORT') {
+  if (cmd === 'HELP' || cmd === 'SUPPORT') {
     await sendMessage(cleanPhone, 'SkillStack NG Support 🛠️\n\nFor any issue, email us at:\nsupport@skillstackng.com\n\nWe respond within 24 hours on weekdays.\n\nUseful commands:\nLESSON — resend today\'s lesson\nSTATUS — check your progress\nSTOP — cancel your subscription\nHELP — show this message\n\nFor general enquiries: hello@skillstackng.com');
     return;
   }
-if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
+if (sub.active === 'false' && cmd === 'CHANGETRACK') {
   await supabase.from('subscribers').update({ track: 'copywriting', name: '' }).eq('phone', cleanPhone);
  await sendMessage(cleanPhone, 'No problem! Let\'s start over.\n\nChoose your track:\n\n1️⃣ Copywriting & Persuasion — 90 days\n2️⃣ Social Media Management — 60 days\n3️⃣ Content Writing — 90 days\n4️⃣ Digital Marketing Fundamentals — 90 days\n5️⃣ Sales & Lead Generation — 90 days\n6️⃣ Freelancing & Getting Online Clients — 90 days\n\nReply 1, 2, 3, 4, 5 or 6.');
   return;
@@ -504,12 +510,12 @@ if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
   }
 
   const validTimes = ['6AM', '7AM', '8AM', '12PM', '6PM', '9PM'];
-  if (sub.active === 'false' && sub.name !== '' && sub.name !== 'AWAITING' && validTimes.includes(message.toUpperCase())) {
+  if (sub.active === 'false' && sub.name !== '' && sub.name !== 'AWAITING' && validTimes.includes(cmd)) {
     const timeMap = {
       '6AM': '06:00', '7AM': '07:00', '8AM': '08:00',
       '12PM': '12:00', '6PM': '18:00', '9PM': '21:00'
     };
-    const timePreference = timeMap[message.toUpperCase()];
+    const timePreference = timeMap[cmd];
 
     if (sub.is_beta) {
       // Already paid the beta fee — activate immediately instead of asking to pay again
@@ -521,7 +527,7 @@ if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
         last_active: new Date(Date.now() - 86400000).toISOString().split('T')[0]
       }).eq('phone', cleanPhone);
       const lesson = await getLesson(1, sub.track || 'copywriting');
-      await sendMessage(cleanPhone, 'Perfect ' + sub.name + '! Your lesson will arrive Monday to Friday at ' + message.toUpperCase() + '. Here is your Day 1 lesson right now:');
+      await sendMessage(cleanPhone, 'Perfect ' + sub.name + '! Your lesson will arrive Monday to Friday at ' + cmd + '. Here is your Day 1 lesson right now:');
       if (lesson) await sendMessage(cleanPhone, formatLesson(lesson, 1, sub.track));
       return;
     }
@@ -531,7 +537,7 @@ if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
     // Send correct payment links based on selected track
     const { monthlyLink, fullLink, fullPrice } = getTrackInfo(sub.track);
 
-    await sendMessage(cleanPhone, 'Perfect ' + sub.name + '! Your lesson will arrive Monday to Friday at ' + message.toUpperCase() + '.\n\nTo activate your subscription pay here:\n\nMonthly — ₦5,000/month:\n' + monthlyLink + '\n\nFull plan — ₦' + fullPrice + ':\n' + fullLink + '\n\nMake sure to enter this WhatsApp number in the payment form.');
+    await sendMessage(cleanPhone, 'Perfect ' + sub.name + '! Your lesson will arrive Monday to Friday at ' + cmd + '.\n\nTo activate your subscription pay here:\n\nMonthly — ₦5,000/month:\n' + monthlyLink + '\n\nFull plan — ₦' + fullPrice + ':\n' + fullLink + '\n\nMake sure to enter this WhatsApp number in the payment form.');
     return;
   }
 
@@ -544,19 +550,19 @@ if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
 
   // Handle time preference reply from newly activated subscribers
   const validTimes2 = ['6AM', '7AM', '8AM', '12PM', '6PM', '9PM'];
-  if (sub.active === 'true' && sub.day_number === 1 && validTimes2.includes(message.toUpperCase())) {
+  if (sub.active === 'true' && sub.day_number === 1 && validTimes2.includes(cmd)) {
     const timeMap2 = {
       '6AM': '06:00', '7AM': '07:00', '8AM': '08:00',
       '12PM': '12:00', '6PM': '18:00', '9PM': '21:00'
     };
-    const timePreference = timeMap2[message.toUpperCase()];
+    const timePreference = timeMap2[cmd];
     await supabase.from('subscribers').update({
       time_preference: timePreference,
       last_active: new Date(Date.now() - 86400000).toISOString().split('T')[0],
       awaiting_task: true
     }).eq('phone', cleanPhone);
     const lesson = await getLesson(1, sub.track || 'copywriting');
-    await sendMessage(cleanPhone, 'Perfect! Your lesson will arrive Monday to Friday at ' + message.toUpperCase() + '. Here is your Day 1 lesson right now:');
+    await sendMessage(cleanPhone, 'Perfect! Your lesson will arrive Monday to Friday at ' + cmd + '. Here is your Day 1 lesson right now:');
     if (lesson) {
       await sendMessage(cleanPhone, formatLesson(lesson, 1, sub.track));
     } else {
@@ -577,28 +583,28 @@ if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
       await sendMessage(cleanPhone, 'What is your first name?');
       return;
     }
-    if (!sub.time_preference && (message.toUpperCase() === 'HI' || message.toUpperCase() === 'HELLO')) {
+    if (!sub.time_preference && (cmd === 'HI' || cmd === 'HELLO')) {
       await sendMessage(cleanPhone, 'What time do you want your daily lesson?\n\nReply with:\n6AM\n7AM\n8AM\n12PM\n6PM\n9PM');
       return;
     }
-    if (message.toUpperCase() === 'LESSON' || message.toUpperCase() === 'HI' || message.toUpperCase() === 'HELLO' || message.toUpperCase() === 'YES' || message.toUpperCase() === 'CONTINUE') {
+    if (cmd === 'LESSON' || cmd === 'HI' || cmd === 'HELLO' || cmd === 'YES' || cmd === 'CONTINUE') {
       await sendMessage(cleanPhone, formatLesson(lesson, sub.day_number, sub.track));
       await supabase.from('subscribers').update({ awaiting_task: true, lesson_delivered_at: new Date().toISOString() }).eq('phone', cleanPhone);
       return;
     }
 
     // Bot commands — checked before word count
-    if (message.toUpperCase() === 'STATUS') {
+    if (cmd === 'STATUS') {
       const trackInfo = getTrackInfo(sub.track);
       await sendMessage(cleanPhone, '📊 Your SkillStack NG Progress\n\nName: ' + sub.name + '\nTrack: ' + trackInfo.label + '\nDay: ' + sub.day_number + ' of ' + trackInfo.totalDays + '\nStreak: ' + sub.streak + ' days 🔥\nLesson time: ' + sub.time_preference + '\n\nKeep going — you are building a real skill. 💪');
       return;
     }
-    if (message.toUpperCase() === 'PAUSE') {
+    if (cmd === 'PAUSE') {
       await supabase.from('subscribers').update({ active: 'paused' }).eq('phone', cleanPhone);
       await sendMessage(cleanPhone, '⏸️ Your lessons have been paused, ' + sub.name + '.\n\nYou are on Day ' + sub.day_number + '. Reply RESUME when you are ready to continue — you will pick up exactly where you left off. 🙏');
       return;
     }
-    if (message.toUpperCase() === 'STOP' || message.toUpperCase() === 'CANCEL') {
+    if (cmd === 'STOP' || cmd === 'CANCEL') {
       await supabase.from('subscribers').update({ active: 'false' }).eq('phone', cleanPhone);
       await sendMessage(cleanPhone, '🛑 Your SkillStack NG subscription has been cancelled, ' + sub.name + '.\n\nYou completed Day ' + sub.day_number + ' of your track. If you ever want to continue, email support@skillstackng.com and we will reactivate your account.\n\nThank you for learning with us. 🙏');
       return;
@@ -627,7 +633,7 @@ if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
   }
 
   // RESUME command
-  if (sub.active === 'paused' && message.toUpperCase() === 'RESUME') {
+  if (sub.active === 'paused' && cmd === 'RESUME') {
     await supabase.from('subscribers').update({ active: 'true', awaiting_task: true }).eq('phone', cleanPhone);
     const lesson = await getLesson(sub.day_number, sub.track || 'copywriting');
     await sendMessage(cleanPhone, '▶️ Welcome back, ' + sub.name + '! Your lessons are now active again.\n\nYou are picking up from Day ' + sub.day_number + '. Here is your lesson:');
