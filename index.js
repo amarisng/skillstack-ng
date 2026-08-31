@@ -28,6 +28,7 @@ const twilioClient = twilio(
 
 const TWILIO_NUMBER = process.env.TWILIO_WHATSAPP_NUMBER;
 const ADMIN_WHATSAPP_NUMBER = process.env.ADMIN_WHATSAPP_NUMBER || '2347063667303';
+const ADMIN_EMAIL = 'hello@skillstackng.com';
 const REFERRER_COMMUNITY_LINK = 'https://chat.whatsapp.com/BZWNc00a5EKBHBYoAyu0Kz';
 const REFERRER_KIT_LINK = 'https://skillstackng.com/ambassador-kit';
 const PAYSTACK_SECRET = process.env.PAYSTACK_SECRET_KEY;
@@ -113,6 +114,15 @@ async function sendEmail(to, subject, htmlContent) {
     console.error('Email send error:', err.message);
     return false;
   }
+}
+
+// Admin alerts sent over WhatsApp have been failing silently for a week
+// (ADMIN_WHATSAPP_NUMBER has no open session — confirmed via Twilio history,
+// 2026-08-31). Email is the guaranteed channel; WhatsApp stays best-effort in
+// case the session happens to be open.
+async function notifyAdmin(subject, message) {
+  await sendMessage(ADMIN_WHATSAPP_NUMBER, message);
+  await sendEmail(ADMIN_EMAIL, subject, '<p>' + message.replace(/\n/g, '<br>') + '</p>');
 }
 
 function referrerActivationEmailHtml(name, label, keyword, waLink) {
@@ -552,7 +562,7 @@ if (sub.active === 'false' && message.toUpperCase() === 'CHANGETRACK') {
     } else {
       console.error('No Day 1 lesson found for track: ' + sub.track);
       await sendMessage(cleanPhone, 'Your Day 1 lesson is being finalized — you will receive it within a few minutes. If you don\'t see it, reply LESSON.');
-      await sendMessage(ADMIN_WHATSAPP_NUMBER, 'ALERT: No Day 1 lesson found for track "' + sub.track + '" (subscriber ' + cleanPhone + ')');
+      await notifyAdmin('ALERT: Missing Day 1 lesson', 'ALERT: No Day 1 lesson found for track "' + sub.track + '" (subscriber ' + cleanPhone + ')');
     }
     return;
   }
@@ -1362,7 +1372,7 @@ app.post('/waitlist', async (req, res) => {
       created_at: new Date().toISOString()
     });
     if (error) console.error('Waitlist insert error:', error.message);
-    await sendMessage(ADMIN_WHATSAPP_NUMBER,
+    await notifyAdmin('New waitlist signup',
       'New waitlist signup!\nName: ' + name + '\nEmail: ' + email + '\nPhone: ' + cleanPhone + '\nTrack: ' + track
     );
     res.status(200).json({ success: true });
@@ -1417,8 +1427,8 @@ app.post('/download-guide', async (req, res) => {
       })
     });
 
-    // Notify you on WhatsApp
-    await sendMessage(ADMIN_WHATSAPP_NUMBER,
+    // Notify you on WhatsApp (best-effort) and email (guaranteed)
+    await notifyAdmin('New guide download',
       'New Guide Download!\n\nName: ' + name +
       '\nEmail: ' + email +
       '\nPhone: ' + (cleanPhone || 'not provided') +
@@ -1503,7 +1513,7 @@ app.post('/ambassador-apply', async (req, res) => {
       created_at: new Date().toISOString()
     });
 
-    await sendMessage(ADMIN_WHATSAPP_NUMBER,
+    await notifyAdmin('New ambassador application',
       'New Ambassador Application!\n\n' +
       'Name: ' + name + '\n' +
       'Phone: ' + cleanPhone + '\n' +
@@ -1559,8 +1569,8 @@ app.post('/affiliate-signup', async (req, res) => {
       created_at: new Date().toISOString()
     });
 
-    // Notify Amaris via WhatsApp
-    await sendMessage(ADMIN_WHATSAPP_NUMBER,
+    // Notify Amaris via WhatsApp (best-effort) and email (guaranteed)
+    await notifyAdmin('New affiliate application',
       'New affiliate application!\n\n' +
       'Name: ' + name + '\n' +
       'Phone: ' + cleanPhone + '\n' +
