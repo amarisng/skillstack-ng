@@ -1732,40 +1732,6 @@ app.get('/approve-ambassador', async (req, res) => {
   }
 });
 
-// One-off: full Twilio conversation history (both directions) for a phone,
-// plus Brevo email event history for an address — for a deeper "did they
-// actually get it and act on it" check than /admin/subscriber-status's
-// single-most-recent-inbound view gives. Build, use, remove.
-app.get('/admin/full-diagnostic', async (req, res) => {
-  try {
-    if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
-    let phone = (req.query.phone || '').replace(/\D/g, '');
-    if (phone.startsWith('0')) phone = '234' + phone.substring(1);
-    const email = req.query.email || '';
-
-    let conversation = [];
-    if (phone) {
-      const outbound = await twilioClient.messages.list({ to: 'whatsapp:+' + phone, limit: 20 });
-      const inbound = await twilioClient.messages.list({ from: 'whatsapp:+' + phone, limit: 20 });
-      conversation = outbound.concat(inbound)
-        .map(m => ({ dateSent: m.dateSent, direction: m.direction, status: m.status, errorCode: m.errorCode, body: m.body }))
-        .sort((a, b) => new Date(a.dateSent) - new Date(b.dateSent));
-    }
-
-    let emailEvents = null;
-    if (email) {
-      const evResp = await fetch('https://api.brevo.com/v3/smtp/statistics/events?email=' + encodeURIComponent(email) + '&limit=20', {
-        headers: { 'api-key': process.env.BREVO_API_KEY }
-      });
-      emailEvents = await evResp.json();
-    }
-
-    res.status(200).json({ conversation, emailEvents });
-  } catch (err) {
-    res.status(500).send('Error: ' + err.message);
-  }
-});
-
 // Permanent (unlike the one-off /admin endpoints elsewhere): a repeatable way
 // to check any subscriber's setup and actual WhatsApp delivery status,
 // instead of rebuilding a one-off diagnostic every time a "did they get it"
