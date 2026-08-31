@@ -219,7 +219,7 @@ async function draftEmailReplyText(fromName, subject, body) {
 // used elsewhere (which itself sends from hello@skillstackng.com — excluded
 // by the own-address filter below, so this can't loop back on itself).
 async function checkInboxForReplies() {
-  if (!GMAIL_USER || !GMAIL_APP_PASSWORD) return;
+  if (!GMAIL_USER || !GMAIL_APP_PASSWORD) return { ok: false, error: 'GMAIL_USER/GMAIL_APP_PASSWORD not set' };
   console.log('Checking inbox for new email replies...');
   const client = new ImapFlow({
     host: 'imap.gmail.com',
@@ -230,13 +230,14 @@ async function checkInboxForReplies() {
   });
 
   const drafted = [];
+  let error = null;
   try {
     await client.connect();
     await client.mailboxOpen('INBOX');
 
     const since = new Date(Date.now() - 2 * 86400000);
     const uids = await client.search({ since }, { uid: true });
-    if (!uids || uids.length === 0) return;
+    if (!uids || uids.length === 0) return { ok: true, checked: 0, drafted: [] };
 
     const mailboxes = await client.list();
     const draftsBox = mailboxes.find(m => m.specialUse === '\\Drafts');
@@ -276,6 +277,7 @@ async function checkInboxForReplies() {
     }
   } catch (err) {
     console.error('checkInboxForReplies error:', err.message);
+    error = err.message;
   } finally {
     try { await client.logout(); } catch (e) {}
   }
@@ -285,6 +287,7 @@ async function checkInboxForReplies() {
       drafted.length + ' new email reply draft' + (drafted.length > 1 ? 's are' : ' is') + ' waiting in your Gmail Drafts folder:\n\n' + drafted.join('\n')
     );
   }
+  return { ok: !error, error, drafted };
 }
 
 const TRACKS = {
@@ -1842,8 +1845,8 @@ app.get('/approve-ambassador', async (req, res) => {
 app.get('/admin/test-inbox-check', async (req, res) => {
   if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
   try {
-    await checkInboxForReplies();
-    res.status(200).send('Inbox check ran — see server logs for details.');
+    const result = await checkInboxForReplies();
+    res.status(200).json(result);
   } catch (err) {
     res.status(500).send('Error: ' + err.message);
   }
