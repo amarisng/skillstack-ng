@@ -1726,26 +1726,6 @@ app.get('/approve-ambassador', async (req, res) => {
   }
 });
 
-// One-off: list subscribers created in the last N days, for a quick weekly
-// signup review. Build, use, remove — same pattern as other one-off /admin
-// endpoints in this file.
-app.get('/admin/recent-subscribers', async (req, res) => {
-  try {
-    if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
-    const days = parseInt(req.query.days, 10) || 7;
-    const since = new Date(Date.now() - days * 86400000).toISOString();
-    const { data, error } = await supabase
-      .from('subscribers')
-      .select('phone, name, track, plan_type, active, day_number, created_at, email, last_charge_reference')
-      .gte('created_at', since)
-      .order('created_at', { ascending: true });
-    if (error) return res.status(500).send('Error: ' + error.message);
-    res.status(200).json({ count: (data || []).length, subscribers: data });
-  } catch (err) {
-    res.status(500).send('Error: ' + err.message);
-  }
-});
-
 // Permanent (unlike the one-off /admin endpoints elsewhere): a repeatable way
 // to check any subscriber's setup and actual WhatsApp delivery status,
 // instead of rebuilding a one-off diagnostic every time a "did they get it"
