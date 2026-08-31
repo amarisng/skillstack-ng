@@ -267,7 +267,8 @@ async function checkInboxForReplies() {
       const subject = parsed.subject || '';
       const replyText = await draftEmailReplyText(fromName, subject, parsed.text || '');
       const replySubject = /^re:/i.test(subject) ? subject : 'Re: ' + subject;
-      const references = ((parsed.references || []).join(' ') + ' ' + messageId).trim();
+      const referencesArr = Array.isArray(parsed.references) ? parsed.references : (parsed.references ? [parsed.references] : []);
+      const references = (referencesArr.join(' ') + ' ' + messageId).trim();
 
       const rawDraft =
         'From: SkillStack NG <' + ADMIN_EMAIL + '>\r\n' +
