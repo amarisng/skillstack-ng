@@ -1892,6 +1892,17 @@ app.get('/approve-ambassador', async (req, res) => {
   }
 });
 
+// One-off: confirm the process actually restarted with the latest deploy
+// (vs. an old process still serving requests). Build, use, remove.
+app.get('/admin/server-info', (req, res) => {
+  if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
+  res.status(200).json({
+    uptimeSeconds: process.uptime(),
+    bootedApprox: new Date(Date.now() - process.uptime() * 1000).toISOString(),
+    now: new Date().toISOString()
+  });
+});
+
 // One-off: manually fire checkInboxForReplies() right now instead of waiting
 // for the 20-minute cron, to verify the IMAP/Gmail/Drafts wiring actually
 // works end to end. Build, use, remove.
