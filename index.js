@@ -276,8 +276,8 @@ async function checkInboxForReplies() {
       console.log('Drafted reply to ' + fromAddress);
     }
   } catch (err) {
-    console.error('checkInboxForReplies error:', err.message);
-    error = err.message;
+    console.error('checkInboxForReplies error:', err.message, err.response || err.responseText || err.code || '');
+    error = err.message + ' | code=' + err.code + ' | response=' + (err.response || err.responseText || '');
   } finally {
     try { await client.logout(); } catch (e) {}
   }
