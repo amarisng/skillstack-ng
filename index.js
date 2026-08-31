@@ -1861,6 +1861,15 @@ app.get('/admin/test-inbox-check', async (req, res) => {
   }
 });
 
+// One-off: read back email_reply_drafts without waiting on the slow
+// synchronous inbox check. Build, use, remove.
+app.get('/admin/list-email-drafts', async (req, res) => {
+  if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
+  const { data, error } = await supabase.from('email_reply_drafts').select('*').order('created_at', { ascending: false }).limit(20);
+  if (error) return res.status(500).send('Error: ' + error.message);
+  res.status(200).json(data);
+});
+
 // Permanent (unlike the one-off /admin endpoints elsewhere): a repeatable way
 // to check any subscriber's setup and actual WhatsApp delivery status,
 // instead of rebuilding a one-off diagnostic every time a "did they get it"
