@@ -1897,20 +1897,9 @@ app.get('/approve-ambassador', async (req, res) => {
   }
 });
 
-// One-off: confirm the process actually restarted with the latest deploy
-// (vs. an old process still serving requests). Build, use, remove.
-app.get('/admin/server-info', (req, res) => {
-  if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
-  res.status(200).json({
-    uptimeSeconds: process.uptime(),
-    bootedApprox: new Date(Date.now() - process.uptime() * 1000).toISOString(),
-    now: new Date().toISOString()
-  });
-});
-
-// One-off: manually fire checkInboxForReplies() right now instead of waiting
-// for the 20-minute cron, to verify the IMAP/Gmail/Drafts wiring actually
-// works end to end. Build, use, remove.
+// Permanent: manually fire checkInboxForReplies() right now instead of
+// waiting up to 20 minutes for the cron — useful for spot-checking after
+// changes, given how many failure modes this integration turned out to have.
 app.get('/admin/test-inbox-check', async (req, res) => {
   if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
   try {
@@ -1930,17 +1919,8 @@ app.get('/admin/test-inbox-check', async (req, res) => {
   }
 });
 
-// One-off: read back email_reply_drafts without waiting on the slow
-// synchronous inbox check. Build, use, remove.
-app.get('/admin/list-email-drafts', async (req, res) => {
-  if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
-  const { data, error } = await supabase.from('email_reply_drafts').select('*').order('created_at', { ascending: false }).limit(20);
-  if (error) return res.status(500).send('Error: ' + error.message);
-  res.status(200).json(data);
-});
-
-// One-off: read back the result (including debug info) of the last
-// fire-and-forget checkInboxForReplies() run. Build, use, remove.
+// Permanent: read back the result (and live checkpoint progress) of the
+// last checkInboxForReplies() run, whether triggered manually or by cron.
 app.get('/admin/last-inbox-check-result', async (req, res) => {
   if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
   res.status(200).json(lastInboxCheckResult || { status: 'no run recorded yet' });
