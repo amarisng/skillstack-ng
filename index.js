@@ -219,7 +219,20 @@ async function draftEmailReplyText(fromName, subject, body) {
 // notification per run summarizing what's waiting, via the same notifyAdmin()
 // used elsewhere (which itself sends from hello@skillstackng.com — excluded
 // by the own-address filter below, so this can't loop back on itself).
+// Wraps the real logic in a hard overall timeout — imapflow's own defaults
+// (e.g. a 5-minute socketTimeout) are too generous for a batch job that
+// should finish in seconds; without a backstop, a stuck connection just
+// hangs silently instead of failing loudly. Confirmed live 2026-08-31: a
+// run hung past 3+ minutes with no error surfaced anywhere.
 async function checkInboxForReplies() {
+  const TIMEOUT_MS = 60000;
+  return Promise.race([
+    checkInboxForRepliesInner(),
+    new Promise(resolve => setTimeout(() => resolve({ ok: false, error: 'Timed out after ' + TIMEOUT_MS + 'ms', drafted: [], debug: [] }), TIMEOUT_MS))
+  ]);
+}
+
+async function checkInboxForRepliesInner() {
   if (!GMAIL_USER || !GMAIL_APP_PASSWORD) return { ok: false, error: 'GMAIL_USER/GMAIL_APP_PASSWORD not set' };
   console.log('Checking inbox for new email replies...');
   const client = new ImapFlow({
@@ -227,7 +240,10 @@ async function checkInboxForReplies() {
     port: 993,
     secure: true,
     auth: { user: GMAIL_USER, pass: GMAIL_APP_PASSWORD },
-    logger: false
+    logger: false,
+    connectionTimeout: 15000,
+    greetingTimeout: 10000,
+    socketTimeout: 30000
   });
 
   const drafted = [];
