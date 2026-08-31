@@ -38,7 +38,7 @@ const PAYSTACK_TEST_SECRET = process.env.PAYSTACK_TEST_SECRET_KEY;
 const VERIFY_TOKEN = process.env.WEBHOOK_VERIFY_TOKEN || 'skillstack_verify_2024';
 const GMAIL_USER = process.env.GMAIL_USER;
 const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD;
-const OWN_SENDING_ADDRESSES = ['hello@skillstackng.com', 'support@skillstackng.com'];
+const OWN_SENDING_ADDRESSES = ['hello@skillstackng.com', 'support@skillstackng.com', 'amarissynergylimited@gmail.com'];
 
 // Twilio rejects any message body over 1600 characters (error 21617) — split long
 // messages (e.g. lesson content) into multiple sequential WhatsApp messages instead.
@@ -253,6 +253,14 @@ async function checkInboxForReplies() {
       if (OWN_SENDING_ADDRESSES.includes(fromAddress)) continue;
       if (/no-?reply|mailer-daemon|postmaster/i.test(fromAddress)) continue;
 
+      // GMAIL_USER logs into the personal inbox hello@/support@ forward into —
+      // that inbox may carry unrelated personal mail too, so only touch
+      // messages actually addressed to a skillstackng.com address (checking
+      // To/Cc plus the headers Cloudflare Email Routing adds on forward).
+      const toText = (parsed.to && parsed.to.text || '') + ' ' + (parsed.cc && parsed.cc.text || '');
+      const deliveredTo = (parsed.headers.get('delivered-to') || '') + ' ' + (parsed.headers.get('x-original-to') || '') + ' ' + (parsed.headers.get('x-forwarded-to') || '');
+      if (!/@skillstackng\.com/i.test(toText + ' ' + deliveredTo)) continue;
+
       const { data: existing } = await supabase.from('email_reply_drafts').select('id').eq('message_id', messageId).limit(1);
       if (existing && existing.length) continue;
 
@@ -262,7 +270,7 @@ async function checkInboxForReplies() {
       const references = ((parsed.references || []).join(' ') + ' ' + messageId).trim();
 
       const rawDraft =
-        'From: SkillStack NG <' + GMAIL_USER + '>\r\n' +
+        'From: SkillStack NG <' + ADMIN_EMAIL + '>\r\n' +
         'To: ' + fromAddress + '\r\n' +
         'Subject: ' + replySubject + '\r\n' +
         'In-Reply-To: ' + messageId + '\r\n' +
