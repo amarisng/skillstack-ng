@@ -1836,6 +1836,19 @@ app.get('/approve-ambassador', async (req, res) => {
   }
 });
 
+// One-off: manually fire checkInboxForReplies() right now instead of waiting
+// for the 20-minute cron, to verify the IMAP/Gmail/Drafts wiring actually
+// works end to end. Build, use, remove.
+app.get('/admin/test-inbox-check', async (req, res) => {
+  if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
+  try {
+    await checkInboxForReplies();
+    res.status(200).send('Inbox check ran — see server logs for details.');
+  } catch (err) {
+    res.status(500).send('Error: ' + err.message);
+  }
+});
+
 // Permanent (unlike the one-off /admin endpoints elsewhere): a repeatable way
 // to check any subscriber's setup and actual WhatsApp delivery status,
 // instead of rebuilding a one-off diagnostic every time a "did they get it"
