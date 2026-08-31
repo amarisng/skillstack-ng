@@ -5,6 +5,8 @@ const Anthropic = require('@anthropic-ai/sdk');
 const cron = require('node-cron');
 const path = require('path');
 const crypto = require('crypto');
+const { ImapFlow } = require('imapflow');
+const { simpleParser } = require('mailparser');
 const app = express();
 
 app.use(express.urlencoded({ extended: false }));
@@ -34,6 +36,9 @@ const REFERRER_KIT_LINK = 'https://skillstackng.com/ambassador-kit';
 const PAYSTACK_SECRET = process.env.PAYSTACK_SECRET_KEY;
 const PAYSTACK_TEST_SECRET = process.env.PAYSTACK_TEST_SECRET_KEY;
 const VERIFY_TOKEN = process.env.WEBHOOK_VERIFY_TOKEN || 'skillstack_verify_2024';
+const GMAIL_USER = process.env.GMAIL_USER;
+const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD;
+const OWN_SENDING_ADDRESSES = ['hello@skillstackng.com', 'support@skillstackng.com'];
 
 // Twilio rejects any message body over 1600 characters (error 21617) — split long
 // messages (e.g. lesson content) into multiple sequential WhatsApp messages instead.
@@ -185,6 +190,101 @@ async function getFeedback(task, submission, feedbackPrompt) {
     }],
   });
   return message.content[0].text;
+}
+
+async function draftEmailReplyText(fromName, subject, body) {
+  const trackList = Object.values(TRACKS).map(t => '- ' + t.label + ' (' + t.totalDays + ' days)').join('\n');
+  const message = await anthropic.messages.create({
+    model: 'claude-sonnet-4-6',
+    max_tokens: 500,
+    messages: [{
+      role: 'user',
+      content: 'You are drafting an email reply on behalf of SkillStack NG, a WhatsApp-based skill-learning platform for Nigerians. ' +
+        'Tracks offered:\n' + trackList + '\n\n' +
+        'Monthly plan is ₦5,000/month; full-plan pricing varies by track (a few thousand more, paid once, no renewals). Lessons are delivered on WhatsApp, Monday-Friday, with AI feedback on daily tasks.\n\n' +
+        'Someone emailed us. Draft a warm, concise, helpful reply in plain text (no markdown). Sign off as "— SkillStack NG". ' +
+        'If the email asks something you do not have enough information to answer accurately (a specific account issue, a payment dispute, something needing a human to check), say so honestly and let them know a team member will follow up, rather than guessing. ' +
+        'Do not invent facts, prices, or policies not given above.\n\n' +
+        'From: ' + (fromName || 'unknown') + '\nSubject: ' + (subject || '(no subject)') + '\n\n' + (body || '').slice(0, 3000)
+    }],
+  });
+  return message.content[0].text;
+}
+
+// Checks the shared inbox for new inbound email, drafts an on-brand reply via
+// Claude for each one that looks like a real message (not our own sends, not
+// auto-generated bounces/no-reply mail), and saves it into Gmail's Drafts
+// folder for human review — nothing sends automatically. Amaris gets a single
+// notification per run summarizing what's waiting, via the same notifyAdmin()
+// used elsewhere (which itself sends from hello@skillstackng.com — excluded
+// by the own-address filter below, so this can't loop back on itself).
+async function checkInboxForReplies() {
+  if (!GMAIL_USER || !GMAIL_APP_PASSWORD) return;
+  console.log('Checking inbox for new email replies...');
+  const client = new ImapFlow({
+    host: 'imap.gmail.com',
+    port: 993,
+    secure: true,
+    auth: { user: GMAIL_USER, pass: GMAIL_APP_PASSWORD },
+    logger: false
+  });
+
+  const drafted = [];
+  try {
+    await client.connect();
+    await client.mailboxOpen('INBOX');
+
+    const since = new Date(Date.now() - 2 * 86400000);
+    const uids = await client.search({ since }, { uid: true });
+    if (!uids || uids.length === 0) return;
+
+    const mailboxes = await client.list();
+    const draftsBox = mailboxes.find(m => m.specialUse === '\\Drafts');
+    const draftsPath = draftsBox ? draftsBox.path : '[Gmail]/Drafts';
+
+    for await (const msg of client.fetch(uids, { source: true, envelope: true }, { uid: true })) {
+      const parsed = await simpleParser(msg.source);
+      const fromAddress = ((parsed.from && parsed.from.value[0] && parsed.from.value[0].address) || '').toLowerCase();
+      const fromName = (parsed.from && parsed.from.value[0] && parsed.from.value[0].name) || fromAddress;
+      const messageId = parsed.messageId;
+      if (!messageId || !fromAddress) continue;
+
+      if (OWN_SENDING_ADDRESSES.includes(fromAddress)) continue;
+      if (/no-?reply|mailer-daemon|postmaster/i.test(fromAddress)) continue;
+
+      const { data: existing } = await supabase.from('email_reply_drafts').select('id').eq('message_id', messageId).limit(1);
+      if (existing && existing.length) continue;
+
+      const subject = parsed.subject || '';
+      const replyText = await draftEmailReplyText(fromName, subject, parsed.text || '');
+      const replySubject = /^re:/i.test(subject) ? subject : 'Re: ' + subject;
+      const references = ((parsed.references || []).join(' ') + ' ' + messageId).trim();
+
+      const rawDraft =
+        'From: SkillStack NG <' + GMAIL_USER + '>\r\n' +
+        'To: ' + fromAddress + '\r\n' +
+        'Subject: ' + replySubject + '\r\n' +
+        'In-Reply-To: ' + messageId + '\r\n' +
+        'References: ' + references + '\r\n' +
+        'Content-Type: text/plain; charset=utf-8\r\n\r\n' +
+        replyText;
+
+      await client.append(draftsPath, rawDraft, ['\\Draft']);
+      await supabase.from('email_reply_drafts').insert({ message_id: messageId, from_address: fromAddress, subject });
+      drafted.push(fromName + ' <' + fromAddress + '> — "' + subject + '"');
+      console.log('Drafted reply to ' + fromAddress);
+    }
+  } catch (err) {
+    console.error('checkInboxForReplies error:', err.message);
+  } finally {
+    try { await client.logout(); } catch (e) {}
+  }
+
+  if (drafted.length) {
+    await notifyAdmin('New email reply draft' + (drafted.length > 1 ? 's' : '') + ' ready for review',
+      drafted.length + ' new email reply draft' + (drafted.length > 1 ? 's are' : ' is') + ' waiting in your Gmail Drafts folder:\n\n' + drafted.join('\n')
+    );
+  }
 }
 
 const TRACKS = {
@@ -1141,6 +1241,10 @@ cron.schedule('0 7 * * 1', async () => {
 
   console.log('Weekly referral stats emails sent.');
 });
+
+// Checks hello@skillstackng.com for new inbound email every 20 minutes and
+// drafts a reply for review — see checkInboxForReplies() above.
+cron.schedule('*/20 * * * *', checkInboxForReplies);
 
 app.get('/privacy', (req, res) => {
   res.send(`<!DOCTYPE html>
