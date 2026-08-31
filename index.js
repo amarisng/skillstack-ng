@@ -1305,7 +1305,10 @@ cron.schedule('0 7 * * 1', async () => {
 
 // Checks hello@skillstackng.com for new inbound email every 20 minutes and
 // drafts a reply for review — see checkInboxForReplies() above.
-cron.schedule('*/20 * * * *', checkInboxForReplies);
+cron.schedule('*/20 * * * *', async () => {
+  const result = await checkInboxForReplies();
+  lastInboxCheckResult = result;
+});
 
 app.get('/privacy', (req, res) => {
   res.send(`<!DOCTYPE html>
