@@ -253,7 +253,7 @@ async function checkInboxForRepliesInner() {
     await client.connect();
     await client.mailboxOpen('INBOX');
 
-    const since = new Date(Date.now() - 2 * 86400000);
+    const since = new Date(Date.now() - 6 * 3600000);
     const uids = await client.search({ since }, { uid: true });
     if (!uids || uids.length === 0) return { ok: true, checked: 0, drafted: [] };
 
@@ -261,27 +261,33 @@ async function checkInboxForRepliesInner() {
     const draftsBox = mailboxes.find(m => m.specialUse === '\\Drafts');
     const draftsPath = draftsBox ? draftsBox.path : '[Gmail]/Drafts';
 
-    for await (const msg of client.fetch(uids, { source: true, envelope: true }, { uid: true })) {
+    // Lightweight pass first: envelope data (from/to/cc/subject) is tiny —
+    // fetching full raw source (bodies, attachments) for every message in
+    // the window was almost certainly what made a real personal inbox hang/
+    // OOM. Only fetch full source for messages that already look relevant.
+    const candidates = [];
+    for await (const msg of client.fetch(uids, { envelope: true }, { uid: true })) {
+      const env = msg.envelope || {};
+      const fromAddress = ((env.from && env.from[0] && env.from[0].address) || '').toLowerCase();
+      if (!fromAddress) continue;
+      if (OWN_SENDING_ADDRESSES.includes(fromAddress)) continue;
+      if (/no-?reply|mailer-daemon|postmaster/i.test(fromAddress)) continue;
+
+      const addrText = [].concat(env.to || [], env.cc || []).map(a => a.address || '').join(' ');
+      const matchesScope = /@skillstackng\.com/i.test(addrText);
+      if (process.env.EMAIL_DEBUG === 'true') {
+        debug.push({ fromAddress, subject: env.subject, to: (env.to || []).map(a => a.address), cc: (env.cc || []).map(a => a.address), matchesScope });
+      }
+      if (matchesScope) candidates.push(msg.uid);
+    }
+
+    for (const uid of candidates) {
+      const msg = await client.fetchOne(uid, { source: true }, { uid: true });
       const parsed = await simpleParser(msg.source);
       const fromAddress = ((parsed.from && parsed.from.value[0] && parsed.from.value[0].address) || '').toLowerCase();
       const fromName = (parsed.from && parsed.from.value[0] && parsed.from.value[0].name) || fromAddress;
       const messageId = parsed.messageId;
       if (!messageId || !fromAddress) continue;
-
-      if (OWN_SENDING_ADDRESSES.includes(fromAddress)) continue;
-      if (/no-?reply|mailer-daemon|postmaster/i.test(fromAddress)) continue;
-
-      // GMAIL_USER logs into the personal inbox hello@/support@ forward into —
-      // that inbox may carry unrelated personal mail too, so only touch
-      // messages actually addressed to a skillstackng.com address (checking
-      // To/Cc plus the headers Cloudflare Email Routing adds on forward).
-      const toText = (parsed.to && parsed.to.text || '') + ' ' + (parsed.cc && parsed.cc.text || '');
-      const deliveredTo = (parsed.headers.get('delivered-to') || '') + ' ' + (parsed.headers.get('x-original-to') || '') + ' ' + (parsed.headers.get('x-forwarded-to') || '');
-      const matchesScope = /@skillstackng\.com/i.test(toText + ' ' + deliveredTo);
-      if (process.env.EMAIL_DEBUG === 'true') {
-        debug.push({ fromAddress, subject: parsed.subject, toText, deliveredTo, matchesScope, allHeaders: Array.from(parsed.headers.keys()) });
-      }
-      if (!matchesScope) continue;
 
       const { data: existing } = await supabase.from('email_reply_drafts').select('id').eq('message_id', messageId).limit(1);
       if (existing && existing.length) continue;
