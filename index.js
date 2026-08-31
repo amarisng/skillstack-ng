@@ -235,6 +235,7 @@ async function checkInboxForReplies() {
 async function checkInboxForRepliesInner() {
   if (!GMAIL_USER || !GMAIL_APP_PASSWORD) return { ok: false, error: 'GMAIL_USER/GMAIL_APP_PASSWORD not set' };
   console.log('Checking inbox for new email replies...');
+  lastInboxCheckResult = { stage: 'starting', checkpoints: ['starting'] };
   const client = new ImapFlow({
     host: 'imap.gmail.com',
     port: 993,
@@ -248,25 +249,34 @@ async function checkInboxForRepliesInner() {
 
   const drafted = [];
   const debug = [];
+  const checkpoints = ['starting'];
+  const checkpoint = (label) => { checkpoints.push(label); lastInboxCheckResult = { stage: label, checkpoints, drafted, debug }; };
   let error = null;
   try {
+    checkpoint('connecting');
     await client.connect();
+    checkpoint('connected, opening mailbox');
     await client.mailboxOpen('INBOX');
+    checkpoint('mailbox open, searching');
 
     const since = new Date(Date.now() - 6 * 3600000);
     const uids = await client.search({ since }, { uid: true });
+    checkpoint('search done, found ' + (uids ? uids.length : 0) + ' messages');
     if (!uids || uids.length === 0) return { ok: true, checked: 0, drafted: [] };
 
     const mailboxes = await client.list();
     const draftsBox = mailboxes.find(m => m.specialUse === '\\Drafts');
     const draftsPath = draftsBox ? draftsBox.path : '[Gmail]/Drafts';
+    checkpoint('drafts folder resolved: ' + draftsPath);
 
     // Lightweight pass first: envelope data (from/to/cc/subject) is tiny —
     // fetching full raw source (bodies, attachments) for every message in
     // the window was almost certainly what made a real personal inbox hang/
     // OOM. Only fetch full source for messages that already look relevant.
     const candidates = [];
+    let envCount = 0;
     for await (const msg of client.fetch(uids, { envelope: true }, { uid: true })) {
+      envCount++;
       const env = msg.envelope || {};
       const fromAddress = ((env.from && env.from[0] && env.from[0].address) || '').toLowerCase();
       if (!fromAddress) continue;
@@ -280,9 +290,12 @@ async function checkInboxForRepliesInner() {
       }
       if (matchesScope) candidates.push(msg.uid);
     }
+    checkpoint('envelope pass done, checked ' + envCount + ', ' + candidates.length + ' candidate(s)');
 
     for (const uid of candidates) {
+      checkpoint('fetching full source for uid ' + uid);
       const msg = await client.fetchOne(uid, { source: true }, { uid: true });
+      checkpoint('fetched uid ' + uid + ', parsing');
       const parsed = await simpleParser(msg.source);
       const fromAddress = ((parsed.from && parsed.from.value[0] && parsed.from.value[0].address) || '').toLowerCase();
       const fromName = (parsed.from && parsed.from.value[0] && parsed.from.value[0].name) || fromAddress;
@@ -293,7 +306,9 @@ async function checkInboxForRepliesInner() {
       if (existing && existing.length) continue;
 
       const subject = parsed.subject || '';
+      checkpoint('asking Claude to draft reply to ' + fromAddress);
       const replyText = await draftEmailReplyText(fromName, subject, parsed.text || '');
+      checkpoint('draft text ready, appending to Drafts folder');
       const replySubject = /^re:/i.test(subject) ? subject : 'Re: ' + subject;
       const referencesArr = Array.isArray(parsed.references) ? parsed.references : (parsed.references ? [parsed.references] : []);
       const references = (referencesArr.join(' ') + ' ' + messageId).trim();
@@ -310,6 +325,7 @@ async function checkInboxForRepliesInner() {
       await client.append(draftsPath, rawDraft, ['\\Draft']);
       await supabase.from('email_reply_drafts').insert({ message_id: messageId, from_address: fromAddress, subject });
       drafted.push(fromName + ' <' + fromAddress + '> — "' + subject + '"');
+      checkpoint('drafted reply to ' + fromAddress);
       console.log('Drafted reply to ' + fromAddress);
     }
   } catch (err) {
@@ -1889,6 +1905,9 @@ app.get('/admin/test-inbox-check', async (req, res) => {
     checkInboxForReplies().then(result => {
       lastInboxCheckResult = result;
       console.log('checkInboxForReplies result:', JSON.stringify(result));
+    }).catch(err => {
+      lastInboxCheckResult = { ok: false, error: 'Unhandled: ' + err.message };
+      console.error('checkInboxForReplies unhandled error:', err.message);
     });
   } catch (err) {
     res.status(500).send('Error: ' + err.message);
