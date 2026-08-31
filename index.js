@@ -39,6 +39,7 @@ const VERIFY_TOKEN = process.env.WEBHOOK_VERIFY_TOKEN || 'skillstack_verify_2024
 const GMAIL_USER = process.env.GMAIL_USER;
 const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD;
 const OWN_SENDING_ADDRESSES = ['hello@skillstackng.com', 'support@skillstackng.com', 'amarissynergylimited@gmail.com'];
+let lastInboxCheckResult = null;
 
 // Twilio rejects any message body over 1600 characters (error 21617) — split long
 // messages (e.g. lesson content) into multiple sequential WhatsApp messages instead.
@@ -1859,8 +1860,14 @@ app.get('/approve-ambassador', async (req, res) => {
 app.get('/admin/test-inbox-check', async (req, res) => {
   if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
   try {
-    const result = await checkInboxForReplies();
-    res.status(200).json(result);
+    // Fire-and-forget: a full inbox scan can run past Render's own gateway
+    // timeout, so don't make the HTTP response wait on it. Check
+    // /admin/list-email-drafts afterward to see what it actually did.
+    res.status(202).send('Started — check /admin/last-inbox-check-result in a minute or two.');
+    checkInboxForReplies().then(result => {
+      lastInboxCheckResult = result;
+      console.log('checkInboxForReplies result:', JSON.stringify(result));
+    });
   } catch (err) {
     res.status(500).send('Error: ' + err.message);
   }
@@ -1873,6 +1880,13 @@ app.get('/admin/list-email-drafts', async (req, res) => {
   const { data, error } = await supabase.from('email_reply_drafts').select('*').order('created_at', { ascending: false }).limit(20);
   if (error) return res.status(500).send('Error: ' + error.message);
   res.status(200).json(data);
+});
+
+// One-off: read back the result (including debug info) of the last
+// fire-and-forget checkInboxForReplies() run. Build, use, remove.
+app.get('/admin/last-inbox-check-result', async (req, res) => {
+  if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
+  res.status(200).json(lastInboxCheckResult || { status: 'no run recorded yet' });
 });
 
 // Permanent (unlike the one-off /admin endpoints elsewhere): a repeatable way
