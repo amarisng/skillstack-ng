@@ -1920,6 +1920,22 @@ app.get('/approve-ambassador', async (req, res) => {
   }
 });
 
+// One-off: send Christopher the approved explainer about the 24h reply
+// window, so he doesn't fall into the same delivery trap again. Build, use, remove.
+app.get('/admin/message-christopher-24h-tip', async (req, res) => {
+  if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
+  try {
+    const sent = await sendMessage('2348033220047',
+      'One more thing, Christopher — to keep your lessons arriving smoothly: WhatsApp only lets us message you first if you\'ve messaged us within the last 24 hours. So replying to each day\'s task (even briefly) is what keeps the door open for your next lesson to come through automatically.\n\n' +
+      'If you ever go a day without replying and the door closes, no problem — just send any message (even "hi") and we\'ll get you straight back on track.\n\n' +
+      'Take your time with today\'s task — just aim to get a reply in within a day or so of receiving it, and everything will keep flowing without any hiccups. 🙂'
+    );
+    res.status(200).send(sent ? 'Sent to Christopher' : 'Send failed');
+  } catch (err) {
+    res.status(500).send('Error: ' + err.message);
+  }
+});
+
 // Permanent: manually fire checkInboxForReplies() right now instead of
 // waiting up to 20 minutes for the cron — useful for spot-checking after
 // changes, given how many failure modes this integration turned out to have.
