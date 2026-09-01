@@ -426,6 +426,19 @@ function extractTrackFromReferrer(referrer) {
   return null;
 }
 
+// Christopher Okafor (2026-08-29 through 09-01) replied to the lesson-time
+// prompt with something other than an exact "8AM"-style token and got
+// silently dropped into the wrong fallback — a strict validTimes.includes()
+// check has no tolerance for "8:00am", "8 am", etc. Extracts an hour+AM/PM
+// from common variations and normalizes to the exact token the rest of the
+// code expects. Returns null if nothing recognizable is found.
+function normalizeTimeReply(cmd) {
+  const stripped = (cmd || '').replace(/[^0-9APM]/g, '');
+  const match = stripped.match(/^(\d{1,2})(?:00)?(AM|PM)$/);
+  if (!match) return null;
+  return parseInt(match[1], 10) + match[2];
+}
+
 function formatLesson(lesson, dayNumber, track) {
   const totalDays = getTrackInfo(track).totalDays;
   return 'Day ' + dayNumber + ' of ' + totalDays + ' - SkillStack NG\n\n' + lesson.title + '\n\n' + lesson.content + '\n\n---\nTODAYS TASK\n' + lesson.task + '\n\nReply with your answer and I will give you personal feedback.\n\n💡 Reply daily to keep your lessons coming — WhatsApp pauses messages to numbers that go quiet.';
@@ -671,12 +684,13 @@ if (sub.active === 'false' && cmd === 'CHANGETRACK') {
   }
 
   const validTimes = ['6AM', '7AM', '8AM', '12PM', '6PM', '9PM'];
-  if (sub.active === 'false' && sub.name !== '' && sub.name !== 'AWAITING' && validTimes.includes(cmd)) {
+  const normalizedTime1 = normalizeTimeReply(cmd);
+  if (sub.active === 'false' && sub.name !== '' && sub.name !== 'AWAITING' && validTimes.includes(normalizedTime1)) {
     const timeMap = {
       '6AM': '06:00', '7AM': '07:00', '8AM': '08:00',
       '12PM': '12:00', '6PM': '18:00', '9PM': '21:00'
     };
-    const timePreference = timeMap[cmd];
+    const timePreference = timeMap[normalizedTime1];
 
     if (sub.is_beta) {
       // Already paid the beta fee — activate immediately instead of asking to pay again
@@ -688,7 +702,7 @@ if (sub.active === 'false' && cmd === 'CHANGETRACK') {
         last_active: new Date(Date.now() - 86400000).toISOString().split('T')[0]
       }).eq('phone', cleanPhone);
       const lesson = await getLesson(1, sub.track || 'copywriting');
-      await sendMessage(cleanPhone, 'Perfect ' + sub.name + '! Your lesson will arrive Monday to Friday at ' + cmd + '. Here is your Day 1 lesson right now:');
+      await sendMessage(cleanPhone, 'Perfect ' + sub.name + '! Your lesson will arrive Monday to Friday at ' + normalizedTime1 + '. Here is your Day 1 lesson right now:');
       if (lesson) await sendMessage(cleanPhone, formatLesson(lesson, 1, sub.track));
       return;
     }
@@ -698,7 +712,7 @@ if (sub.active === 'false' && cmd === 'CHANGETRACK') {
     // Send correct payment links based on selected track
     const { monthlyLink, fullLink, fullPrice } = getTrackInfo(sub.track);
 
-    await sendMessage(cleanPhone, 'Perfect ' + sub.name + '! Your lesson will arrive Monday to Friday at ' + cmd + '.\n\nTo activate your subscription pay here:\n\nMonthly — ₦5,000/month:\n' + monthlyLink + '\n\nFull plan — ₦' + fullPrice + ':\n' + fullLink + '\n\nMake sure to enter this WhatsApp number in the payment form.');
+    await sendMessage(cleanPhone, 'Perfect ' + sub.name + '! Your lesson will arrive Monday to Friday at ' + normalizedTime1 + '.\n\nTo activate your subscription pay here:\n\nMonthly — ₦5,000/month:\n' + monthlyLink + '\n\nFull plan — ₦' + fullPrice + ':\n' + fullLink + '\n\nMake sure to enter this WhatsApp number in the payment form.');
     return;
   }
 
@@ -711,19 +725,20 @@ if (sub.active === 'false' && cmd === 'CHANGETRACK') {
 
   // Handle time preference reply from newly activated subscribers
   const validTimes2 = ['6AM', '7AM', '8AM', '12PM', '6PM', '9PM'];
-  if (sub.active === 'true' && sub.day_number === 1 && validTimes2.includes(cmd)) {
+  const normalizedTime2 = normalizeTimeReply(cmd);
+  if (sub.active === 'true' && sub.day_number === 1 && validTimes2.includes(normalizedTime2)) {
     const timeMap2 = {
       '6AM': '06:00', '7AM': '07:00', '8AM': '08:00',
       '12PM': '12:00', '6PM': '18:00', '9PM': '21:00'
     };
-    const timePreference = timeMap2[cmd];
+    const timePreference = timeMap2[normalizedTime2];
     await supabase.from('subscribers').update({
       time_preference: timePreference,
       last_active: new Date(Date.now() - 86400000).toISOString().split('T')[0],
       awaiting_task: true
     }).eq('phone', cleanPhone);
     const lesson = await getLesson(1, sub.track || 'copywriting');
-    await sendMessage(cleanPhone, 'Perfect! Your lesson will arrive Monday to Friday at ' + cmd + '. Here is your Day 1 lesson right now:');
+    await sendMessage(cleanPhone, 'Perfect! Your lesson will arrive Monday to Friday at ' + normalizedTime2 + '. Here is your Day 1 lesson right now:');
     if (lesson) {
       await sendMessage(cleanPhone, formatLesson(lesson, 1, sub.track));
     } else {
@@ -744,7 +759,12 @@ if (sub.active === 'false' && cmd === 'CHANGETRACK') {
       await sendMessage(cleanPhone, 'What is your first name?');
       return;
     }
-    if (!sub.time_preference && (cmd === 'HI' || cmd === 'HELLO')) {
+    // Reaching here with no time_preference means whatever they just said
+    // didn't parse as a valid time either (that's handled earlier, above) —
+    // re-show the menu regardless of what they typed, rather than falling
+    // through to "already submitted", which is what stranded Christopher
+    // Okafor for 3 days: he kept replying in full sentences, not just HI.
+    if (!sub.time_preference) {
       await sendMessage(cleanPhone, 'What time do you want your daily lesson?\n\nReply with:\n6AM\n7AM\n8AM\n12PM\n6PM\n9PM');
       return;
     }
