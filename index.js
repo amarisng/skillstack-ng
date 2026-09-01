@@ -1927,12 +1927,20 @@ app.get('/approve-ambassador', async (req, res) => {
 app.get('/admin/check-christopher-payments', async (req, res) => {
   if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
   try {
-    const resp = await fetch('https://api.paystack.co/transaction?customer=chris.kk4u@gmail.com&perPage=50', {
+    const custResp = await fetch('https://api.paystack.co/customer/chris.kk4u@gmail.com', {
       headers: { Authorization: 'Bearer ' + PAYSTACK_SECRET },
       signal: AbortSignal.timeout(15000)
     });
-    const data = await resp.json();
-    res.status(200).json(data);
+    const custData = await custResp.json();
+    const code = custData.data && custData.data.customer_code;
+    if (!code) return res.status(200).json({ customerLookup: custData, transactions: null });
+
+    const txResp = await fetch('https://api.paystack.co/transaction?customer=' + code + '&perPage=50', {
+      headers: { Authorization: 'Bearer ' + PAYSTACK_SECRET },
+      signal: AbortSignal.timeout(15000)
+    });
+    const txData = await txResp.json();
+    res.status(200).json({ customerCode: code, transactions: txData });
   } catch (err) {
     res.status(500).send('Error: ' + err.message);
   }
