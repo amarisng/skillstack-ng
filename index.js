@@ -1920,6 +1920,15 @@ app.get('/approve-ambassador', async (req, res) => {
   }
 });
 
+// One-off: check whether 2 "Drafted reply to chris.kk4u@gmail.com" log lines
+// meant a dedup bug or genuinely 2 different emails from him. Build, use, remove.
+app.get('/admin/list-christopher-drafts', async (req, res) => {
+  if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
+  const { data, error } = await supabase.from('email_reply_drafts').select('*').eq('from_address', 'chris.kk4u@gmail.com').order('created_at', { ascending: true });
+  if (error) return res.status(500).send('Error: ' + error.message);
+  res.status(200).json(data);
+});
+
 // Permanent: manually fire checkInboxForReplies() right now instead of
 // waiting up to 20 minutes for the cron — useful for spot-checking after
 // changes, given how many failure modes this integration turned out to have.
