@@ -732,10 +732,34 @@ const flyers = [
 
 ];
 
+// Banners were being offered as raw .svg downloads — most phone galleries
+// and WhatsApp status don't render SVG as a photo, so they "disappeared" on
+// download. Rasterize to PNG (at the flyer's real target pixel size) via
+// canvas before offering it, so what downloads is an actual image file.
+function svgToPngUrl(svgString, width, height) {
+  return new Promise((resolve, reject) => {
+    const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+    const svgUrl = URL.createObjectURL(svgBlob);
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      URL.revokeObjectURL(svgUrl);
+      canvas.toBlob(blob => {
+        if (!blob) return reject(new Error('canvas.toBlob returned null'));
+        resolve(URL.createObjectURL(blob));
+      }, 'image/png');
+    };
+    img.onerror = () => { URL.revokeObjectURL(svgUrl); reject(new Error('SVG failed to load as image')); };
+    img.src = svgUrl;
+  });
+}
+
 const grid = document.getElementById('bannersGrid');
 flyers.forEach(f => {
-  const blob = new Blob([f.svg], { type: 'image/svg+xml' });
-  const url = URL.createObjectURL(blob);
+  const [pxWidth, pxHeight] = f.size.split('×').map(n => parseInt(n.trim(), 10));
   const parser = new DOMParser();
   const doc = parser.parseFromString(f.svg, 'image/svg+xml');
   const svgEl = doc.documentElement;
@@ -754,11 +778,24 @@ flyers.forEach(f => {
 
   const footer = document.createElement('div');
   footer.className = 'banner-footer';
-  footer.innerHTML = `<div><div class="banner-name">${f.name}</div><div class="banner-size">${f.size}</div></div><a href="${url}" download="SkillStack-${f.name.replace(/[^a-z0-9]/gi,'-')}.svg" class="download-btn">Download</a>`;
+  footer.innerHTML = `<div><div class="banner-name">${f.name}</div><div class="banner-size">${f.size}</div></div><a href="#" class="download-btn">Preparing…</a>`;
 
   card.appendChild(preview);
   card.appendChild(footer);
   grid.appendChild(card);
+
+  const link = footer.querySelector('.download-btn');
+  svgToPngUrl(f.svg, pxWidth, pxHeight).then(pngUrl => {
+    link.href = pngUrl;
+    link.setAttribute('download', 'SkillStack-' + f.name.replace(/[^a-z0-9]/gi, '-') + '.png');
+    link.textContent = 'Download';
+  }).catch(err => {
+    console.error('PNG conversion failed for', f.name, err);
+    const blob = new Blob([f.svg], { type: 'image/svg+xml' });
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute('download', 'SkillStack-' + f.name.replace(/[^a-z0-9]/gi, '-') + '.svg');
+    link.textContent = 'Download (SVG)';
+  });
 });
 </script>
 </body>
