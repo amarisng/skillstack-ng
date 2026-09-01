@@ -1920,22 +1920,6 @@ app.get('/approve-ambassador', async (req, res) => {
   }
 });
 
-// One-off: check Brevo delivery/open events for Christopher's apology email.
-// Build, use, remove.
-app.get('/admin/check-christopher-email-events', async (req, res) => {
-  if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
-  try {
-    const resp = await fetch('https://api.brevo.com/v3/smtp/statistics/events?email=chris.kk4u@gmail.com&limit=20', {
-      headers: { 'api-key': process.env.BREVO_API_KEY },
-      signal: AbortSignal.timeout(15000)
-    });
-    const data = await resp.json();
-    res.status(200).json(data);
-  } catch (err) {
-    res.status(500).send('Error: ' + err.message);
-  }
-});
-
 // Permanent: manually fire checkInboxForReplies() right now instead of
 // waiting up to 20 minutes for the cron — useful for spot-checking after
 // changes, given how many failure modes this integration turned out to have.
