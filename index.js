@@ -1920,39 +1920,6 @@ app.get('/approve-ambassador', async (req, res) => {
   }
 });
 
-// One-off: Christopher's email claims he paid Aug 19th, but his subscriber
-// record shows created_at Aug 29th — checking whether there's a separate,
-// earlier Paystack transaction (possible duplicate charge) before saying
-// anything to him about dates. Build, use, remove.
-app.get('/admin/check-christopher-payments', async (req, res) => {
-  if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
-  try {
-    const verifyResp = await fetch('https://api.paystack.co/transaction/verify/T736054486223121', {
-      headers: { Authorization: 'Bearer ' + PAYSTACK_SECRET },
-      signal: AbortSignal.timeout(15000)
-    });
-    const verifyData = await verifyResp.json();
-
-    // Customer-filtered search proved unreliable for a guest checkout — pull
-    // a raw recent list and match by email manually instead.
-    const listResp = await fetch('https://api.paystack.co/transaction?perPage=100&from=2026-08-10&to=2026-09-01', {
-      headers: { Authorization: 'Bearer ' + PAYSTACK_SECRET },
-      signal: AbortSignal.timeout(15000)
-    });
-    const listData = await listResp.json();
-    const matches = (listData.data || []).filter(t => t.customer && t.customer.email === 'chris.kk4u@gmail.com')
-      .map(t => ({ reference: t.reference, amount: t.amount, paid_at: t.paid_at, status: t.status }));
-
-    res.status(200).json({
-      knownTxVerified: verifyData.data ? { reference: verifyData.data.reference, paid_at: verifyData.data.paid_at, amount: verifyData.data.amount, status: verifyData.data.status } : verifyData,
-      matchingTransactionsInRange: matches,
-      totalTransactionsScanned: (listData.data || []).length
-    });
-  } catch (err) {
-    res.status(500).send('Error: ' + err.message);
-  }
-});
-
 // Permanent: manually fire checkInboxForReplies() right now instead of
 // waiting up to 20 minutes for the cron — useful for spot-checking after
 // changes, given how many failure modes this integration turned out to have.
