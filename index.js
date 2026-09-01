@@ -1927,20 +1927,27 @@ app.get('/approve-ambassador', async (req, res) => {
 app.get('/admin/check-christopher-payments', async (req, res) => {
   if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
   try {
-    const custResp = await fetch('https://api.paystack.co/customer/chris.kk4u@gmail.com', {
+    const verifyResp = await fetch('https://api.paystack.co/transaction/verify/T736054486223121', {
       headers: { Authorization: 'Bearer ' + PAYSTACK_SECRET },
       signal: AbortSignal.timeout(15000)
     });
-    const custData = await custResp.json();
-    const code = custData.data && custData.data.customer_code;
-    if (!code) return res.status(200).json({ customerLookup: custData, transactions: null });
+    const verifyData = await verifyResp.json();
 
-    const txResp = await fetch('https://api.paystack.co/transaction?customer=' + code + '&perPage=50', {
+    // Customer-filtered search proved unreliable for a guest checkout — pull
+    // a raw recent list and match by email manually instead.
+    const listResp = await fetch('https://api.paystack.co/transaction?perPage=100&from=2026-08-10&to=2026-09-01', {
       headers: { Authorization: 'Bearer ' + PAYSTACK_SECRET },
       signal: AbortSignal.timeout(15000)
     });
-    const txData = await txResp.json();
-    res.status(200).json({ customerCode: code, transactions: txData });
+    const listData = await listResp.json();
+    const matches = (listData.data || []).filter(t => t.customer && t.customer.email === 'chris.kk4u@gmail.com')
+      .map(t => ({ reference: t.reference, amount: t.amount, paid_at: t.paid_at, status: t.status }));
+
+    res.status(200).json({
+      knownTxVerified: verifyData.data ? { reference: verifyData.data.reference, paid_at: verifyData.data.paid_at, amount: verifyData.data.amount, status: verifyData.data.status } : verifyData,
+      matchingTransactionsInRange: matches,
+      totalTransactionsScanned: (listData.data || []).length
+    });
   } catch (err) {
     res.status(500).send('Error: ' + err.message);
   }
