@@ -1920,30 +1920,6 @@ app.get('/approve-ambassador', async (req, res) => {
   }
 });
 
-// One-off: send Christopher's approved reply directly. Build, use, remove.
-app.get('/admin/email-christopher-reply', async (req, res) => {
-  if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
-  try {
-    const sent = await sendEmail('chris.kk4u@gmail.com',
-      'Re: Hello Ayo',
-      '<p>Hi Christopher,</p>' +
-      '<p>You\'re right to be frustrated, and I\'m sorry — this has gone on far longer than it should have.</p>' +
-      '<p>Two separate technical issues stacked on top of each other on our end:</p>' +
-      '<ol>' +
-      '<li>When your payment went through, WhatsApp requires a business to receive a message from a customer before it can message them first — so our welcome messages to you didn\'t go through, through no fault of yours.</li>' +
-      '<li>When you did message us to sort it out, a bug in how our system read short replies caused it to give you that confusing "already submitted" response instead of actually setting up your lessons. That\'s on us, and it\'s now fixed.</li>' +
-      '</ol>' +
-      '<p>One correction for the record, though it doesn\'t change any of the above: our records (and Paystack\'s) show your payment went through on <strong>August 29th</strong>, not the 19th — still far longer than acceptable for you to be locked out.</p>' +
-      '<p>Your Day 1 Content Writing lesson has just been sent to your WhatsApp — please check now. From here your lessons will arrive daily as expected.</p>' +
-      '<p>Genuinely sorry for the run-around, Christopher. If anything else feels off, reply here directly and I\'ll deal with it personally.</p>' +
-      '<p>— SkillStack NG</p>'
-    );
-    res.status(200).send(sent ? 'Reply sent to Christopher' : 'Email failed to send');
-  } catch (err) {
-    res.status(500).send('Error: ' + err.message);
-  }
-});
-
 // Permanent: manually fire checkInboxForReplies() right now instead of
 // waiting up to 20 minutes for the cron — useful for spot-checking after
 // changes, given how many failure modes this integration turned out to have.
