@@ -1920,6 +1920,28 @@ app.get('/approve-ambassador', async (req, res) => {
   }
 });
 
+// One-off: unstick Christopher Okafor right now rather than making him
+// retry over WhatsApp after 3 days of getting the wrong reply. Sets his
+// lesson time directly and sends Day 1 immediately. Build, use, remove.
+app.get('/admin/unstick-christopher', async (req, res) => {
+  if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
+  try {
+    const phone = '2348033220047';
+    await supabase.from('subscribers').update({
+      time_preference: '08:00',
+      awaiting_task: true,
+      last_active: new Date(Date.now() - 86400000).toISOString().split('T')[0]
+    }).eq('phone', phone);
+    const sub = await getSubscriber(phone);
+    const lesson = await getLesson(sub.day_number, sub.track || 'copywriting');
+    await sendMessage(phone, 'Hi Christopher — really sorry for the run-around. Your Day 1 Content Writing lesson, right now:');
+    if (lesson) await sendMessage(phone, formatLesson(lesson, sub.day_number, sub.track));
+    res.status(200).send(lesson ? 'Sent Day 1 lesson to Christopher' : 'No lesson found for his track/day');
+  } catch (err) {
+    res.status(500).send('Error: ' + err.message);
+  }
+});
+
 // Permanent: manually fire checkInboxForReplies() right now instead of
 // waiting up to 20 minutes for the cron — useful for spot-checking after
 // changes, given how many failure modes this integration turned out to have.
