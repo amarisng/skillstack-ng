@@ -1920,6 +1920,32 @@ app.get('/approve-ambassador', async (req, res) => {
   }
 });
 
+// One-off: extend Stephen's subscription by the 3 weekday lesson-delivery
+// attempts he lost to the session-window issue (Aug 28, 31, Sept 1), and
+// let him know. Build, use, remove.
+app.get('/admin/fix-stephen', async (req, res) => {
+  if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
+  try {
+    const phone = '2348128440225';
+    const sub = await getSubscriber(phone);
+    const newExpiry = new Date(sub.subscription_expires);
+    newExpiry.setDate(newExpiry.getDate() + 3);
+    const newExpiryStr = newExpiry.toISOString().split('T')[0];
+    await supabase.from('subscribers').update({ subscription_expires: newExpiryStr }).eq('phone', phone);
+
+    const sent = await sendMessage(phone,
+      'Hi Stephen — following up on the issue you mentioned. We found it: your Day 2 lesson failed to reach you multiple times between Aug 28 and Sept 1 (a WhatsApp delivery restriction on our end, not anything you did wrong). Sorry for the disruption.\n\n' +
+      'Good news:\n' +
+      '✅ You\'re fully caught up — Day 2 delivered, task submitted, feedback given, now on Day 3.\n' +
+      '✅ Your subscription has been extended by 3 days (new expiry: ' + newExpiry.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) + ') to make up for the days you lost.\n\n' +
+      'No action needed from you — just keep going as normal. One tip to avoid this happening again: WhatsApp only lets us message you first if you\'ve messaged us within the last 24 hours, so replying to each day\'s task is what keeps your next lesson arriving automatically. If you ever miss a day, just send any message and we\'ll get you straight back on track.'
+    );
+    res.status(200).send((sent ? 'Sent. ' : 'Send failed, but expiry updated. ') + 'New expiry: ' + newExpiryStr);
+  } catch (err) {
+    res.status(500).send('Error: ' + err.message);
+  }
+});
+
 // Permanent: manually fire checkInboxForReplies() right now instead of
 // waiting up to 20 minutes for the cron — useful for spot-checking after
 // changes, given how many failure modes this integration turned out to have.
