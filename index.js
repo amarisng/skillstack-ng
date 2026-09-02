@@ -1920,6 +1920,29 @@ app.get('/approve-ambassador', async (req, res) => {
   }
 });
 
+// One-off: correct the earlier under-counted extension (3 days) to reflect
+// the real gap (Aug 19-Sept 1, ~10 weekdays stuck on Day 2), and let him
+// know. Build, use, remove.
+app.get('/admin/correct-stephen-extension', async (req, res) => {
+  if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
+  try {
+    const phone = '2348128440225';
+    const sub = await getSubscriber(phone);
+    const newExpiry = new Date(sub.subscription_expires);
+    newExpiry.setDate(newExpiry.getDate() + 7); // +7 more, on top of the 3 already given = 10 total
+    const newExpiryStr = newExpiry.toISOString().split('T')[0];
+    await supabase.from('subscribers').update({ subscription_expires: newExpiryStr }).eq('phone', phone);
+
+    const sent = await sendMessage(phone,
+      'Quick correction, Stephen — on closer look, the delivery issue affected you for longer than I first said. You were actually stuck on Day 2 from Aug 19 through Sept 1 (about 10 weekdays), not just a few days — you even tried submitting your task multiple times during that window and it kept failing to go through, which is on us.\n\n' +
+      'I\'ve extended your subscription further to properly cover that — new expiry: ' + newExpiry.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) + '. No action needed, just wanted you to have the accurate picture. Thanks for your patience.'
+    );
+    res.status(200).send((sent ? 'Sent. ' : 'Send failed, but expiry updated. ') + 'New expiry: ' + newExpiryStr);
+  } catch (err) {
+    res.status(500).send('Error: ' + err.message);
+  }
+});
+
 // One-off: Stephen's full delivery history since he opted in (Aug 16), not
 // just the last 10 messages — checking whether there were other missed
 // stretches beyond the Aug 28-Sept 1 gap already found. Build, use, remove.
