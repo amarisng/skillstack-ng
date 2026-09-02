@@ -1920,6 +1920,24 @@ app.get('/approve-ambassador', async (req, res) => {
   }
 });
 
+// One-off: Stephen's full delivery history since he opted in (Aug 16), not
+// just the last 10 messages — checking whether there were other missed
+// stretches beyond the Aug 28-Sept 1 gap already found. Build, use, remove.
+app.get('/admin/stephen-full-history', async (req, res) => {
+  if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
+  try {
+    const phone = '2348128440225';
+    const outbound = await twilioClient.messages.list({ to: 'whatsapp:+' + phone, limit: 100 });
+    const inbound = await twilioClient.messages.list({ from: 'whatsapp:+' + phone, limit: 100 });
+    const combined = outbound.concat(inbound)
+      .map(m => ({ dateSent: m.dateSent, direction: m.direction, status: m.status, errorCode: m.errorCode, bodyPreview: (m.body || '').slice(0, 60) }))
+      .sort((a, b) => new Date(a.dateSent) - new Date(b.dateSent));
+    res.status(200).json({ count: combined.length, messages: combined });
+  } catch (err) {
+    res.status(500).send('Error: ' + err.message);
+  }
+});
+
 // Permanent: manually fire checkInboxForReplies() right now instead of
 // waiting up to 20 minutes for the cron — useful for spot-checking after
 // changes, given how many failure modes this integration turned out to have.
