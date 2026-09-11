@@ -553,7 +553,11 @@ async function issueCertificate(sub) {
     );
     await supabase.from('subscribers').update({ certificate_issued: true, certificate_url: url }).eq('phone', sub.phone);
 
-    if (!sent && sub.email) {
+    // Email whenever one's on file, not just when WhatsApp fails — a
+    // certificate is something people want to keep and search for later
+    // (LinkedIn, client proposals), and email is a far more durable, findable
+    // home for that than a WhatsApp media message.
+    if (sub.email) {
       await sendEmail(sub.email, 'Your SkillStack NG Certificate — ' + trackInfo.label,
         '<p>Congratulations ' + sub.name + '! You have completed the ' + trackInfo.label + ' track on SkillStack NG.</p>' +
         '<p><a href="' + url + '">View and download your certificate</a></p>' +
@@ -2068,29 +2072,38 @@ app.get('/approve-ambassador', async (req, res) => {
   }
 });
 
-// One-off: preview the certificate or progress card on a real phone before
-// this goes live for real subscribers — first time sending WhatsApp media
-// via Twilio in this codebase, worth confirming it actually works. Build,
-// use, remove. Usage: ?phone=234...&type=certificate|card
+// One-off: preview the certificate or progress card via WhatsApp and/or
+// email before this goes live for real subscribers. Build, use, remove.
+// Usage: ?type=certificate|card&phone=234...&email=you@example.com (either
+// or both of phone/email).
 app.get('/admin/preview-generated-image', async (req, res) => {
   if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
   try {
     const phone = req.query.phone;
-    if (!phone) return res.status(400).send('phone query param required');
+    const email = req.query.email;
+    if (!phone && !email) return res.status(400).send('phone and/or email query param required');
     const type = req.query.type === 'card' ? 'card' : 'certificate';
 
-    let svg, caption;
+    let svg, waCaption, emailSubject, emailBody;
     if (type === 'certificate') {
       svg = certificateSvg('Test Subscriber', 'Content Writing', new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }), 'SSNG-PREVIEW-TEST');
-      caption = 'Preview: certificate design (not a real completion).';
+      waCaption = 'Preview: certificate design (not a real completion).';
+      emailSubject = 'Preview: Your SkillStack NG Certificate';
+      emailBody = '<p>This is a design preview of the completion certificate email, not a real completion.</p>';
     } else {
       svg = progressCardSvg('Test Subscriber', 'Content Writing', 12, 90, 5);
-      caption = 'Preview: weekly progress card design.';
+      waCaption = 'Preview: weekly progress card design.';
+      emailSubject = 'Preview: Your SkillStack NG Progress Card';
+      emailBody = '<p>This is a design preview of the weekly progress card email, not real data.</p>';
     }
     const png = await renderSvgToPngBuffer(svg);
     const url = await uploadGeneratedImage(png, 'previews/' + type + '-' + Date.now() + '.png');
-    const sent = await sendMediaMessage(phone, caption, url);
-    res.status(200).send((sent ? 'Sent. ' : 'Send reported undelivered. ') + 'URL: ' + url);
+
+    const results = { url };
+    if (phone) results.whatsapp = await sendMediaMessage(phone, waCaption, url) ? 'sent' : 'undelivered';
+    if (email) results.email = await sendEmail(email, emailSubject, emailBody + '<p><a href="' + url + '">View image</a></p><img src="' + url + '" style="max-width:500px;display:block;margin-top:10px;">') ? 'sent' : 'failed';
+
+    res.status(200).json(results);
   } catch (err) {
     res.status(500).send('Error: ' + err.message);
   }
