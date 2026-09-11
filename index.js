@@ -498,16 +498,12 @@ function certificateSvg(name, trackLabel, dateStr, certId) {
     <text x="800" y="640" font-family="Arial,sans-serif" font-size="26" fill="#1A2E1F" text-anchor="middle">has successfully completed the</text>
     <text x="800" y="700" font-family="Arial Black,Arial" font-weight="900" font-size="44" fill="#00C48C" text-anchor="middle">${t}</text>
     <text x="800" y="742" font-family="Arial,sans-serif" font-size="24" fill="#1A2E1F" text-anchor="middle">track on SkillStack NG</text>
-    <line x1="180" y1="920" x2="400" y2="920" stroke="#0D1F17" stroke-width="2"/>
-    <text x="290" y="960" font-family="Arial,sans-serif" font-size="20" fill="#5A7A65" text-anchor="middle">Date</text>
-    <text x="290" y="998" font-family="Arial Black,Arial" font-weight="900" font-size="24" fill="#0D1F17" text-anchor="middle">${d}</text>
-    <text x="800" y="900" font-family="Georgia,'Times New Roman',serif" font-style="italic" font-size="46" fill="#0D1F17" text-anchor="middle">Olujimi Metilelu</text>
-    <line x1="640" y1="920" x2="960" y2="920" stroke="#0D1F17" stroke-width="2"/>
-    <text x="800" y="960" font-family="Arial,sans-serif" font-size="20" fill="#5A7A65" text-anchor="middle">Signature</text>
-    <text x="800" y="998" font-family="Arial Black,Arial" font-weight="900" font-size="22" fill="#0D1F17" text-anchor="middle">Founder, SkillStack NG</text>
-    <line x1="1200" y1="920" x2="1420" y2="920" stroke="#0D1F17" stroke-width="2"/>
-    <text x="1310" y="960" font-family="Arial,sans-serif" font-size="20" fill="#5A7A65" text-anchor="middle">Certificate ID</text>
-    <text x="1310" y="998" font-family="Arial,sans-serif" font-size="18" fill="#0D1F17" text-anchor="middle">${c}</text>
+    <line x1="200" y1="920" x2="420" y2="920" stroke="#0D1F17" stroke-width="2"/>
+    <text x="310" y="960" font-family="Arial,sans-serif" font-size="20" fill="#5A7A65" text-anchor="middle">Date</text>
+    <text x="310" y="998" font-family="Arial Black,Arial" font-weight="900" font-size="24" fill="#0D1F17" text-anchor="middle">${d}</text>
+    <line x1="1180" y1="920" x2="1400" y2="920" stroke="#0D1F17" stroke-width="2"/>
+    <text x="1290" y="960" font-family="Arial,sans-serif" font-size="20" fill="#5A7A65" text-anchor="middle">Certificate ID</text>
+    <text x="1290" y="998" font-family="Arial,sans-serif" font-size="18" fill="#0D1F17" text-anchor="middle">${c}</text>
     <text x="800" y="1080" font-family="Arial,sans-serif" font-size="20" fill="#8AAA95" text-anchor="middle">skillstackng.com</text>
   </svg>`;
 }
