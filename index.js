@@ -1920,21 +1920,14 @@ app.get('/approve-ambassador', async (req, res) => {
   }
 });
 
-// One-off: check the real max lesson_number per track in the lessons table —
-// the day-advancement cap (65) may not match each track's actual authored
-// content or its advertised 60/90-day length. Build, use, remove.
-app.get('/admin/lesson-counts', async (req, res) => {
+// One-off: create the Supabase Storage bucket for generated certificate/
+// progress-card images, if it doesn't already exist. Build, use, remove.
+app.get('/admin/setup-images-bucket', async (req, res) => {
   if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
   try {
-    const { data, error } = await supabase.from('lessons').select('track, lesson_number');
-    if (error) return res.status(500).send('Error: ' + error.message);
-    const byTrack = {};
-    (data || []).forEach(r => {
-      if (!byTrack[r.track]) byTrack[r.track] = { count: 0, max: 0 };
-      byTrack[r.track].count++;
-      byTrack[r.track].max = Math.max(byTrack[r.track].max, r.lesson_number);
-    });
-    res.status(200).json(byTrack);
+    const { data, error } = await supabase.storage.createBucket('generated-images', { public: true });
+    if (error && !/already exists/i.test(error.message)) return res.status(500).send('Error: ' + error.message);
+    res.status(200).send(error ? 'Bucket already existed' : 'Bucket created: ' + JSON.stringify(data));
   } catch (err) {
     res.status(500).send('Error: ' + err.message);
   }
