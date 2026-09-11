@@ -1920,6 +1920,26 @@ app.get('/approve-ambassador', async (req, res) => {
   }
 });
 
+// One-off: check the real max lesson_number per track in the lessons table —
+// the day-advancement cap (65) may not match each track's actual authored
+// content or its advertised 60/90-day length. Build, use, remove.
+app.get('/admin/lesson-counts', async (req, res) => {
+  if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
+  try {
+    const { data, error } = await supabase.from('lessons').select('track, lesson_number');
+    if (error) return res.status(500).send('Error: ' + error.message);
+    const byTrack = {};
+    (data || []).forEach(r => {
+      if (!byTrack[r.track]) byTrack[r.track] = { count: 0, max: 0 };
+      byTrack[r.track].count++;
+      byTrack[r.track].max = Math.max(byTrack[r.track].max, r.lesson_number);
+    });
+    res.status(200).json(byTrack);
+  } catch (err) {
+    res.status(500).send('Error: ' + err.message);
+  }
+});
+
 // Permanent: manually fire checkInboxForReplies() right now instead of
 // waiting up to 20 minutes for the cron — useful for spot-checking after
 // changes, given how many failure modes this integration turned out to have.
