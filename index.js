@@ -1920,40 +1920,6 @@ app.get('/approve-ambassador', async (req, res) => {
   }
 });
 
-// One-off: check Domotimi's full Paystack payment history — verify the known
-// reference to get his customer code, then search recent transactions for
-// any other payment from him (possible duplicate/gaming attempt). Build,
-// use, remove.
-app.get('/admin/check-domotimi-payments', async (req, res) => {
-  if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
-  try {
-    const verifyResp = await fetch('https://api.paystack.co/transaction/verify/T907253260381082', {
-      headers: { Authorization: 'Bearer ' + PAYSTACK_SECRET },
-      signal: AbortSignal.timeout(15000)
-    });
-    const verifyData = await verifyResp.json();
-    const custEmail = verifyData.data && verifyData.data.customer && verifyData.data.customer.email;
-
-    const listResp = await fetch('https://api.paystack.co/transaction?perPage=100&from=2026-08-01&to=2026-09-11', {
-      headers: { Authorization: 'Bearer ' + PAYSTACK_SECRET },
-      signal: AbortSignal.timeout(15000)
-    });
-    const listData = await listResp.json();
-    const matches = (listData.data || []).filter(t =>
-      (t.customer && t.customer.email === custEmail) ||
-      (t.metadata && JSON.stringify(t.metadata).includes('07035289336'))
-    ).map(t => ({ reference: t.reference, amount: t.amount, paid_at: t.paid_at, status: t.status, plan: t.plan_object && t.plan_object.name }));
-
-    res.status(200).json({
-      knownTx: verifyData.data ? { reference: verifyData.data.reference, email: custEmail, amount: verifyData.data.amount, paid_at: verifyData.data.paid_at, metadata: verifyData.data.metadata } : verifyData,
-      allMatches: matches,
-      totalScanned: (listData.data || []).length
-    });
-  } catch (err) {
-    res.status(500).send('Error: ' + err.message);
-  }
-});
-
 // Permanent: manually fire checkInboxForReplies() right now instead of
 // waiting up to 20 minutes for the cron — useful for spot-checking after
 // changes, given how many failure modes this integration turned out to have.
