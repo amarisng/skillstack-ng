@@ -7,6 +7,7 @@ const path = require('path');
 const crypto = require('crypto');
 const { ImapFlow } = require('imapflow');
 const { simpleParser } = require('mailparser');
+const sharp = require('sharp');
 const app = express();
 
 app.use(express.urlencoded({ extended: false }));
@@ -93,6 +94,45 @@ async function sendMessage(to, body) {
     console.error('Send error:', err.message);
     return false;
   }
+}
+
+// Same delivery-confirmation pattern as sendMessage() (poll after create(),
+// since Twilio resolves on acceptance not actual delivery) but for a WhatsApp
+// media message — used for certificates and weekly progress cards.
+async function sendMediaMessage(to, caption, mediaUrl) {
+  try {
+    const cleanNumber = to.replace(/\D/g, '');
+    const formattedTo = 'whatsapp:+' + cleanNumber;
+    const msg = await twilioClient.messages.create({
+      from: TWILIO_NUMBER,
+      to: formattedTo,
+      body: caption,
+      mediaUrl: [mediaUrl]
+    });
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    const updated = await twilioClient.messages(msg.sid).fetch();
+    const delivered = !(updated.status === 'undelivered' || updated.status === 'failed');
+    console.log('Media sent to ' + cleanNumber + (delivered ? '' : ' (undelivered, error ' + updated.errorCode + ')'));
+    return delivered;
+  } catch (err) {
+    console.error('Send media error:', err.message);
+    return false;
+  }
+}
+
+function escapeXml(str) {
+  return String(str || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[c]));
+}
+
+async function renderSvgToPngBuffer(svgString) {
+  return sharp(Buffer.from(svgString)).png().toBuffer();
+}
+
+async function uploadGeneratedImage(buffer, path) {
+  const { error } = await supabase.storage.from('generated-images').upload(path, buffer, { contentType: 'image/png', upsert: true });
+  if (error) throw new Error('Upload failed: ' + error.message);
+  const { data } = supabase.storage.from('generated-images').getPublicUrl(path);
+  return data.publicUrl;
 }
 
 async function sendEmail(to, subject, htmlContent) {
@@ -442,6 +482,85 @@ function normalizeTimeReply(cmd) {
 function formatLesson(lesson, dayNumber, track) {
   const totalDays = getTrackInfo(track).totalDays;
   return 'Day ' + dayNumber + ' of ' + totalDays + ' - SkillStack NG\n\n' + lesson.title + '\n\n' + lesson.content + '\n\n---\nTODAYS TASK\n' + lesson.task + '\n\nReply with your answer and I will give you personal feedback.\n\n💡 Reply daily to keep your lessons coming — WhatsApp pauses messages to numbers that go quiet.';
+}
+
+function certificateSvg(name, trackLabel, dateStr, certId) {
+  const n = escapeXml(name), t = escapeXml(trackLabel), d = escapeXml(dateStr), c = escapeXml(certId);
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1131" viewBox="0 0 1600 1131">
+    <rect width="1600" height="1131" fill="#F7FAF8"/>
+    <rect x="30" y="30" width="1540" height="1071" fill="none" stroke="#0D1F17" stroke-width="6"/>
+    <rect x="50" y="50" width="1500" height="1031" fill="none" stroke="#00C48C" stroke-width="3"/>
+    <text x="800" y="180" font-family="Arial Black,Arial" font-weight="900" font-size="42" fill="#00C48C" text-anchor="middle">SkillStack NG</text>
+    <text x="800" y="280" font-family="Arial,sans-serif" font-size="28" fill="#5A7A65" text-anchor="middle" letter-spacing="4">CERTIFICATE OF COMPLETION</text>
+    <text x="800" y="420" font-family="Arial,sans-serif" font-size="24" fill="#1A2E1F" text-anchor="middle">This certifies that</text>
+    <text x="800" y="520" font-family="Arial Black,Arial" font-weight="900" font-size="72" fill="#0D1F17" text-anchor="middle">${n}</text>
+    <rect x="500" y="560" width="600" height="3" fill="#D8EAE0"/>
+    <text x="800" y="640" font-family="Arial,sans-serif" font-size="26" fill="#1A2E1F" text-anchor="middle">has successfully completed the</text>
+    <text x="800" y="700" font-family="Arial Black,Arial" font-weight="900" font-size="44" fill="#00C48C" text-anchor="middle">${t}</text>
+    <text x="800" y="742" font-family="Arial,sans-serif" font-size="24" fill="#1A2E1F" text-anchor="middle">track on SkillStack NG</text>
+    <line x1="200" y1="920" x2="420" y2="920" stroke="#0D1F17" stroke-width="2"/>
+    <text x="310" y="960" font-family="Arial,sans-serif" font-size="20" fill="#5A7A65" text-anchor="middle">Date</text>
+    <text x="310" y="998" font-family="Arial Black,Arial" font-weight="900" font-size="24" fill="#0D1F17" text-anchor="middle">${d}</text>
+    <line x1="1180" y1="920" x2="1400" y2="920" stroke="#0D1F17" stroke-width="2"/>
+    <text x="1290" y="960" font-family="Arial,sans-serif" font-size="20" fill="#5A7A65" text-anchor="middle">Certificate ID</text>
+    <text x="1290" y="998" font-family="Arial,sans-serif" font-size="20" fill="#0D1F17" text-anchor="middle">${c}</text>
+    <text x="800" y="1080" font-family="Arial,sans-serif" font-size="20" fill="#8AAA95" text-anchor="middle">skillstackng.com</text>
+  </svg>`;
+}
+
+function progressCardSvg(name, trackLabel, dayNumber, totalDays, streak) {
+  const n = escapeXml(name), t = escapeXml(trackLabel);
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">
+    <rect width="1080" height="1350" fill="#0D1F17"/>
+    <rect width="1080" height="10" fill="#00C48C"/>
+    <rect y="1340" width="1080" height="10" fill="#00C48C"/>
+    <text x="540" y="140" font-family="Arial Black,Arial" font-weight="900" font-size="38" fill="#00C48C" text-anchor="middle">SkillStack NG</text>
+    <text x="540" y="230" font-family="Arial,sans-serif" font-size="30" fill="rgba(255,255,255,0.6)" text-anchor="middle">My learning journey</text>
+    <text x="540" y="420" font-family="Arial Black,Arial" font-weight="900" font-size="64" fill="#FFFFFF" text-anchor="middle">${n}</text>
+    <text x="540" y="490" font-family="Arial,sans-serif" font-size="34" fill="#00C48C" text-anchor="middle">${t}</text>
+    <rect x="140" y="570" width="800" height="260" rx="24" fill="#00C48C"/>
+    <text x="540" y="690" font-family="Arial Black,Arial" font-weight="900" font-size="90" fill="#0D1F17" text-anchor="middle">Day ${dayNumber}</text>
+    <text x="540" y="750" font-family="Arial,sans-serif" font-size="30" fill="#0D1F17" text-anchor="middle">of ${totalDays}</text>
+    <rect x="140" y="870" width="800" height="180" rx="24" fill="rgba(0,196,140,0.15)" stroke="#00C48C" stroke-width="2"/>
+    <text x="540" y="960" font-family="Arial Black,Arial" font-weight="900" font-size="48" fill="#00C48C" text-anchor="middle">🔥 ${streak}-day streak</text>
+    <text x="540" y="1010" font-family="Arial,sans-serif" font-size="22" fill="rgba(255,255,255,0.6)" text-anchor="middle">Learning on WhatsApp, 15 mins a day</text>
+    <text x="540" y="1200" font-family="Arial Black,Arial" font-weight="900" font-size="44" fill="#FFFFFF" text-anchor="middle">skillstackng.com</text>
+    <text x="540" y="1250" font-family="Arial,sans-serif" font-size="26" fill="rgba(255,255,255,0.5)" text-anchor="middle">Learn a skill that pays</text>
+  </svg>`;
+}
+
+// Fires once, the moment a subscriber finishes the last lesson that actually
+// exists for their track (detected by the caller via getLesson() returning
+// null for the next day) — not tied to the advertised 90/60-day totalDays,
+// since real content tops out at 65 lessons for most tracks. Guarded by
+// subscribers.certificate_issued so it only ever sends once.
+async function issueCertificate(sub) {
+  try {
+    const trackInfo = getTrackInfo(sub.track);
+    const certId = 'SSNG-' + sub.phone.slice(-6) + '-' + Date.now().toString(36).toUpperCase();
+    const dateStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+    const svg = certificateSvg(sub.name, trackInfo.label, dateStr, certId);
+    const png = await renderSvgToPngBuffer(svg);
+    const url = await uploadGeneratedImage(png, 'certificates/' + sub.phone + '-' + Date.now() + '.png');
+
+    const sent = await sendMediaMessage(sub.phone,
+      '🎓 Congratulations ' + sub.name + '! You\'ve completed the ' + trackInfo.label + ' track on SkillStack NG. Here\'s your certificate — share it on LinkedIn, attach it to proposals, use it as proof of your skill. Well done!',
+      url
+    );
+    await supabase.from('subscribers').update({ certificate_issued: true, certificate_url: url }).eq('phone', sub.phone);
+
+    if (!sent && sub.email) {
+      await sendEmail(sub.email, 'Your SkillStack NG Certificate — ' + trackInfo.label,
+        '<p>Congratulations ' + sub.name + '! You have completed the ' + trackInfo.label + ' track on SkillStack NG.</p>' +
+        '<p><a href="' + url + '">View and download your certificate</a></p>' +
+        '<p>Share it on LinkedIn, attach it to client proposals, and use it as proof that you did the work.</p>' +
+        '<p>— SkillStack NG</p>'
+      );
+    }
+    console.log('Certificate issued to ' + sub.phone);
+  } catch (err) {
+    console.error('issueCertificate error for ' + sub.phone + ':', err.message);
+  }
 }
 
 async function activateSubscriber(whatsappNumber, name, planType = 'monthly', paymentInfo = {}) {
@@ -803,13 +922,38 @@ if (sub.active === 'false' && cmd === 'CHANGETRACK') {
     }
     const feedback = await getFeedback(lesson.task, message, lesson.feedback_prompt);
     await sendMessage(cleanPhone, 'Feedback on Day ' + sub.day_number + ':\n\n' + feedback + '\n\nStreak: ' + (sub.streak + 1) + ' days. Keep going!\n\nQuestions, stuck on something, or not sure what to do next? Just reply here — happy to help.');
-    const nextDay = sub.day_number < 65 ? sub.day_number + 1 : sub.day_number;
+    // Real content tops out at 65 lessons (90/60 "days" on the landing page
+    // means calendar-day span, weekdays only — not a literal lesson count),
+    // so completion is whatever day genuinely has no next lesson, not a
+    // hardcoded cap.
+    const nextLessonExists = await getLesson(sub.day_number + 1, sub.track || 'copywriting');
+    const nextDay = nextLessonExists ? sub.day_number + 1 : sub.day_number;
     await supabase.from('subscribers').update({
       day_number: nextDay,
       streak: sub.streak + 1,
       last_active: new Date().toISOString().split('T')[0],
       awaiting_task: false
     }).eq('phone', cleanPhone);
+    if (!nextLessonExists && !sub.certificate_issued) {
+      await issueCertificate(sub);
+    } else if (new Date().getDay() === 5) {
+      // Friday shareable progress card — piggybacks on their own
+      // task-feedback reply (guaranteed delivery, same session) instead of
+      // a broadcast cron, which would hit the same WhatsApp session-window
+      // failures documented everywhere else proactive sends were tried.
+      try {
+        const trackInfo = getTrackInfo(sub.track);
+        const svg = progressCardSvg(sub.name, trackInfo.label, nextDay, trackInfo.totalDays, sub.streak + 1);
+        const png = await renderSvgToPngBuffer(svg);
+        const url = await uploadGeneratedImage(png, 'progress-cards/' + sub.phone + '-' + Date.now() + '.png');
+        await sendMediaMessage(sub.phone,
+          'Your week in review, ' + sub.name + '! 🎉 Proud of your progress — share this on your WhatsApp status or Instagram to inspire someone else.',
+          url
+        );
+      } catch (err) {
+        console.error('Progress card error for ' + sub.phone + ':', err.message);
+      }
+    }
     return;
   }
 
@@ -1920,14 +2064,29 @@ app.get('/approve-ambassador', async (req, res) => {
   }
 });
 
-// One-off: create the Supabase Storage bucket for generated certificate/
-// progress-card images, if it doesn't already exist. Build, use, remove.
-app.get('/admin/setup-images-bucket', async (req, res) => {
+// One-off: preview the certificate or progress card on a real phone before
+// this goes live for real subscribers — first time sending WhatsApp media
+// via Twilio in this codebase, worth confirming it actually works. Build,
+// use, remove. Usage: ?phone=234...&type=certificate|card
+app.get('/admin/preview-generated-image', async (req, res) => {
   if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
   try {
-    const { data, error } = await supabase.storage.createBucket('generated-images', { public: true });
-    if (error && !/already exists/i.test(error.message)) return res.status(500).send('Error: ' + error.message);
-    res.status(200).send(error ? 'Bucket already existed' : 'Bucket created: ' + JSON.stringify(data));
+    const phone = req.query.phone;
+    if (!phone) return res.status(400).send('phone query param required');
+    const type = req.query.type === 'card' ? 'card' : 'certificate';
+
+    let svg, caption;
+    if (type === 'certificate') {
+      svg = certificateSvg('Test Subscriber', 'Content Writing', new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }), 'SSNG-PREVIEW-TEST');
+      caption = 'Preview: certificate design (not a real completion).';
+    } else {
+      svg = progressCardSvg('Test Subscriber', 'Content Writing', 12, 90, 5);
+      caption = 'Preview: weekly progress card design.';
+    }
+    const png = await renderSvgToPngBuffer(svg);
+    const url = await uploadGeneratedImage(png, 'previews/' + type + '-' + Date.now() + '.png');
+    const sent = await sendMediaMessage(phone, caption, url);
+    res.status(200).send((sent ? 'Sent. ' : 'Send reported undelivered. ') + 'URL: ' + url);
   } catch (err) {
     res.status(500).send('Error: ' + err.message);
   }
