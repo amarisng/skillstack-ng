@@ -269,10 +269,27 @@ async function draftEmailReplyText(fromName, subject, body) {
 // should finish in seconds; without a backstop, a stuck connection just
 // hangs silently instead of failing loudly. Confirmed live 2026-08-31: a
 // run hung past 3+ minutes with no error surfaced anywhere.
+// Guards against overlapping runs: if a run is still going (a slow IMAP
+// connection, many candidates) when the next cron tick fires, node-cron
+// starts a second execution anyway. Both would see the same inbound email
+// as "new" (the dedup check-then-insert isn't atomic), both draft it and
+// notify — confirmed live 2026-09-13: Christopher got a duplicate draft and
+// Amaris got two identical "new draft ready" notifications for one email.
+let inboxCheckInProgress = false;
 async function checkInboxForReplies() {
+  if (inboxCheckInProgress) {
+    console.log('checkInboxForReplies already running, skipping this tick');
+    return { ok: true, skipped: true, reason: 'already in progress', drafted: [] };
+  }
+  inboxCheckInProgress = true;
   const TIMEOUT_MS = 60000;
+  // The lock is tied to the inner promise's real completion, not to the
+  // race below — if the soft timeout fires first, the inner call keeps
+  // running in the background, and the lock must stay held until it
+  // actually finishes, or a new tick could start concurrently with it.
+  const innerPromise = checkInboxForRepliesInner().finally(() => { inboxCheckInProgress = false; });
   return Promise.race([
-    checkInboxForRepliesInner(),
+    innerPromise,
     new Promise(resolve => setTimeout(() => resolve({ ok: false, error: 'Timed out after ' + TIMEOUT_MS + 'ms', drafted: [], debug: [] }), TIMEOUT_MS))
   ]);
 }
@@ -368,7 +385,15 @@ async function checkInboxForRepliesInner() {
         replyText;
 
       await client.append(draftsPath, rawDraft, ['\\Draft']);
-      await supabase.from('email_reply_drafts').insert({ message_id: messageId, from_address: fromAddress, subject });
+      const { error: insertError } = await supabase.from('email_reply_drafts').insert({ message_id: messageId, from_address: fromAddress, subject });
+      if (insertError) {
+        // Only realistic cause is the unique constraint on message_id — some
+        // other path already recorded this message. The draft is already in
+        // Gmail at this point (a harmless duplicate for Amaris to delete),
+        // but don't also count it as newly drafted or notify about it again.
+        console.error('email_reply_drafts insert failed for ' + messageId + ':', insertError.message);
+        continue;
+      }
       drafted.push(fromName + ' <' + fromAddress + '> — "' + subject + '"');
       checkpoint('drafted reply to ' + fromAddress);
       console.log('Drafted reply to ' + fromAddress);
@@ -2100,20 +2125,6 @@ app.get('/admin/preview-generated-image', async (req, res) => {
     if (email) results.email = await sendEmail(email, emailSubject, emailBody + '<p><a href="' + url + '">View image</a></p><img src="' + url + '" style="max-width:500px;display:block;margin-top:10px;">') ? 'sent' : 'failed';
 
     res.status(200).json(results);
-  } catch (err) {
-    res.status(500).send('Error: ' + err.message);
-  }
-});
-
-// One-off: check whether Christopher's 2 draft notifications were a real
-// dedup bug (same message_id drafted twice) or 2 genuinely separate inbound
-// messages. Build, use, remove.
-app.get('/admin/check-christopher-drafts', async (req, res) => {
-  if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
-  try {
-    const { data, error } = await supabase.from('email_reply_drafts').select('*').eq('from_address', 'chris.kk4u@gmail.com').order('created_at', { ascending: true });
-    if (error) return res.status(500).send('Error: ' + error.message);
-    res.status(200).json(data);
   } catch (err) {
     res.status(500).send('Error: ' + err.message);
   }
