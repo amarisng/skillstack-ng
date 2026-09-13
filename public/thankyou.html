@@ -437,6 +437,26 @@ src="https://www.facebook.com/tr?id=1968827687158458&ev=PageView&noscript=1"
       localStorage.removeItem('ssng_ref');
     }).catch(function() {});
   })();
+
+  // TikTok CompleteRegistration + Purchase — reads the track/plan/value the
+  // relevant track page stashed in localStorage right before sending them to
+  // Paystack (see the InitiateCheckout handler on that page), since
+  // Paystack's static Payment Page links don't pass transaction details
+  // back through the redirect. Falls back to firing with no product detail
+  // if someone somehow lands here without that (e.g. a bookmarked link).
+  (function() {
+    if (typeof ttq === 'undefined') return;
+    const raw = localStorage.getItem('ssng_purchase_intent');
+    const info = raw ? JSON.parse(raw) : null;
+    const payload = info ? {
+      contents: [{ content_id: info.track, content_type: 'product', content_name: info.label }],
+      value: info.value,
+      currency: 'NGN'
+    } : {};
+    ttq.track('CompleteRegistration', payload);
+    ttq.track('Purchase', payload);
+    localStorage.removeItem('ssng_purchase_intent');
+  })();
   function copyNumber() {
     navigator.clipboard.writeText('+15554075935').then(() => {
       const btn = document.getElementById('copyBtn');

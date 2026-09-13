@@ -707,5 +707,30 @@ src="https://www.facebook.com/tr?id=1968827687158458&ev=PageView&noscript=1"
     });
   })();
 </script>
+<script>
+// TikTok InitiateCheckout — fires on any Paystack payment link click, and
+// stashes track/plan/value in localStorage (same pattern this codebase
+// already uses for ssng_ref affiliate tracking) so /thankyou can read it
+// back after the Paystack redirect, since Paystack's static Payment Page
+// links don't carry transaction details back through the redirect.
+(function() {
+  var SLUG_INFO = {"p1kkgoo91-":{"track":"social_media_management","label":"Social Media Management","plan":"monthly","value":5000},"6aanjfut9m":{"track":"social_media_management","label":"Social Media Management","plan":"full","value":9000},"yn75oepjbw":{"track":"content_writing","label":"Content Writing","plan":"monthly","value":5000},"vd5zt2ws9q":{"track":"content_writing","label":"Content Writing","plan":"full","value":13000},"3ke4qasoo5":{"track":"digital_marketing","label":"Digital Marketing Fundamentals","plan":"monthly","value":5000},"wbmr9cgdyn":{"track":"digital_marketing","label":"Digital Marketing Fundamentals","plan":"full","value":13000},"2-h3igsfd2":{"track":"copywriting","label":"Copywriting & Persuasion","plan":"monthly","value":5000},"bo96lsmt2c":{"track":"copywriting","label":"Copywriting & Persuasion","plan":"full","value":13000},"x3irlfttwr":{"track":"sales_lead_generation","label":"Sales & Lead Generation","plan":"monthly","value":5000},"n28xp6t6so":{"track":"sales_lead_generation","label":"Sales & Lead Generation","plan":"full","value":13000},"r63q8robgg":{"track":"freelancing","label":"Freelancing & Getting Online Clients","plan":"monthly","value":5000},"m6p-e7pt98":{"track":"freelancing","label":"Freelancing & Getting Online Clients","plan":"full","value":13000}};
+  document.querySelectorAll('a[href*="paystack.shop"]').forEach(function(link) {
+    link.addEventListener('click', function() {
+      var slug = link.href.split('/').pop().split('?')[0];
+      var info = SLUG_INFO[slug];
+      if (!info) return;
+      if (typeof ttq !== 'undefined') {
+        ttq.track('InitiateCheckout', {
+          contents: [{ content_id: info.track, content_type: 'product', content_name: info.label }],
+          value: info.value,
+          currency: 'NGN'
+        });
+      }
+      localStorage.setItem('ssng_purchase_intent', JSON.stringify(info));
+    });
+  });
+})();
+</script>
 </body>
 </html>
