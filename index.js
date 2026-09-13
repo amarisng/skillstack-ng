@@ -2105,6 +2105,20 @@ app.get('/admin/preview-generated-image', async (req, res) => {
   }
 });
 
+// One-off: check whether Christopher's 2 draft notifications were a real
+// dedup bug (same message_id drafted twice) or 2 genuinely separate inbound
+// messages. Build, use, remove.
+app.get('/admin/check-christopher-drafts', async (req, res) => {
+  if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
+  try {
+    const { data, error } = await supabase.from('email_reply_drafts').select('*').eq('from_address', 'chris.kk4u@gmail.com').order('created_at', { ascending: true });
+    if (error) return res.status(500).send('Error: ' + error.message);
+    res.status(200).json(data);
+  } catch (err) {
+    res.status(500).send('Error: ' + err.message);
+  }
+});
+
 // Permanent: manually fire checkInboxForReplies() right now instead of
 // waiting up to 20 minutes for the cron — useful for spot-checking after
 // changes, given how many failure modes this integration turned out to have.
