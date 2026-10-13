@@ -2130,6 +2130,24 @@ app.get('/admin/preview-generated-image', async (req, res) => {
   }
 });
 
+// One-off: Emmanuel's full message history since signup — the 10-message
+// status view doesn't show the exact inbound text around 17:19 that seems
+// to have burned his Day 2 task slot. Build, use, remove.
+app.get('/admin/emmanuel-full-history', async (req, res) => {
+  if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
+  try {
+    const phone = '2349151042054';
+    const outbound = await twilioClient.messages.list({ to: 'whatsapp:+' + phone, limit: 100 });
+    const inbound = await twilioClient.messages.list({ from: 'whatsapp:+' + phone, limit: 100 });
+    const combined = outbound.concat(inbound)
+      .map(m => ({ dateSent: m.dateSent, direction: m.direction, status: m.status, errorCode: m.errorCode, body: m.body }))
+      .sort((a, b) => new Date(a.dateSent) - new Date(b.dateSent));
+    res.status(200).json({ count: combined.length, messages: combined });
+  } catch (err) {
+    res.status(500).send('Error: ' + err.message);
+  }
+});
+
 // One-off: find the most recently created premium (full-plan) subscriber,
 // to investigate why today's task feedback didn't go out. Build, use, remove.
 app.get('/admin/latest-premium-sub', async (req, res) => {
