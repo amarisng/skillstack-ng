@@ -226,16 +226,34 @@ async function getLesson(lessonNumber, track = 'copywriting') {
   return data;
 }
 
+// Confirmed live 2026-10-13: a subscriber (Emmanuel) sent "Haven't gotten
+// any lesson yet" — a complaint, not a task attempt, but it happened to be
+// exactly 5 words, clearing the caller's wordCount<5 pre-filter. Claude
+// correctly recognized it wasn't a real submission ("You have not submitted
+// a PAS copy for me to review"), but the caller advanced his day/streak and
+// marked the task slot used regardless of what the feedback actually said —
+// so when he sent his genuine task answer minutes later, he was rejected
+// with "you already submitted" and never got real feedback. Now asks Claude
+// to explicitly flag whether the submission is a genuine attempt, so the
+// caller can decide whether to actually consume the day's task slot.
 async function getFeedback(task, submission, feedbackPrompt) {
   const message = await anthropic.messages.create({
     model: 'claude-sonnet-4-6',
     max_tokens: 300,
     messages: [{
       role: 'user',
-      content: feedbackPrompt + '\n\nLesson task: ' + task + '\n\nStudent submission: ' + submission
+      content: 'Your first line must be exactly VALID or INVALID — INVALID if the student submission below is not a genuine attempt at the task (e.g. a question, a complaint, an unrelated message, asking for the lesson again), VALID if it is a real attempt even if the quality is poor. Then a newline, then your response.\n\n' +
+        feedbackPrompt + '\n\nLesson task: ' + task + '\n\nStudent submission: ' + submission
     }],
   });
-  return message.content[0].text;
+  const text = message.content[0].text;
+  const match = text.match(/^(VALID|INVALID)\s*\n([\s\S]*)/i);
+  if (match) {
+    return { isValid: match[1].toUpperCase() === 'VALID', text: match[2].trim() };
+  }
+  // Claude didn't follow the format — fail open (treat as valid) rather
+  // than silently blocking a real submission over a formatting miss.
+  return { isValid: true, text: text };
 }
 
 async function draftEmailReplyText(fromName, subject, body) {
@@ -950,7 +968,14 @@ if (sub.active === 'false' && cmd === 'CHANGETRACK') {
       return;
     }
     const feedback = await getFeedback(lesson.task, message, lesson.feedback_prompt);
-    await sendMessage(cleanPhone, 'Feedback on Day ' + sub.day_number + ':\n\n' + feedback + '\n\nStreak: ' + (sub.streak + 1) + ' days. Keep going!\n\nQuestions, stuck on something, or not sure what to do next? Just reply here — happy to help.');
+    if (!feedback.isValid) {
+      // Not a real task attempt (a question, a complaint, etc. that happened
+      // to clear the word-count filter) — explain and leave awaiting_task
+      // alone so their actual answer, whenever it comes, still gets graded.
+      await sendMessage(cleanPhone, feedback.text + '\n\nWhen you are ready, reply with your actual answer to today\'s task and I will give you real feedback.');
+      return;
+    }
+    await sendMessage(cleanPhone, 'Feedback on Day ' + sub.day_number + ':\n\n' + feedback.text + '\n\nStreak: ' + (sub.streak + 1) + ' days. Keep going!\n\nQuestions, stuck on something, or not sure what to do next? Just reply here — happy to help.');
     // Real content tops out at 65 lessons (90/60 "days" on the landing page
     // means calendar-day span, weekdays only — not a literal lesson count),
     // so completion is whatever day genuinely has no next lesson, not a
