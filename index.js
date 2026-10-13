@@ -2130,6 +2130,53 @@ app.get('/admin/preview-generated-image', async (req, res) => {
   }
 });
 
+// One-off: find the most recently created premium (full-plan) subscriber,
+// to investigate why today's task feedback didn't go out. Build, use, remove.
+app.get('/admin/latest-premium-sub', async (req, res) => {
+  if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
+  try {
+    const { data, error } = await supabase.from('subscribers').select('*').eq('plan_type', 'full').order('created_at', { ascending: false }).limit(3);
+    if (error) return res.status(500).send('Error: ' + error.message);
+    res.status(200).json(data);
+  } catch (err) {
+    res.status(500).send('Error: ' + err.message);
+  }
+});
+
+// One-off: list all Brevo email templates so we can identify and review the
+// actual content of the guide-download nurture sequence. Build, use, remove.
+app.get('/admin/list-brevo-templates', async (req, res) => {
+  if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
+  try {
+    const resp = await fetch('https://api.brevo.com/v3/smtp/templates?limit=50&sort=desc', {
+      headers: { 'api-key': process.env.BREVO_API_KEY },
+      signal: AbortSignal.timeout(15000)
+    });
+    const data = await resp.json();
+    const summary = (data.templates || []).map(t => ({ id: t.id, name: t.name, subject: t.subject, isActive: t.isActive }));
+    res.status(200).json({ count: summary.length, templates: summary });
+  } catch (err) {
+    res.status(500).send('Error: ' + err.message);
+  }
+});
+
+// One-off: fetch one Brevo template's full HTML content by ID. Build, use, remove.
+app.get('/admin/get-brevo-template', async (req, res) => {
+  if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
+  try {
+    const id = req.query.id;
+    if (!id) return res.status(400).send('id query param required');
+    const resp = await fetch('https://api.brevo.com/v3/smtp/templates/' + id, {
+      headers: { 'api-key': process.env.BREVO_API_KEY },
+      signal: AbortSignal.timeout(15000)
+    });
+    const data = await resp.json();
+    res.status(200).json({ id: data.id, name: data.name, subject: data.subject, htmlContent: data.htmlContent });
+  } catch (err) {
+    res.status(500).send('Error: ' + err.message);
+  }
+});
+
 // Permanent: manually fire checkInboxForReplies() right now instead of
 // waiting up to 20 minutes for the cron — useful for spot-checking after
 // changes, given how many failure modes this integration turned out to have.
