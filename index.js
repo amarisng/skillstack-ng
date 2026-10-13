@@ -2155,58 +2155,6 @@ app.get('/admin/preview-generated-image', async (req, res) => {
   }
 });
 
-// One-off: Emmanuel's full message history since signup — the 10-message
-// status view doesn't show the exact inbound text around 17:19 that seems
-// to have burned his Day 2 task slot. Build, use, remove.
-// One-off: give Emmanuel real feedback on the Day 2 task he actually
-// submitted (the Aqua water PAS copy), which got silently discarded by the
-// bug just fixed. His day_number is already correctly at 3 (he genuinely
-// did real work for both Day 1 and Day 2), so this only sends the feedback
-// he was owed — no state changes needed. Build, use, remove.
-app.get('/admin/fix-emmanuel', async (req, res) => {
-  if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
-  try {
-    const phone = '2349151042054';
-    const realSubmission = "You're feeling so thirsty on a Monday afternoon in the office and you need a cold water it's might feel like if you don't get water you might begin to feel weak or unable to satisfy the thirst, this is where Aqua water comes in with the big pack, you can never run out of water, once refrigerated over night, can last you almost the whole day while still cold and refreshing to drink";
-    const lesson = await getLesson(2, 'copywriting');
-    if (!lesson) return res.status(500).send('Day 2 copywriting lesson not found');
-    const feedback = await getFeedback(lesson.task, realSubmission, lesson.feedback_prompt);
-    const intro = 'Hi Emmanuel — really sorry about the mixup earlier. A short message you sent got misread as your Day 2 answer, which is on us and is now fixed. Here is real feedback on the PAS copy you actually submitted:\n\n';
-    const sent = await sendMessage(phone, intro + 'Feedback on Day 2:\n\n' + feedback.text + '\n\nKeep going! 💪');
-    res.status(200).send(sent ? 'Sent real feedback to Emmanuel' : 'Send reported undelivered');
-  } catch (err) {
-    res.status(500).send('Error: ' + err.message);
-  }
-});
-
-app.get('/admin/emmanuel-full-history', async (req, res) => {
-  if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
-  try {
-    const phone = '2349151042054';
-    const outbound = await twilioClient.messages.list({ to: 'whatsapp:+' + phone, limit: 100 });
-    const inbound = await twilioClient.messages.list({ from: 'whatsapp:+' + phone, limit: 100 });
-    const combined = outbound.concat(inbound)
-      .map(m => ({ dateSent: m.dateSent, direction: m.direction, status: m.status, errorCode: m.errorCode, body: m.body }))
-      .sort((a, b) => new Date(a.dateSent) - new Date(b.dateSent));
-    res.status(200).json({ count: combined.length, messages: combined });
-  } catch (err) {
-    res.status(500).send('Error: ' + err.message);
-  }
-});
-
-// One-off: find the most recently created premium (full-plan) subscriber,
-// to investigate why today's task feedback didn't go out. Build, use, remove.
-app.get('/admin/latest-premium-sub', async (req, res) => {
-  if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
-  try {
-    const { data, error } = await supabase.from('subscribers').select('*').eq('plan_type', 'full').order('created_at', { ascending: false }).limit(3);
-    if (error) return res.status(500).send('Error: ' + error.message);
-    res.status(200).json(data);
-  } catch (err) {
-    res.status(500).send('Error: ' + err.message);
-  }
-});
-
 // One-off: list all Brevo email templates so we can identify and review the
 // actual content of the guide-download nurture sequence. Build, use, remove.
 app.get('/admin/list-brevo-templates', async (req, res) => {
