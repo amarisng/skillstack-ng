@@ -2189,6 +2189,29 @@ app.get('/admin/get-brevo-template', async (req, res) => {
   }
 });
 
+// One-off: Christopher Okafor Day 14 diagnostic
+app.get('/admin/christopher-diag', async (req, res) => {
+  if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
+  try {
+    const { data: subs } = await supabase.from('subscribers').select('*').ilike('email', '%chris.kk4u%');
+    const sub = (subs || [])[0];
+    if (!sub) return res.status(404).json({ error: 'not found', subs });
+    const phone = sub.phone;
+    const [to, from] = await Promise.all([
+      twilioClient.messages.list({ to: 'whatsapp:+' + phone, limit: 200 }),
+      twilioClient.messages.list({ from: 'whatsapp:+' + phone, limit: 200 })
+    ]);
+    const history = [...to, ...from].sort((a, b) => new Date(a.dateSent || a.dateCreated) - new Date(b.dateSent || b.dateCreated)).map(m => ({
+      t: m.dateSent || m.dateCreated, dir: m.direction === 'inbound' ? 'IN' : 'OUT', status: m.status, err: m.errorCode, body: (m.body || '').slice(0, 160)
+    }));
+    const { data: lessons, error: lessonErr } = await supabase.from('lessons').select('lesson_number, track, title').eq('track', sub.track).gte('lesson_number', 11).lte('lesson_number', 17).order('lesson_number');
+    const { data: day14all } = await supabase.from('lessons').select('id, lesson_number, track').eq('lesson_number', 14);
+    res.status(200).json({ sub, lessons, lessonErr, day14all, historyCount: history.length, history });
+  } catch (err) {
+    res.status(500).send('Error: ' + err.message);
+  }
+});
+
 // Permanent: manually fire checkInboxForReplies() right now instead of
 // waiting up to 20 minutes for the cron — useful for spot-checking after
 // changes, given how many failure modes this integration turned out to have.
