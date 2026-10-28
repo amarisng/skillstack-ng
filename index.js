@@ -818,7 +818,7 @@ async function handleOnboarding(phone, message) {
   }
 // Allow inactive subscribers to correct their track before payment
   if (cmd === 'HELP' || cmd === 'SUPPORT') {
-    await sendMessage(cleanPhone, 'SkillStack NG Support 🛠️\n\nFor any issue, email us at:\nsupport@skillstackng.com\n\nWe respond within 24 hours on weekdays.\n\nUseful commands:\nLESSON — resend today\'s lesson\nSTATUS — check your progress\nSTOP — cancel your subscription\nHELP — show this message\n\nFor general enquiries: hello@skillstackng.com');
+    await sendMessage(cleanPhone, 'SkillStack NG Support 🛠️\n\nFor any issue, email us at:\nsupport@skillstackng.com\n\nWe respond within 24 hours on weekdays.\n\nUseful commands:\nLESSON — resend today\'s lesson\nSTATUS — check your progress\nPAUSE — pause your lessons\nHELP — show this message\n\nTo cancel your subscription or for billing issues, email hello@skillstackng.com — it cannot be done over WhatsApp.');
     return;
   }
 if (sub.active === 'false' && cmd === 'CHANGETRACK') {
@@ -951,9 +951,15 @@ if (sub.active === 'false' && cmd === 'CHANGETRACK') {
       await sendMessage(cleanPhone, '⏸️ Your lessons have been paused, ' + sub.name + '.\n\nYou are on Day ' + sub.day_number + '. Reply RESUME when you are ready to continue — you will pick up exactly where you left off. 🙏');
       return;
     }
-    if (cmd === 'STOP' || cmd === 'CANCEL') {
-      await supabase.from('subscribers').update({ active: 'false' }).eq('phone', cleanPhone);
-      await sendMessage(cleanPhone, '🛑 Your SkillStack NG subscription has been cancelled, ' + sub.name + '.\n\nYou completed Day ' + sub.day_number + ' of your track. If you ever want to continue, email support@skillstackng.com and we will reactivate your account.\n\nThank you for learning with us. 🙏');
+    // Cancelling/refunds/billing can't be done over WhatsApp: STOP used to
+    // flip active=false and claim "cancelled", but never touched the Paystack
+    // subscription, so people were still being billed (a subscriber had to be
+    // unsubscribed manually on Paystack, Oct 2026). Send them to email, where
+    // Amaris actually cancels billing.
+    const EMAIL_HELP_MSG = 'To cancel your subscription, or for any billing or account issue, please email us at hello@skillstackng.com 📧\n\nInclude your WhatsApp number and the email you paid with, and we will sort it out within 24 hours on weekdays. Cancellations cannot be done over WhatsApp.\n\nWant a break instead? Reply PAUSE and your lessons will stop until you reply RESUME.';
+    const billingIntent = message.trim().split(/\s+/).length <= 40 && /\b(cancel|unsubscribe|un-subscribe|refund|chargeback|charged me|stop (my )?(sub|subscription|payment|charg)|stop charging|deduct|billing)/i.test(message);
+    if (cmd === 'STOP' || cmd === 'CANCEL' || billingIntent) {
+      await sendMessage(cleanPhone, EMAIL_HELP_MSG);
       return;
     }
 
@@ -989,7 +995,7 @@ if (sub.active === 'false' && cmd === 'CHANGETRACK') {
       } catch (e) {
         console.error('Missed-lesson resend check failed:', e.message);
       }
-      await sendMessage(cleanPhone, feedback.text + '\n\nWhen you are ready, reply with your actual answer to today\'s task and I will give you real feedback.');
+      await sendMessage(cleanPhone, feedback.text + '\n\nWhen you are ready, reply with your actual answer to today\'s task and I will give you real feedback.\n\nHaving a problem with your lessons or account? Email hello@skillstackng.com — that is the fastest way to reach a real person.');
       return;
     }
     await sendMessage(cleanPhone, 'Feedback on Day ' + sub.day_number + ':\n\n' + feedback.text + '\n\nStreak: ' + (sub.streak + 1) + ' days. Keep going!\n\nQuestions, stuck on something, or not sure what to do next? Just reply here — happy to help.');
@@ -2201,44 +2207,6 @@ app.get('/admin/get-brevo-template', async (req, res) => {
     });
     const data = await resp.json();
     res.status(200).json({ id: data.id, name: data.name, subject: data.subject, htmlContent: data.htmlContent });
-  } catch (err) {
-    res.status(500).send('Error: ' + err.message);
-  }
-});
-
-// One-off: send Christopher Okafor his undelivered Day 14 lesson
-app.get('/admin/christopher-send-day14', async (req, res) => {
-  if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
-  try {
-    const sub = await getSubscriber('2348033220047');
-    const lesson = await getLesson(sub.day_number, sub.track);
-    await sendMessage(sub.phone, 'Hi Christopher — sorry about the wait. Your Day ' + sub.day_number + ' lesson failed to reach you three mornings in a row because WhatsApp blocks our scheduled messages when you have not messaged us in the last 24 hours. That is on us, not you. Here it is:');
-    await sendMessage(sub.phone, formatLesson(lesson, sub.day_number, sub.track));
-    await supabase.from('subscribers').update({ awaiting_task: true, lesson_delivered_at: new Date().toISOString() }).eq('phone', sub.phone);
-    res.status(200).send('Sent Day ' + sub.day_number + ' to Christopher');
-  } catch (err) {
-    res.status(500).send('Error: ' + err.message);
-  }
-});
-
-// One-off: Christopher Okafor Day 14 diagnostic
-app.get('/admin/christopher-diag', async (req, res) => {
-  if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
-  try {
-    const { data: subs } = await supabase.from('subscribers').select('*').ilike('email', '%chris.kk4u%');
-    const sub = (subs || [])[0];
-    if (!sub) return res.status(404).json({ error: 'not found', subs });
-    const phone = sub.phone;
-    const [to, from] = await Promise.all([
-      twilioClient.messages.list({ to: 'whatsapp:+' + phone, limit: 200 }),
-      twilioClient.messages.list({ from: 'whatsapp:+' + phone, limit: 200 })
-    ]);
-    const history = [...to, ...from].sort((a, b) => new Date(a.dateSent || a.dateCreated) - new Date(b.dateSent || b.dateCreated)).map(m => ({
-      t: m.dateSent || m.dateCreated, dir: m.direction === 'inbound' ? 'IN' : 'OUT', status: m.status, err: m.errorCode, body: (m.body || '').slice(0, 160)
-    }));
-    const { data: lessons, error: lessonErr } = await supabase.from('lessons').select('lesson_number, track, title').eq('track', sub.track).gte('lesson_number', 11).lte('lesson_number', 17).order('lesson_number');
-    const { data: day14all } = await supabase.from('lessons').select('id, lesson_number, track').eq('lesson_number', 14);
-    res.status(200).json({ sub, lessons, lessonErr, day14all, historyCount: history.length, history });
   } catch (err) {
     res.status(500).send('Error: ' + err.message);
   }
