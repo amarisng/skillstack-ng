@@ -2212,6 +2212,26 @@ app.get('/admin/get-brevo-template', async (req, res) => {
   }
 });
 
+// One-off: send Christopher Okafor the approved Day 14 follow-up email
+app.get('/admin/email-christopher-day14', async (req, res) => {
+  if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
+  try {
+    const sub = await getSubscriber('2348033220047');
+    if (!sub || !sub.email) return res.status(404).send('No email on record');
+    const html = '<p>Hi Chris,</p>' +
+      '<p>Your Day 14 lesson, Writing The Body Of A Blog Post, is now on your WhatsApp. I sent it this evening, along with an apology. Thank you for your patience and for flagging this so clearly.</p>' +
+      '<p>The cause was on our side. Our scheduled 8am messages fail whenever WhatsApp has not heard from you in the last 24 hours. Your Day 13 and Day 14 lessons were blocked that way several mornings. Each time you wrote in, nothing re-sent the lesson. We have now fixed that, so if a lesson ever fails to arrive and you message us, it will be re-sent straight away.</p>' +
+      '<p>To keep lessons arriving on time, send a short reply on WhatsApp each day, even just a few words. That keeps the WhatsApp window open.</p>' +
+      '<p>If you ever have an issue, emailing hello@skillstackng.com is the fastest way to reach a real person.</p>' +
+      '<p>Well done on completing 13 days. You are doing great.</p>' +
+      '<p>Regards,<br>Amaris<br>SkillStack NG</p>';
+    const ok = await sendEmail(sub.email, 'Re: Mix-up with My Lesson', html);
+    res.status(ok ? 200 : 500).send(ok ? 'Email sent to ' + sub.email : 'Send failed');
+  } catch (err) {
+    res.status(500).send('Error: ' + err.message);
+  }
+});
+
 // Permanent: manually fire checkInboxForReplies() right now instead of
 // waiting up to 20 minutes for the cron — useful for spot-checking after
 // changes, given how many failure modes this integration turned out to have.
