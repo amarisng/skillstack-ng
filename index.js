@@ -972,6 +972,23 @@ if (sub.active === 'false' && cmd === 'CHANGETRACK') {
       // Not a real task attempt (a question, a complaint, etc. that happened
       // to clear the word-count filter) — explain and leave awaiting_task
       // alone so their actual answer, whenever it comes, still gets graded.
+      // Confirmed live 2026-10-28 (Christopher Okafor): his Day 14 lesson
+      // failed with 63016 three mornings running; every complaint he sent
+      // opened a fresh session but nothing re-sent the lesson, and the AI
+      // reply wrongly told him "the task is already here". If today's lesson
+      // never delivered, a message from them is our chance to send it now.
+      try {
+        const recent = await twilioClient.messages.list({ to: 'whatsapp:+' + cleanPhone, limit: 8 });
+        const missed = recent.some(m => (m.body || '').includes('Day ' + sub.day_number + ' of') && ['undelivered', 'failed'].includes(m.status));
+        if (missed) {
+          await sendMessage(cleanPhone, 'Sorry — your Day ' + sub.day_number + ' lesson did not reach you. WhatsApp blocks our scheduled messages when you have not messaged us in the last 24 hours. Here it is now:');
+          await sendMessage(cleanPhone, formatLesson(lesson, sub.day_number, sub.track));
+          await supabase.from('subscribers').update({ awaiting_task: true, lesson_delivered_at: new Date().toISOString() }).eq('phone', cleanPhone);
+          return;
+        }
+      } catch (e) {
+        console.error('Missed-lesson resend check failed:', e.message);
+      }
       await sendMessage(cleanPhone, feedback.text + '\n\nWhen you are ready, reply with your actual answer to today\'s task and I will give you real feedback.');
       return;
     }
@@ -2184,6 +2201,21 @@ app.get('/admin/get-brevo-template', async (req, res) => {
     });
     const data = await resp.json();
     res.status(200).json({ id: data.id, name: data.name, subject: data.subject, htmlContent: data.htmlContent });
+  } catch (err) {
+    res.status(500).send('Error: ' + err.message);
+  }
+});
+
+// One-off: send Christopher Okafor his undelivered Day 14 lesson
+app.get('/admin/christopher-send-day14', async (req, res) => {
+  if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
+  try {
+    const sub = await getSubscriber('2348033220047');
+    const lesson = await getLesson(sub.day_number, sub.track);
+    await sendMessage(sub.phone, 'Hi Christopher — sorry about the wait. Your Day ' + sub.day_number + ' lesson failed to reach you three mornings in a row because WhatsApp blocks our scheduled messages when you have not messaged us in the last 24 hours. That is on us, not you. Here it is:');
+    await sendMessage(sub.phone, formatLesson(lesson, sub.day_number, sub.track));
+    await supabase.from('subscribers').update({ awaiting_task: true, lesson_delivered_at: new Date().toISOString() }).eq('phone', sub.phone);
+    res.status(200).send('Sent Day ' + sub.day_number + ' to Christopher');
   } catch (err) {
     res.status(500).send('Error: ' + err.message);
   }
