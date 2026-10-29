@@ -2212,6 +2212,36 @@ app.get('/admin/get-brevo-template', async (req, res) => {
   }
 });
 
+// One-off (read-only): guide-funnel numbers — leads, lead->paid, Brevo stats
+app.get('/admin/funnel-report', async (req, res) => {
+  if (req.query.key !== VERIFY_TOKEN) return res.status(403).send('Forbidden');
+  try {
+    const { data: leads } = await supabase.from('leads').select('name,email,phone,track_interest,source,created_at').limit(5000);
+    const { data: subs } = await supabase.from('subscribers').select('email,phone,track,plan_type,active,day_number,created_at').limit(5000);
+    const L = leads || [], S = subs || [];
+    const day = d => (d || '').slice(0, 10);
+    const count = (arr, f) => arr.reduce((m, x) => { const k = f(x) || 'none'; m[k] = (m[k] || 0) + 1; return m; }, {});
+    const subByEmail = {}, subByPhone = {};
+    S.forEach(s => { if (s.email) subByEmail[s.email.toLowerCase().trim()] = s; if (s.phone) subByPhone[s.phone] = s; });
+    const converted = L.filter(l => (l.email && subByEmail[l.email.toLowerCase().trim()]) || (l.phone && subByPhone[l.phone]));
+    const paidSubs = S.filter(s => s.plan_type && s.created_at);
+    const brevo = async (path) => {
+      try { const r = await fetch('https://api.brevo.com/v3' + path, { headers: { 'api-key': process.env.BREVO_API_KEY }, signal: AbortSignal.timeout(15000) }); return await r.json(); }
+      catch (e) { return { error: e.message }; }
+    };
+    const [list3, report] = await Promise.all([brevo('/contacts/lists/3'), brevo('/smtp/statistics/aggregatedReport?days=90')]);
+    res.status(200).json({
+      leads: { total: L.length, withPhone: L.filter(l => l.phone).length, byTrack: count(L, l => l.track_interest), bySource: count(L, l => l.source), byDay: count(L, l => day(l.created_at)) },
+      subscribers: { total: S.length, byPlan: count(S, s => s.plan_type), byTrack: count(S, s => s.track), byCreatedDay: count(paidSubs, s => day(s.created_at)) },
+      leadToSubscriber: { converted: converted.length, ofLeads: L.length, rate: L.length ? (converted.length / L.length * 100).toFixed(1) + '%' : null, convertedTracks: count(converted, l => l.track_interest) },
+      brevoList3: { totalSubscribers: list3.totalSubscribers, uniqueSubscribers: list3.uniqueSubscribers, totalBlacklisted: list3.totalBlacklisted, error: list3.error || list3.message },
+      brevoAggregate90d: report
+    });
+  } catch (err) {
+    res.status(500).send('Error: ' + err.message);
+  }
+});
+
 // Permanent: manually fire checkInboxForReplies() right now instead of
 // waiting up to 20 minutes for the cron — useful for spot-checking after
 // changes, given how many failure modes this integration turned out to have.

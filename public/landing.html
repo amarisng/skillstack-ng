@@ -1067,6 +1067,9 @@ src="https://www.facebook.com/tr?id=1968827687158458&ev=PageView&noscript=1"
       var slug = link.href.split('/').pop().split('?')[0];
       var info = SLUG_INFO[slug];
       if (!info) return;
+      if (typeof fbq !== 'undefined') {
+        fbq('track', 'InitiateCheckout', { value: info.value, currency: 'NGN', content_name: info.label, content_ids: [info.track], content_type: 'product' });
+      }
       if (typeof ttq !== 'undefined') {
         ttq.track('InitiateCheckout', {
           contents: [{ content_id: info.track, content_type: 'product', content_name: info.label }],

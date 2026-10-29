@@ -444,17 +444,23 @@ src="https://www.facebook.com/tr?id=1968827687158458&ev=PageView&noscript=1"
   // Paystack's static Payment Page links don't pass transaction details
   // back through the redirect. Falls back to firing with no product detail
   // if someone somehow lands here without that (e.g. a bookmarked link).
+  // Meta Purchase is fired here too, only when real value was stashed (Meta
+  // rejects a Purchase with no value/currency).
   (function() {
-    if (typeof ttq === 'undefined') return;
     const raw = localStorage.getItem('ssng_purchase_intent');
     const info = raw ? JSON.parse(raw) : null;
-    const payload = info ? {
-      contents: [{ content_id: info.track, content_type: 'product', content_name: info.label }],
-      value: info.value,
-      currency: 'NGN'
-    } : {};
-    ttq.track('CompleteRegistration', payload);
-    ttq.track('Purchase', payload);
+    if (typeof fbq !== 'undefined' && info) {
+      fbq('track', 'Purchase', { value: info.value, currency: 'NGN', content_name: info.label, content_ids: [info.track], content_type: 'product' });
+    }
+    if (typeof ttq !== 'undefined') {
+      const payload = info ? {
+        contents: [{ content_id: info.track, content_type: 'product', content_name: info.label }],
+        value: info.value,
+        currency: 'NGN'
+      } : {};
+      ttq.track('CompleteRegistration', payload);
+      ttq.track('Purchase', payload);
+    }
     localStorage.removeItem('ssng_purchase_intent');
   })();
   function copyNumber() {

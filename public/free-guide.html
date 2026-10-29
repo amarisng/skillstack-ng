@@ -307,6 +307,12 @@ async function submitGuide() {
     });
   } catch(e) { /* fail silently */ }
 
+  try {
+    if (typeof fbq !== 'undefined') fbq('track', 'Lead', { content_name: 'Income Guide', content_category: track || 'not_specified' });
+    if (typeof ttq !== 'undefined') ttq.track('SubmitForm', { content_name: 'Income Guide' });
+    if (typeof gtag !== 'undefined') gtag('event', 'generate_lead', { method: 'free-guide' });
+  } catch(e) {}
+
   document.getElementById('guideForm').style.display = 'none';
   document.getElementById('formSuccess').style.display = 'block';
 }
